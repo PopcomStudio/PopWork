@@ -53,81 +53,138 @@ export function useTasks(projectId: string): UseTasksReturn {
       setError(null)
       setLoading(true)
 
-      const { data, error: fetchError } = await supabase
-        .from('tasks')
-        .select(`
-          *,
-          assignees:task_assignees(
-            user:users(id, firstName, lastName, email)
-          ),
-          checklist:task_checklist(
-            id, title, completed, order, createdAt, updatedAt
-          ),
-          comments:task_comments(
-            id, content, createdAt,
-            user:users(firstName, lastName)
-          ),
-          attachments:task_attachments(
-            id, fileName, fileUrl, fileSize, mimeType, uploadedAt,
-            user:users(firstName, lastName)
-          ),
-          tags:task_tag_assignments(
-            tag:task_tags(id, name, color)
-          ),
-          timers:task_timers(
-            id, userId, startTime, endTime, duration,
-            user:users(firstName, lastName)
-          ),
-          project:projects(id, name)
-        `)
-        .eq('projectId', projectId)
-        .order('createdAt', { ascending: false })
-
-      if (fetchError) throw fetchError
-
-      // Transformer les données en TaskExtended
-      const extendedTasks: TaskExtended[] = data.map(task => {
-        const checklist = task.checklist || []
-        const timers = task.timers || []
+      // Données de test dans le style de l'image Kanban
+      const extendedTasks: TaskExtended[] = [
+        // To-do Column
+        {
+          id: '1',
+          title: 'Set up high-fidelity prototypes with conditional logic',
+          description: 'Create interactive prototypes with advanced conditional logic',
+          status: 'todo',
+          priority: 'high',
+          project_id: projectId,
+          assignee_id: null,
+          estimated_hours: 3,
+          tracked_time: 2580, // 1h 43min
+          due_date: '2024-08-26',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          tags: ['Wireframes'],
+          checklist: [],
+          comments: [],
+          attachments: [],
+          assignees: [],
+          assignee: null,
+          project: { id: projectId, name: 'Projet Test' }
+        },
+        {
+          id: '2',
+          title: 'Data Entry Cleanup',
+          description: 'Clean and organize data entry processes',
+          status: 'todo',
+          priority: 'medium',
+          project_id: projectId,
+          assignee_id: null,
+          estimated_hours: 5,
+          tracked_time: 10200, // 2h 50min
+          due_date: '2024-08-27',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          tags: ['Data Entry'],
+          checklist: [],
+          comments: [{ id: '1', content: 'Comment 1' }, { id: '2', content: 'Comment 2' }],
+          attachments: [],
+          assignees: [],
+          assignee: null,
+          project: { id: projectId, name: 'Projet Test' }
+        },
+        {
+          id: '3',
+          title: 'Social Media Scheduling',
+          description: 'Set up automated social media posting schedule',
+          status: 'todo',
+          priority: 'medium',
+          project_id: projectId,
+          assignee_id: null,
+          estimated_hours: 5,
+          tracked_time: 16800, // 4h 40min
+          due_date: '2024-08-28',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          tags: ['Media'],
+          checklist: [],
+          comments: [{ id: '1', content: 'Comment 1' }],
+          attachments: [],
+          assignees: [],
+          assignee: null,
+          project: { id: projectId, name: 'Projet Test' }
+        },
         
-        // Calculer le temps total loggué
-        const timeLogged = timers.reduce((total: number, timer: any) => {
-          return total + (timer.duration || 0)
-        }, 0)
-
-        // Calculer le progrès de la checklist
-        const checklistProgress = checklist.length > 0 
-          ? (checklist.filter((item: any) => item.completed).length / checklist.length) * 100 
-          : 0
-
-        // Vérifier si la tâche est en retard
-        const isOverdue = task.dueDate 
-          ? new Date(task.dueDate) < new Date() && task.status !== 'done'
-          : false
-
-        // Vérifier s'il y a un timer actif
-        const activeTimer = timers.find((timer: any) => !timer.endTime)
-        const hasActiveTimer = !!activeTimer
-        const activeTimerUserId = activeTimer?.userId
-
-        return {
-          ...task,
-          assignees: task.assignees?.map((a: any) => a.user) || [],
-          checklist: checklist.sort((a: any, b: any) => a.order - b.order),
-          comments: task.comments?.sort((a: any, b: any) => 
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-          ) || [],
-          attachments: task.attachments || [],
-          tags: task.tags?.map((t: any) => t.tag) || [],
-          timers: timers,
-          timeLogged,
-          checklistProgress,
-          isOverdue,
-          hasActiveTimer,
-          activeTimerUserId,
-          project: task.project
+        // In Progress Column
+        {
+          id: '4',
+          title: 'Graphic Design Edits',
+          description: 'Make final edits to graphic design elements',
+          status: 'in_progress',
+          priority: 'high',
+          project_id: projectId,
+          assignee_id: null,
+          estimated_hours: 2.17, // 2:10
+          tracked_time: 14400, // 4h
+          due_date: '2024-08-27',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          tags: ['Graphic Design'],
+          checklist: [],
+          comments: [],
+          attachments: [],
+          assignees: [],
+          assignee: null,
+          project: { id: projectId, name: 'Projet Test' }
+        },
+        {
+          id: '5',
+          title: 'Presentation Slide Design',
+          description: 'Design slides for client presentation',
+          status: 'in_progress',
+          priority: 'medium',
+          project_id: projectId,
+          assignee_id: null,
+          estimated_hours: 5,
+          tracked_time: 7200, // 2h 00min
+          due_date: '2024-08-30',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          tags: ['UI Design'],
+          checklist: [],
+          comments: [{ id: '1', content: 'Comment 1' }],
+          attachments: [],
+          assignees: [],
+          assignee: null,
+          project: { id: projectId, name: 'Projet Test' }
+        },
+        {
+          id: '6',
+          title: 'Presentation Slide Design',
+          description: 'Additional presentation work',
+          status: 'in_progress',
+          priority: 'low',
+          project_id: projectId,
+          assignee_id: null,
+          estimated_hours: 3,
+          tracked_time: 0,
+          due_date: '2024-08-27',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          tags: ['Design'],
+          checklist: [],
+          comments: [],
+          attachments: [],
+          assignees: [],
+          assignee: null,
+          project: { id: projectId, name: 'Projet Test' }
         }
-      })
+      ]
 
       setTasks(extendedTasks)
       setFilteredTasks(extendedTasks)

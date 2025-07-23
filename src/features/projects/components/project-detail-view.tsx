@@ -47,6 +47,7 @@ import {
 } from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Checkbox } from '@/components/ui/checkbox'
+import { KanbanBoard } from './kanban/KanbanBoard'
 
 interface ProjectDetailViewProps {
   projectId: string
@@ -523,16 +524,7 @@ export function ProjectDetailView({ projectId }: ProjectDetailViewProps) {
 
           {/* Onglet Kanban */}
           <TabsContent value="kanban" className="space-y-6 mt-6">
-            <div className="flex items-center gap-2 mb-6">
-              <IconColumns className="h-5 w-5" />
-              <h2 className="text-xl font-semibold">Tableau Kanban</h2>
-            </div>
-            
-            <div className="text-center py-16">
-              <IconColumns className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <p className="text-muted-foreground mb-2">Vue Kanban en cours de développement</p>
-              <p className="text-sm text-muted-foreground">Ici s'affichera le tableau de gestion des tâches</p>
-            </div>
+            <KanbanBoard projectId={projectId} />
           </TabsContent>
 
           {/* Onglet Gant */}
@@ -545,7 +537,7 @@ export function ProjectDetailView({ projectId }: ProjectDetailViewProps) {
             <div className="text-center py-16">
               <IconTimeline className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <p className="text-muted-foreground mb-2">Diagramme de Gant en cours de développement</p>
-              <p className="text-sm text-muted-foreground">Ici s'affichera la planification temporelle du projet</p>
+              <p className="text-sm text-muted-foreground">Ici s&apos;affichera la planification temporelle du projet</p>
             </div>
           </TabsContent>
 
@@ -559,7 +551,7 @@ export function ProjectDetailView({ projectId }: ProjectDetailViewProps) {
             <div className="text-center py-16">
               <IconCalendar className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <p className="text-muted-foreground mb-2">Vue calendrier en cours de développement</p>
-              <p className="text-sm text-muted-foreground">Ici s'affichera le planning des tâches et échéances</p>
+              <p className="text-sm text-muted-foreground">Ici s&apos;affichera le planning des tâches et échéances</p>
             </div>
           </TabsContent>
 
@@ -573,7 +565,7 @@ export function ProjectDetailView({ projectId }: ProjectDetailViewProps) {
             <div className="text-center py-16">
               <IconFolder className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <p className="text-muted-foreground mb-2">Gestion des fichiers en cours de développement</p>
-              <p className="text-sm text-muted-foreground">Ici s'affichera l'espace de stockage des documents projet</p>
+              <p className="text-sm text-muted-foreground">Ici s&apos;affichera l&apos;espace de stockage des documents projet</p>
             </div>
           </TabsContent>
                      {/* Onglet Administration */}
@@ -586,7 +578,7 @@ export function ProjectDetailView({ projectId }: ProjectDetailViewProps) {
              <div className="text-center py-16">
                <IconSettings className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                <p className="text-muted-foreground mb-2">Administration du projet en cours de développement</p>
-               <p className="text-sm text-muted-foreground">Ici s'affichera les paramètres du projet</p>
+               <p className="text-sm text-muted-foreground">Ici s&apos;affichera les paramètres du projet</p>
              </div>
            </TabsContent>
         </Tabs>
@@ -653,7 +645,7 @@ export function ProjectDetailView({ projectId }: ProjectDetailViewProps) {
               <div className="space-y-2">
                 <Label>Assignation d'équipe</Label>
                 <p className="text-sm text-muted-foreground">
-                  Sélectionnez les membres de l'équipe qui travailleront sur ce projet.
+                  Sélectionnez les membres de l&apos;équipe qui travailleront sur ce projet.
                 </p>
               </div>
 

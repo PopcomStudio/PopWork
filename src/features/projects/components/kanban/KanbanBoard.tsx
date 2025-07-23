@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useMemo } from 'react'
+import React, { useState } from 'react'
 import {
   DndContext,
   DragEndEvent,
@@ -11,73 +11,50 @@ import {
   useSensors,
   closestCorners,
 } from '@dnd-kit/core'
-import { 
-  SortableContext, 
-  horizontalListSortingStrategy 
-} from '@dnd-kit/sortable'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import {
-  IconPlus,
-  IconFilter,
-  IconSearch,
-  IconRefresh,
-  IconListCheck,
-  IconClock,
-  IconAlertTriangle
-} from '@tabler/icons-react'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { IconFilter, IconRefresh, IconPlus, IconAlertTriangle } from '@tabler/icons-react'
 
 import { useTasks } from '../../hooks/useTasks'
-import { useTaskTimer } from '../../hooks/useTaskTimer'
-import { 
-  TaskExtended, 
-  TaskStatus, 
-  DEFAULT_KANBAN_COLUMNS,
-  KanbanColumn,
-  TaskFilters 
-} from '../../types/kanban'
-
-import { KanbanColumn as KanbanColumnComponent } from './KanbanColumn'
+import { TaskExtended, TaskStatus } from '../../types/kanban'
+import { KanbanColumn } from './KanbanColumn'
 import { TaskCard } from './TaskCard'
 import { TaskModal } from './TaskModal'
-import { TaskFilters as TaskFiltersComponent } from './TaskFilters'
+import { TaskFilters } from './TaskFilters'
 
 interface KanbanBoardProps {
   projectId: string
-  className?: string
 }
 
-export function KanbanBoard({ projectId, className }: KanbanBoardProps) {
-  const [activeTask, setActiveTask] = useState<TaskExtended | null>(null)
-  const [selectedTask, setSelectedTask] = useState<TaskExtended | null>(null)
-  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false)
-  const [showFilters, setShowFilters] = useState(false)
-  const [isCreating, setIsCreating] = useState(false)
+const KANBAN_COLUMNS = [
+  { id: 'todo', title: 'To-do', status: 'todo' as TaskStatus },
+  { id: 'in_progress', title: 'In Progress', status: 'in_progress' as TaskStatus },
+  { id: 'review', title: 'Review Ready', status: 'review' as TaskStatus },
+  { id: 'done', title: 'Done', status: 'done' as TaskStatus },
+]
 
+export function KanbanBoard({ projectId }: KanbanBoardProps) {
   const {
     tasks,
     loading,
     error,
-    stats,
     createTask,
     updateTask,
-    deleteTask,
     moveTask,
-    assignUser,
-    unassignUser,
-    applyFilters,
-    clearFilters,
+    getTasksByStatus,
     refreshTasks,
-    getTasksByStatus
   } = useTasks(projectId)
 
-  const { activeTimer } = useTaskTimer()
+  const [activeTask, setActiveTask] = useState<TaskExtended | null>(null)
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false)
+  const [selectedTask, setSelectedTask] = useState<TaskExtended | null>(null)
+  const [isCreating, setIsCreating] = useState(false)
+  const [showFilters, setShowFilters] = useState(false)
 
-  // Configuration des sensors pour le drag & drop
+  // Configuration DnD
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -85,17 +62,6 @@ export function KanbanBoard({ projectId, className }: KanbanBoardProps) {
       },
     })
   )
-
-  // Créer les colonnes avec les compteurs
-  const columns: KanbanColumn[] = useMemo(() => {
-    return DEFAULT_KANBAN_COLUMNS.map(col => ({
-      ...col,
-      count: getTasksByStatus(col.status).length
-    }))
-  }, [tasks, getTasksByStatus])
-
-  // IDs des colonnes pour SortableContext
-  const columnIds = columns.map(col => col.id)
 
   // Gestion du début de drag
   const handleDragStart = (event: DragStartEvent) => {
@@ -117,7 +83,7 @@ export function KanbanBoard({ projectId, className }: KanbanBoardProps) {
     const overId = over.id as string
 
     // Vérifier si on dépose sur une colonne
-    const targetColumn = columns.find(col => col.id === overId)
+    const targetColumn = KANBAN_COLUMNS.find(col => col.id === overId)
     if (targetColumn) {
       try {
         await moveTask(taskId, targetColumn.status)
@@ -127,82 +93,78 @@ export function KanbanBoard({ projectId, className }: KanbanBoardProps) {
     }
   }
 
-  // Ouvrir le modal de création de tâche
-  const handleCreateTask = (status?: TaskStatus) => {
+  // Créer une tâche pour un statut spécifique
+  const handleCreateTaskForStatus = (status: TaskStatus) => {
     const newTask: Partial<TaskExtended> = {
-      status: status || 'todo',
+      id: '',
+      title: '',
+      description: '',
+      status,
       priority: 'medium',
-      projectId
+      project_id: projectId,
+      assignee_id: null,
+      estimated_hours: 0,
+      tracked_time: 0,
+      due_date: null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      tags: [],
+      checklist: [],
+      comments: [],
+      attachments: [],
+      assignees: [],
+      assignee: null,
+      project: { id: projectId, name: 'Projet' }
     }
     setSelectedTask(newTask as TaskExtended)
     setIsTaskModalOpen(true)
     setIsCreating(true)
   }
 
-  // Ouvrir le modal d'édition de tâche
-  const handleEditTask = (task: TaskExtended) => {
-    setSelectedTask(task)
-    setIsTaskModalOpen(true)
-    setIsCreating(false)
-  }
-
-  // Fermer le modal
-  const handleCloseModal = () => {
-    setSelectedTask(null)
-    setIsTaskModalOpen(false)
-    setIsCreating(false)
-  }
-
   // Sauvegarder une tâche
-  const handleSaveTask = async (taskData: any) => {
+  const handleSaveTask = async (taskData: Partial<TaskExtended>) => {
     try {
       if (isCreating) {
         await createTask(taskData)
       } else {
-        await updateTask({ ...taskData, id: selectedTask!.id })
+        await updateTask(taskData)
       }
-      handleCloseModal()
+      setIsTaskModalOpen(false)
+      setSelectedTask(null)
     } catch (err) {
       console.error('Erreur sauvegarde tâche:', err)
     }
   }
 
-  // Supprimer une tâche
-  const handleDeleteTask = async (taskId: string) => {
-    try {
-      await deleteTask(taskId)
-      handleCloseModal()
-    } catch (err) {
-      console.error('Erreur suppression tâche:', err)
-    }
-  }
-
-  // Appliquer des filtres
-  const handleApplyFilters = (filters: TaskFilters) => {
-    applyFilters(filters)
-    setShowFilters(false)
+  // Fermer le modal
+  const handleCloseModal = () => {
+    setIsTaskModalOpen(false)
+    setSelectedTask(null)
+    setIsCreating(false)
   }
 
   if (loading) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-6">
         <div className="flex items-center justify-between">
           <Skeleton className="h-8 w-48" />
           <div className="flex gap-2">
             <Skeleton className="h-9 w-20" />
-            <Skeleton className="h-9 w-20" />
+            <Skeleton className="h-9 w-24" />
+            <Skeleton className="h-9 w-32" />
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Card key={i} className="h-96">
-              <CardHeader>
-                <Skeleton className="h-6 w-24" />
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {Array.from({ length: 3 }).map((_, j) => (
-                  <Skeleton key={j} className="h-24 w-full" />
-                ))}
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {KANBAN_COLUMNS.map((column) => (
+            <Card key={column.id} className="bg-gray-50">
+              <CardContent className="p-4">
+                <Skeleton className="h-6 w-24 mb-4" />
+                <div className="space-y-3">
+                  {[1, 2, 3].map((i) => (
+                    <Skeleton key={i} className="h-24 w-full" />
+                  ))}
+                </div>
               </CardContent>
             </Card>
           ))}
@@ -215,39 +177,17 @@ export function KanbanBoard({ projectId, className }: KanbanBoardProps) {
     return (
       <Alert variant="destructive">
         <IconAlertTriangle className="h-4 w-4" />
-        <AlertDescription>
-          {error}
-        </AlertDescription>
+        <AlertDescription>{error}</AlertDescription>
       </Alert>
     )
   }
 
   return (
-    <div className={`space-y-6 ${className}`}>
-      {/* Header avec statistiques et actions */}
+    <div className="space-y-6">
+      {/* Header avec actions */}
       <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
         <div className="flex gap-4 items-center">
           <h2 className="text-2xl font-semibold">Tableau Kanban</h2>
-          {stats && (
-            <div className="flex gap-2">
-              <Badge variant="outline" className="gap-1">
-                <IconListCheck className="h-3 w-3" />
-                {stats.completedTasks}/{stats.totalTasks} terminées
-              </Badge>
-              {stats.overdueTasks > 0 && (
-                <Badge variant="destructive" className="gap-1">
-                  <IconAlertTriangle className="h-3 w-3" />
-                  {stats.overdueTasks} en retard
-                </Badge>
-              )}
-              {activeTimer && (
-                <Badge variant="secondary" className="gap-1">
-                  <IconClock className="h-3 w-3" />
-                  Timer actif
-                </Badge>
-              )}
-            </div>
-          )}
         </div>
 
         <div className="flex gap-2">
@@ -269,7 +209,7 @@ export function KanbanBoard({ projectId, className }: KanbanBoardProps) {
           </Button>
           <Button
             size="sm"
-            onClick={() => handleCreateTask()}
+            onClick={() => handleCreateTaskForStatus('todo')}
           >
             <IconPlus className="h-4 w-4 mr-1" />
             Nouvelle tâche
@@ -281,10 +221,17 @@ export function KanbanBoard({ projectId, className }: KanbanBoardProps) {
       {showFilters && (
         <Card>
           <CardContent className="pt-4">
-            <TaskFiltersComponent
-              onApplyFilters={handleApplyFilters}
-              onClearFilters={clearFilters}
-              projectId={projectId}
+            <TaskFilters
+              filters={{
+                search: '',
+                priority: undefined,
+                assignee: undefined,
+                tags: [],
+                hasTimer: false,
+                overdue: false
+              }}
+              onFiltersChange={() => {}}
+              availableTags={[]}
             />
           </CardContent>
         </Card>
@@ -297,42 +244,31 @@ export function KanbanBoard({ projectId, className }: KanbanBoardProps) {
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 min-h-[600px]">
-          <SortableContext items={columnIds} strategy={horizontalListSortingStrategy}>
-            {columns.map((column) => (
-              <KanbanColumnComponent
-                key={column.id}
-                column={column}
-                tasks={getTasksByStatus(column.status)}
-                onCreateTask={() => handleCreateTask(column.status)}
-                onEditTask={handleEditTask}
-              />
-            ))}
-          </SortableContext>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {KANBAN_COLUMNS.map((column) => (
+            <KanbanColumn
+              key={column.id}
+              status={column.status}
+              title={column.title}
+              tasks={getTasksByStatus(column.status)}
+              onCreateTask={() => handleCreateTaskForStatus(column.status)}
+            />
+          ))}
         </div>
 
         {/* Overlay pour le drag */}
         <DragOverlay>
-          {activeTask ? (
-            <TaskCard
-              task={activeTask}
-              onEdit={() => {}}
-              isDragging
-            />
-          ) : null}
+          {activeTask ? <TaskCard task={activeTask} /> : null}
         </DragOverlay>
       </DndContext>
 
       {/* Modal de tâche */}
       {selectedTask && (
         <TaskModal
-          task={selectedTask}
+          task={isCreating ? undefined : selectedTask}
           isOpen={isTaskModalOpen}
-          isCreating={isCreating}
           onClose={handleCloseModal}
           onSave={handleSaveTask}
-          onDelete={handleDeleteTask}
-          projectId={projectId}
         />
       )}
     </div>
