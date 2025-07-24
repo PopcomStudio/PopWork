@@ -53,138 +53,56 @@ export function useTasks(projectId: string): UseTasksReturn {
       setError(null)
       setLoading(true)
 
-      // Données de test dans le style de l'image Kanban
-      const extendedTasks: TaskExtended[] = [
-        // To-do Column
-        {
-          id: '1',
-          title: 'Set up high-fidelity prototypes with conditional logic',
-          description: 'Create interactive prototypes with advanced conditional logic',
-          status: 'todo',
-          priority: 'high',
-          project_id: projectId,
-          assignee_id: null,
-          estimated_hours: 3,
-          tracked_time: 2580, // 1h 43min
-          due_date: '2024-08-26',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          tags: ['Wireframes'],
-          checklist: [],
-          comments: [],
-          attachments: [],
-          assignees: [],
-          assignee: null,
-          project: { id: projectId, name: 'Projet Test' }
-        },
-        {
-          id: '2',
-          title: 'Data Entry Cleanup',
-          description: 'Clean and organize data entry processes',
-          status: 'todo',
-          priority: 'medium',
-          project_id: projectId,
-          assignee_id: null,
-          estimated_hours: 5,
-          tracked_time: 10200, // 2h 50min
-          due_date: '2024-08-27',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          tags: ['Data Entry'],
-          checklist: [],
-          comments: [{ id: '1', content: 'Comment 1' }, { id: '2', content: 'Comment 2' }],
-          attachments: [],
-          assignees: [],
-          assignee: null,
-          project: { id: projectId, name: 'Projet Test' }
-        },
-        {
-          id: '3',
-          title: 'Social Media Scheduling',
-          description: 'Set up automated social media posting schedule',
-          status: 'todo',
-          priority: 'medium',
-          project_id: projectId,
-          assignee_id: null,
-          estimated_hours: 5,
-          tracked_time: 16800, // 4h 40min
-          due_date: '2024-08-28',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          tags: ['Media'],
-          checklist: [],
-          comments: [{ id: '1', content: 'Comment 1' }],
-          attachments: [],
-          assignees: [],
-          assignee: null,
-          project: { id: projectId, name: 'Projet Test' }
-        },
-        
-        // In Progress Column
-        {
-          id: '4',
-          title: 'Graphic Design Edits',
-          description: 'Make final edits to graphic design elements',
-          status: 'in_progress',
-          priority: 'high',
-          project_id: projectId,
-          assignee_id: null,
-          estimated_hours: 2.17, // 2:10
-          tracked_time: 14400, // 4h
-          due_date: '2024-08-27',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          tags: ['Graphic Design'],
-          checklist: [],
-          comments: [],
-          attachments: [],
-          assignees: [],
-          assignee: null,
-          project: { id: projectId, name: 'Projet Test' }
-        },
-        {
-          id: '5',
-          title: 'Presentation Slide Design',
-          description: 'Design slides for client presentation',
-          status: 'in_progress',
-          priority: 'medium',
-          project_id: projectId,
-          assignee_id: null,
-          estimated_hours: 5,
-          tracked_time: 7200, // 2h 00min
-          due_date: '2024-08-30',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          tags: ['UI Design'],
-          checklist: [],
-          comments: [{ id: '1', content: 'Comment 1' }],
-          attachments: [],
-          assignees: [],
-          assignee: null,
-          project: { id: projectId, name: 'Projet Test' }
-        },
-        {
-          id: '6',
-          title: 'Presentation Slide Design',
-          description: 'Additional presentation work',
-          status: 'in_progress',
-          priority: 'low',
-          project_id: projectId,
-          assignee_id: null,
-          estimated_hours: 3,
-          tracked_time: 0,
-          due_date: '2024-08-27',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          tags: ['Design'],
-          checklist: [],
-          comments: [],
-          attachments: [],
-          assignees: [],
-          assignee: null,
-          project: { id: projectId, name: 'Projet Test' }
-        }
-      ]
+      // Récupérer les tâches depuis Supabase avec leurs tags
+      const { data: tasksData, error: tasksError } = await supabase
+        .from('tasks')
+        .select(`
+          *,
+          project:projects(id, name),
+          task_assignees(
+            user_id,
+            users(id, first_name, last_name, email)
+          ),
+          task_tags(
+            tag_id,
+            tags(id, name, color, project_id)
+          )
+        `)
+        .eq('project_id', projectId)
+        .order('created_at', { ascending: false })
+
+      if (tasksError) throw tasksError
+
+      // Transformer les données en format TaskExtended
+      const extendedTasks: TaskExtended[] = (tasksData || []).map(task => ({
+        id: task.id,
+        title: task.title,
+        description: task.description || '',
+        status: task.status as TaskStatus,
+        priority: task.priority,
+        project_id: task.project_id,
+        assignee_id: task.task_assignees?.[0]?.user_id || null,
+        estimated_hours: 0, // À ajouter dans le schéma DB si nécessaire
+        tracked_time: 0, // À calculer depuis task_timers si nécessaire
+        due_date: task.due_date,
+        created_at: task.created_at,
+        updated_at: task.updated_at,
+        tags: task.task_tags?.map(tt => tt.tags) || [],
+        checklist: [], // À ajouter dans le schéma DB si nécessaire
+        comments: [], // À ajouter dans le schéma DB si nécessaire
+        attachments: [], // À ajouter dans le schéma DB si nécessaire
+        assignees: task.task_assignees?.map(ta => ({
+          id: ta.users.id,
+          firstName: ta.users.first_name,
+          lastName: ta.users.last_name,
+          email: ta.users.email
+        })) || [],
+        assignee: task.task_assignees?.[0] ? {
+          id: task.task_assignees[0].users.id,
+          full_name: `${task.task_assignees[0].users.first_name} ${task.task_assignees[0].users.last_name}`
+        } : null,
+        project: task.project ? { id: task.project.id, name: task.project.name } : { id: projectId, name: 'Projet' }
+      }))
 
       setTasks(extendedTasks)
       setFilteredTasks(extendedTasks)
@@ -257,8 +175,8 @@ export function useTasks(projectId: string): UseTasksReturn {
           description: data.description || '',
           priority: data.priority,
           status: data.status || 'todo',
-          projectId: data.projectId,
-          dueDate: data.dueDate
+          project_id: data.projectId,
+          due_date: data.dueDate
         }])
         .select()
         .single()
@@ -268,9 +186,9 @@ export function useTasks(projectId: string): UseTasksReturn {
       // Assigner les utilisateurs si spécifiés
       if (data.assigneeIds && data.assigneeIds.length > 0) {
         const assignments = data.assigneeIds.map(userId => ({
-          taskId: newTask.id,
-          userId,
-          assignedAt: new Date().toISOString()
+          task_id: newTask.id,
+          user_id: userId,
+          assigned_at: new Date().toISOString()
         }))
 
         await supabase.from('task_assignees').insert(assignments)
@@ -281,6 +199,7 @@ export function useTasks(projectId: string): UseTasksReturn {
       
       return newTask as TaskExtended
     } catch (err) {
+      console.error('Erreur détaillée création tâche:', err)
       throw new Error(err instanceof Error ? err.message : 'Erreur création tâche')
     }
   }, [supabase, fetchTasks])
@@ -295,7 +214,7 @@ export function useTasks(projectId: string): UseTasksReturn {
           description: data.description,
           priority: data.priority,
           status: data.status,
-          dueDate: data.dueDate
+          due_date: data.dueDate
         })
         .eq('id', data.id)
         .select()
@@ -363,9 +282,9 @@ export function useTasks(projectId: string): UseTasksReturn {
       const { error: assignError } = await supabase
         .from('task_assignees')
         .insert([{
-          taskId,
-          userId,
-          assignedAt: new Date().toISOString()
+          task_id: taskId,
+          user_id: userId,
+          assigned_at: new Date().toISOString()
         }])
 
       if (assignError) throw assignError
@@ -382,8 +301,8 @@ export function useTasks(projectId: string): UseTasksReturn {
       const { error: unassignError } = await supabase
         .from('task_assignees')
         .delete()
-        .eq('taskId', taskId)
-        .eq('userId', userId)
+        .eq('task_id', taskId)
+        .eq('user_id', userId)
 
       if (unassignError) throw unassignError
 

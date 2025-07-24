@@ -1,6 +1,6 @@
 // Types étendus pour la vue Kanban
 
-import { Task, User, TaskTimer, TaskAssignee } from '@/shared/types/database'
+import { Task, User, TaskTimer, TaskAssignee, Tag } from '@/shared/types/database'
 
 // Nouveaux types pour les fonctionnalités Kanban
 export interface TaskChecklist {
@@ -40,12 +40,7 @@ export interface TaskAttachment {
   }
 }
 
-export interface TaskTag {
-  id: string
-  name: string
-  color: string
-  projectId: string
-}
+// Utiliser le type Tag de la base de données directement
 
 export interface TaskTagAssignment {
   id: string
@@ -60,7 +55,7 @@ export interface TaskExtended extends Task {
   checklist: TaskChecklist[]
   comments: TaskComment[]
   attachments: TaskAttachment[]
-  tags: TaskTag[]
+  tags: Tag[]
   timers: TaskTimer[]
   
   // Champs calculés

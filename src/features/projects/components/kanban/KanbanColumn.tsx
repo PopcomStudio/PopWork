@@ -17,12 +17,6 @@ interface KanbanColumnProps {
   onCreateTask: () => void
 }
 
-const statusStyles = {
-  todo: 'bg-gray-50/50 border-gray-200',
-  in_progress: 'bg-blue-50/50 border-blue-200',
-  review: 'bg-orange-50/50 border-orange-200',
-  done: 'bg-green-50/50 border-green-200'
-}
 
 export function KanbanColumn({ status, tasks, title, onCreateTask }: KanbanColumnProps) {
   const { setNodeRef, isOver } = useDroppable({
@@ -30,7 +24,7 @@ export function KanbanColumn({ status, tasks, title, onCreateTask }: KanbanColum
   })
 
   return (
-    <Card className={`h-fit ${statusStyles[status]}`}>
+    <Card className="h-fit border-none shadow-none bg-gray-50">
       <CardHeader>
         <CardTitle className="text-base font-semibold flex items-center gap-3">
           {title}

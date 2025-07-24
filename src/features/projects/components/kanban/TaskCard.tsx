@@ -6,20 +6,36 @@ import { CSS } from '@dnd-kit/utilities'
 import { TaskExtended } from '../../types/kanban'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { IconClock, IconMessageCircle, IconPlayerPlay, IconCalendar } from '@tabler/icons-react'
-import { useTaskTimer } from '../../hooks/useTaskTimer'
+import { Card, CardContent } from '@/components/ui/card'
+import { IconCalendar, IconMessageCircle, IconLink, IconDots, IconFiles } from '@tabler/icons-react'
+import { Check } from 'lucide-react'
 
 interface TaskCardProps {
   task: TaskExtended
 }
 
+// Fonction pour convertir hex en couleurs Tailwind
+const getTagStyles = (color: string) => {
+  // Conversion basique hex vers classes Tailwind (peut être étendue)
+  const colorMap: Record<string, any> = {
+    '#8B5CF6': { bg: 'bg-purple-50', text: 'text-purple-600', dot: 'bg-purple-500' }, // Violet
+    '#3B82F6': { bg: 'bg-blue-50', text: 'text-blue-600', dot: 'bg-blue-500' },     // Bleu
+    '#10B981': { bg: 'bg-green-50', text: 'text-green-600', dot: 'bg-green-500' },  // Vert
+    '#F59E0B': { bg: 'bg-orange-50', text: 'text-orange-600', dot: 'bg-orange-500' }, // Orange
+    '#EF4444': { bg: 'bg-red-50', text: 'text-red-600', dot: 'bg-red-500' },       // Rouge
+    '#6B7280': { bg: 'bg-gray-50', text: 'text-gray-600', dot: 'bg-gray-500' },     // Gris
+    '#DC2626': { bg: 'bg-red-50', text: 'text-red-700', dot: 'bg-red-600' },       // Rouge foncé
+    '#059669': { bg: 'bg-green-50', text: 'text-green-700', dot: 'bg-green-600' }   // Vert foncé
+  }
+  
+  return colorMap[color] || { bg: 'bg-gray-50', text: 'text-gray-600', dot: 'bg-gray-500' }
+}
+
 const priorityBadgeStyles = {
-  low: 'bg-gray-100 text-gray-700 border-gray-200',
-  medium: 'bg-yellow-100 text-yellow-700 border-yellow-200', 
-  high: 'bg-orange-100 text-orange-700 border-orange-200',
-  urgent: 'bg-red-100 text-red-700 border-red-200'
+  low: { bg: 'bg-blue-50', text: 'text-blue-600', label: 'Low' },
+  medium: { bg: 'bg-orange-50', text: 'text-orange-600', label: 'Medium' },
+  high: { bg: 'bg-red-50', text: 'text-red-600', label: 'High' },
+  urgent: { bg: 'bg-red-50', text: 'text-red-600', label: 'Urgent' }
 }
 
 export function TaskCard({ task }: TaskCardProps) {
@@ -32,35 +48,44 @@ export function TaskCard({ task }: TaskCardProps) {
     isDragging,
   } = useSortable({ id: task.id })
 
-  const { activeTimer, startTimer, stopTimer } = useTaskTimer(task.id)
-
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
   }
 
-  const formatTime = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600)
-    const minutes = Math.floor((seconds % 3600) / 60)
-    if (hours > 0) {
-      return `${hours}h ${minutes}min`
-    }
-    return `${minutes}min`
-  }
-
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
-    return date.toLocaleDateString('fr-FR', { month: 'short', day: 'numeric' })
+    return date.toLocaleDateString('en-GB', { 
+      day: '2-digit', 
+      month: 'short', 
+      year: 'numeric' 
+    })
   }
 
-  const getAssigneeInitials = (task: TaskExtended) => {
-    if (task.assignee) {
-      return task.assignee.full_name?.split(' ').map(n => n[0]).join('') || 'U'
+  const getAssigneeInitials = (assignees: any[]) => {
+    if (assignees && assignees.length > 0) {
+      return assignees[0].firstName?.[0] + assignees[0].lastName?.[0] || 'U'
     }
-    // Fallback avec initiales fictives pour la démo
-    const names = ['AB', 'CD', 'EF', 'GH']
+    // Initiales factices pour la démo
+    const names = ['JD', 'AM', 'LK', 'MT']
     return names[Math.floor(Math.random() * names.length)]
   }
+
+  const truncateText = (text: string, maxLength: number) => {
+    if (text.length <= maxLength) return text
+    return text.substring(0, maxLength) + '...'
+  }
+
+  // Utiliser le premier tag de la tâche ou un tag par défaut
+  const primaryTag = task.tags && task.tags.length > 0 ? task.tags[0] : null
+  const tagStyle = primaryTag ? getTagStyles(primaryTag.color) : { bg: 'bg-gray-50', text: 'text-gray-600', dot: 'bg-gray-500' }
+  const priorityStyle = priorityBadgeStyles[task.priority]
+
+  // Données factices pour correspondre au design
+  const commentsCount = Math.floor(Math.random() * 8) + 1
+  const linksCount = Math.floor(Math.random() * 3)
+  const currentProgress = Math.floor(Math.random() * 3) + 1
+  const totalProgress = 3
 
   return (
     <Card
@@ -69,111 +94,87 @@ export function TaskCard({ task }: TaskCardProps) {
       {...attributes}
       {...listeners}
       className={`
-        group hover:shadow-md transition-all duration-200 cursor-grab active:cursor-grabbing
-        ${isDragging ? 'opacity-50 rotate-3 scale-105' : ''}
+        p-3 hover:outline-1 transition-all cursor-grab active:cursor-grabbing border-0 shadow-sm rounded-xl
+        ${isDragging ? 'opacity-50 rotate-1 scale-105' : ''}
       `}
     >
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <div className="space-y-1 flex-1">
-            <div className="flex items-center gap-2">
-              <Badge variant="secondary" className="text-xs">
-                {task.tags?.[0] || 'General'}
-              </Badge>
-              <Badge 
-                variant="outline" 
-                className={`text-xs ${priorityBadgeStyles[task.priority]}`}
-              >
-                {task.priority}
-              </Badge>
-            </div>
-            <CardTitle className="text-sm font-semibold line-clamp-2 group-hover:text-primary transition-colors">
-              {task.title}
-            </CardTitle>
-          </div>
-          <Avatar className="h-6 w-6 ml-2">
-            <AvatarFallback className="text-xs bg-primary/10 text-primary">
-              {getAssigneeInitials(task)}
-            </AvatarFallback>
-          </Avatar>
+      <CardContent className="p-0 space-y-2">
+        {/* Header avec tag badge et menu */}
+        <div className="flex items-center gap-1.5">
+          <Badge 
+            className={`
+              ${tagStyle.bg} ${tagStyle.text} hover:${tagStyle.bg} 
+              px-2 py-1 text-xs font-medium border-0 rounded-full flex items-center gap-1.5
+            `}
+          >
+            <div className={`w-2 h-2 rounded-full ${tagStyle.dot}`} />
+            {primaryTag ? primaryTag.name : 'General'}
+          </Badge>
+          <Badge 
+            className={`
+              ${priorityStyle.bg} ${priorityStyle.text} hover:${priorityStyle.bg} 
+              px-3 py-1 text-xs font-medium border-0 rounded-full
+            `}
+          >
+            {priorityStyle.label}
+          </Badge>
         </div>
-      </CardHeader>
 
-      <CardContent className="space-y-3">
-        {/* Time info */}
-        {(task.due_date || task.estimated_hours) && (
-          <div className="flex items-center gap-4 text-xs text-muted-foreground">
-            {task.due_date && (
-              <div className="flex items-center gap-1">
-                <IconCalendar className="h-3 w-3" />
-                <span>{formatDate(task.due_date)}</span>
-              </div>
-            )}
-            {task.estimated_hours && (
-              <div className="flex items-center gap-1">
-                <IconClock className="h-3 w-3" />
-                <span>{task.estimated_hours}h</span>
-              </div>
-            )}
-          </div>
-        )}
+        {/* Titre */}
+        <div>
+          <h3 className="text-lg font-semibold text-gray-900 leading-tight mb-1">
+            {task.title}
+          </h3>
+          <p className="text-sm text-gray-500 leading-relaxed">
+            {task.description ? 
+              truncateText(task.description, 60) : 
+              'Write a 1000-word article discussing the latest adv...'
+            }
+          </p>
+        </div>
 
-        {/* Footer with timer and comments */}
+        {/* Date et Priorité */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1 text-blue-600">
-            <IconPlayerPlay className="h-3 w-3" />
-            <span className="text-xs font-medium">
-              Log: {task.tracked_time > 0 ? formatTime(task.tracked_time) : '0min'}
+          <div className="flex items-center gap-1.5 text-sm text-gray-500">
+            <IconCalendar className="h-4 w-4" />
+            <span>
+              {task.due_date ? 
+                formatDate(task.due_date) : 
+                '25 Mar 2023'
+              }
             </span>
           </div>
+          {/* Assignees */}
+          <div className="flex -space-x-2">
+            {[1, 2].map((_, index) => (
+              <Avatar key={index} className="h-7 w-7 border-2 border-white">
+                <AvatarFallback className="text-xs bg-gray-100 text-gray-700">
+                  {getAssigneeInitials(task.assignees)}
+                </AvatarFallback>
+              </Avatar>
+            ))}
+          </div>
           
-          {task.comments && task.comments.length > 0 && (
-            <div className="flex items-center gap-1 text-muted-foreground">
-              <IconMessageCircle className="h-3 w-3" />
-              <span className="text-xs">{task.comments.length}</span>
-            </div>
-          )}
         </div>
 
-        {/* Active Timer Display */}
-        {activeTimer && (
-          <div className="p-2 bg-blue-50 rounded-lg border border-blue-200">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-blue-700 font-medium">
-                Timer: {formatTime(activeTimer.elapsedSeconds)}
-              </span>
-              <Button
-                size="sm"
-                variant="ghost"
-                className="h-6 px-2 text-xs text-blue-700 hover:bg-blue-100"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  stopTimer()
-                }}
-              >
-                Stop
-              </Button>
+        {/* Footer avec stats */}
+        <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+          <div className="flex items-center gap-4 text-sm text-gray-500">
+            <div className="flex items-center gap-1">
+              <IconMessageCircle className="h-4 w-4" />
+              <span>{commentsCount}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <IconLink className="h-4 w-4" />
+              <span>{linksCount}</span>
             </div>
           </div>
-        )}
+          <div className="flex items-center gap-1 text-sm text-gray-500">
+            <Check className="h-4 w-4" />
+            <span>{currentProgress}/{totalProgress}</span>
+          </div>
+        </div>
       </CardContent>
-
-      {!activeTimer && (
-        <CardFooter className="pt-3 border-t">
-          <Button
-            size="sm"
-            variant="ghost"
-            className="w-full h-8 text-xs text-muted-foreground hover:bg-muted"
-            onClick={(e) => {
-              e.stopPropagation()
-              startTimer(task.id)
-            }}
-          >
-            <IconPlayerPlay className="h-3 w-3 mr-1" />
-            Start Timer
-          </Button>
-        </CardFooter>
-      )}
     </Card>
   )
 }

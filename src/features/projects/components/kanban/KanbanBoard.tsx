@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { IconFilter, IconRefresh, IconPlus, IconAlertTriangle } from '@tabler/icons-react'
+import { IconFilter, IconRefresh, IconAlertTriangle } from '@tabler/icons-react'
 
 import { useTasks } from '../../hooks/useTasks'
 import { TaskExtended, TaskStatus } from '../../types/kanban'
@@ -34,7 +34,7 @@ const KANBAN_COLUMNS = [
   { id: 'in_progress', title: 'In Progress', status: 'in_progress' as TaskStatus },
   { id: 'review', title: 'Review Ready', status: 'review' as TaskStatus },
   { id: 'done', title: 'Done', status: 'done' as TaskStatus },
-]
+] as const
 
 export function KanbanBoard({ projectId }: KanbanBoardProps) {
   const {
@@ -125,12 +125,31 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
   const handleSaveTask = async (taskData: Partial<TaskExtended>) => {
     try {
       if (isCreating) {
-        await createTask(taskData)
+        // Transformer les données pour createTask
+        const createData = {
+          title: taskData.title || '',
+          description: taskData.description || '',
+          priority: taskData.priority || 'medium',
+          projectId: projectId,
+          status: taskData.status || 'todo',
+          dueDate: taskData.dueDate,
+        }
+        await createTask(createData)
       } else {
-        await updateTask(taskData)
+        // Transformer les données pour updateTask
+        const updateData = {
+          id: taskData.id || '',
+          title: taskData.title,
+          description: taskData.description,
+          priority: taskData.priority,
+          status: taskData.status,
+          dueDate: taskData.dueDate,
+        }
+        await updateTask(updateData)
       }
       setIsTaskModalOpen(false)
       setSelectedTask(null)
+      setIsCreating(false)
     } catch (err) {
       console.error('Erreur sauvegarde tâche:', err)
     }
@@ -207,13 +226,6 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
             <IconRefresh className="h-4 w-4 mr-1" />
             Actualiser
           </Button>
-          <Button
-            size="sm"
-            onClick={() => handleCreateTaskForStatus('todo')}
-          >
-            <IconPlus className="h-4 w-4 mr-1" />
-            Nouvelle tâche
-          </Button>
         </div>
       </div>
 
@@ -225,10 +237,9 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
               filters={{
                 search: '',
                 priority: undefined,
-                assignee: undefined,
-                tags: [],
-                hasTimer: false,
-                overdue: false
+                assigneeId: undefined,
+                tagIds: [],
+                hasOverdueTasks: false
               }}
               onFiltersChange={() => {}}
               availableTags={[]}
@@ -244,7 +255,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
           {KANBAN_COLUMNS.map((column) => (
             <KanbanColumn
               key={column.id}
@@ -269,6 +280,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
           isOpen={isTaskModalOpen}
           onClose={handleCloseModal}
           onSave={handleSaveTask}
+          projectId={projectId}
         />
       )}
     </div>

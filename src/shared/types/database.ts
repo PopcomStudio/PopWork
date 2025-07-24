@@ -97,6 +97,22 @@ export interface TaskTimer {
   createdAt: string
 }
 
+export interface Tag {
+  id: string
+  name: string
+  color: string
+  projectId: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface TaskTag {
+  id: string
+  taskId: string
+  tagId: string
+  createdAt: string
+}
+
 export interface Invoice {
   id: string
   number: string
