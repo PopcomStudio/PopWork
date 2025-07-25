@@ -40,6 +40,111 @@ export interface TaskAttachment {
   }
 }
 
+// Nouveaux types pour le système enrichi de commentaires et pièces jointes
+
+export interface CommentReaction {
+  id: string
+  commentId: string
+  userId: string
+  emoji: string
+  createdAt: string
+  user?: {
+    firstName: string
+    lastName: string
+  }
+}
+
+export interface CommentMention {
+  id: string
+  commentId: string
+  type: 'user' | 'attachment'
+  targetId: string // userId ou attachmentId
+  startIndex: number
+  endIndex: number
+}
+
+export interface TaskCommentExtended {
+  id: string
+  taskId: string
+  userId: string
+  content: string
+  parentCommentId?: string // Pour les réponses
+  attachmentId?: string // Référence vers un fichier pour commentaire contextuel
+  mentions: CommentMention[]
+  reactions: CommentReaction[]
+  createdAt: string
+  updatedAt: string
+  user: {
+    id: string
+    firstName: string
+    lastName: string
+    email: string
+  }
+  replies?: TaskCommentExtended[] // Commentaires enfants
+  isEdited?: boolean
+}
+
+export interface TaskAttachmentExtended {
+  id: string
+  taskId: string
+  fileName: string
+  fileUrl: string
+  fileSize: number
+  mimeType: string
+  uploadedBy: string
+  uploadedAt: string
+  comments: TaskCommentExtended[] // Commentaires sur le fichier
+  commentsCount: number
+  user: {
+    id: string
+    firstName: string
+    lastName: string
+    email: string
+  }
+  preview?: {
+    thumbnailUrl?: string
+    width?: number
+    height?: number
+  }
+}
+
+// Types pour l'éditeur de mentions
+export interface MentionSuggestion {
+  id: string
+  type: 'user' | 'attachment'
+  label: string
+  sublabel?: string
+  avatar?: string
+}
+
+export interface MentionMatch {
+  type: 'user' | 'attachment'
+  trigger: '@'
+  query: string
+  startIndex: number
+  endIndex: number
+}
+
+// Types pour les réactions
+export interface EmojiReaction {
+  emoji: string
+  count: number
+  users: Array<{
+    id: string
+    firstName: string
+    lastName: string
+  }>
+  hasUserReacted: boolean
+}
+
+// Interface pour les données de l'éditeur de commentaires
+export interface CommentEditorData {
+  content: string
+  mentions: CommentMention[]
+  parentCommentId?: string
+  attachmentId?: string
+}
+
 // Utiliser le type Tag de la base de données directement
 
 export interface TaskTagAssignment {
@@ -53,8 +158,8 @@ export interface TaskExtended extends Task {
   // Relations
   assignees: User[]
   checklist: TaskChecklist[]
-  comments: TaskComment[]
-  attachments: TaskAttachment[]
+  comments: TaskCommentExtended[]
+  attachments: TaskAttachmentExtended[]
   tags: Tag[]
   timers: TaskTimer[]
   
@@ -82,13 +187,12 @@ export interface KanbanColumn {
   count: number
 }
 
-// Statuts de tâches étendus
+// Statuts de tâches étendus (correspond à la base de données)
 export type TaskStatus = 
   | 'todo' 
   | 'in_progress' 
   | 'review' 
-  | 'done' 
-  | 'blocked'
+  | 'done'
 
 // Configuration par défaut des colonnes
 export const DEFAULT_KANBAN_COLUMNS: Omit<KanbanColumn, 'count'>[] = [

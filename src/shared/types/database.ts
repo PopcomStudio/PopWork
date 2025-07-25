@@ -65,12 +65,12 @@ export interface Task {
   id: string
   title: string
   description: string
-  status: 'todo' | 'in_progress' | 'done'
-  priority: 'low' | 'medium' | 'high'
-  projectId: string
-  createdAt: string
-  updatedAt: string
-  dueDate?: string
+  status: 'todo' | 'in_progress' | 'review' | 'done'
+  priority: 'low' | 'medium' | 'high' | 'urgent'
+  project_id: string
+  due_date?: string
+  created_at: string
+  updated_at: string
 }
 
 export interface TaskAssignee {

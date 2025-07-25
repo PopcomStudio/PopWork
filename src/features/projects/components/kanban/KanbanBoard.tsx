@@ -41,9 +41,9 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
     tasks,
     loading,
     error,
-    createTask,
     updateTask,
     moveTask,
+    reorderTasks,
     getTasksByStatus,
     refreshTasks,
   } = useTasks(projectId)
@@ -54,11 +54,11 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
   const [isCreating, setIsCreating] = useState(false)
   const [showFilters, setShowFilters] = useState(false)
 
-  // Configuration DnD
+  // Configuration DnD optimisée sans délai
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8,
+        distance: 8, // Distance minimale pour activer le drag
       },
     })
   )
@@ -69,6 +69,10 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
     const task = tasks.find(t => t.id === active.id)
     if (task) {
       setActiveTask(task)
+      // Vibration tactile pour confirmer le début du drag
+      if ('vibrate' in navigator) {
+        navigator.vibrate(50)
+      }
     }
   }
 
@@ -82,13 +86,34 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
     const taskId = active.id as string
     const overId = over.id as string
 
-    // Vérifier si on dépose sur une colonne
+    // Trouver la tâche déplacée
+    const draggedTask = tasks.find(t => t.id === taskId)
+    if (!draggedTask) return
+
+    // Cas 1: Déplacement vers une autre colonne
     const targetColumn = KANBAN_COLUMNS.find(col => col.id === overId)
-    if (targetColumn) {
+    if (targetColumn && draggedTask.status !== targetColumn.status) {
       try {
         await moveTask(taskId, targetColumn.status)
       } catch (err) {
         console.error('Erreur déplacement tâche:', err)
+      }
+      return
+    }
+
+    // Cas 2: Réorganisation dans la même colonne
+    const overTask = tasks.find(t => t.id === overId)
+    if (overTask && draggedTask.status === overTask.status) {
+      const statusTasks = getTasksByStatus(draggedTask.status)
+      const oldIndex = statusTasks.findIndex(t => t.id === taskId)
+      const newIndex = statusTasks.findIndex(t => t.id === overId)
+      
+      if (oldIndex !== newIndex && oldIndex !== -1 && newIndex !== -1) {
+        try {
+          await reorderTasks(taskId, newIndex, draggedTask.status)
+        } catch (err) {
+          console.error('Erreur réorganisation tâche:', err)
+        }
       }
     }
   }
@@ -102,10 +127,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
       status,
       priority: 'medium',
       project_id: projectId,
-      assignee_id: null,
-      estimated_hours: 0,
-      tracked_time: 0,
-      due_date: null,
+      due_date: undefined,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       tags: [],
@@ -113,7 +135,11 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
       comments: [],
       attachments: [],
       assignees: [],
-      assignee: null,
+      timers: [],
+      timeLogged: 0,
+      checklistProgress: 0,
+      isOverdue: false,
+      hasActiveTimer: false,
       project: { id: projectId, name: 'Projet' }
     }
     setSelectedTask(newTask as TaskExtended)
@@ -121,39 +147,13 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
     setIsCreating(true)
   }
 
-  // Sauvegarder une tâche
-  const handleSaveTask = async (taskData: Partial<TaskExtended>) => {
-    try {
-      if (isCreating) {
-        // Transformer les données pour createTask
-        const createData = {
-          title: taskData.title || '',
-          description: taskData.description || '',
-          priority: taskData.priority || 'medium',
-          projectId: projectId,
-          status: taskData.status || 'todo',
-          dueDate: taskData.dueDate,
-        }
-        await createTask(createData)
-      } else {
-        // Transformer les données pour updateTask
-        const updateData = {
-          id: taskData.id || '',
-          title: taskData.title,
-          description: taskData.description,
-          priority: taskData.priority,
-          status: taskData.status,
-          dueDate: taskData.dueDate,
-        }
-        await updateTask(updateData)
-      }
-      setIsTaskModalOpen(false)
-      setSelectedTask(null)
-      setIsCreating(false)
-    } catch (err) {
-      console.error('Erreur sauvegarde tâche:', err)
-    }
+  // Éditer une tâche existante
+  const handleEditTask = (task: TaskExtended) => {
+    setSelectedTask(task)
+    setIsTaskModalOpen(true)
+    setIsCreating(false)
   }
+
 
   // Fermer le modal
   const handleCloseModal = () => {
@@ -255,7 +255,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
           {KANBAN_COLUMNS.map((column) => (
             <KanbanColumn
               key={column.id}
@@ -263,6 +263,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
               title={column.title}
               tasks={getTasksByStatus(column.status)}
               onCreateTask={() => handleCreateTaskForStatus(column.status)}
+              onEditTask={handleEditTask}
             />
           ))}
         </div>
@@ -279,7 +280,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
           task={isCreating ? undefined : selectedTask}
           isOpen={isTaskModalOpen}
           onClose={handleCloseModal}
-          onSave={handleSaveTask}
+          updateTask={updateTask}
           projectId={projectId}
         />
       )}

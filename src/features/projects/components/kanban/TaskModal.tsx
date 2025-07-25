@@ -1,15 +1,15 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { TaskExtended, TaskStatus } from '../../types/kanban';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { TaskExtended, TaskStatus, UpdateTaskData } from '../../types/kanban';
 import { Task, Tag, User } from '@/shared/types/database';
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -21,7 +21,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from '@/components/ui/command';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
@@ -33,26 +44,27 @@ import {
   IconMessage,
   IconPaperclip,
   IconSend,
-  IconPlus
+  IconPlus,
+  IconX
 } from '@tabler/icons-react';
 import { createClientComponentClient } from '@/lib/supabase';
+import { CommentItem } from '../discussion/CommentItem';
+import { CommentEditor } from '../discussion/CommentEditor';
+import { AttachmentCard } from '../attachments/AttachmentCard';
+import { FileUploader } from '../attachments/FileUploader';
+import { useTaskComments } from '../../hooks/useTaskComments';
+import { useTaskAttachments } from '../../hooks/useTaskAttachments';
 
 interface TaskModalProps {
   task?: TaskExtended; // Optionnel pour gérer les cas où task peut être undefined
   isOpen: boolean;
   onClose: () => void;
-  onSave: (task: Partial<TaskExtended>) => void;
+  updateTask?: (data: UpdateTaskData) => Promise<TaskExtended>; // Pour l'auto-sauvegarde sans fermer
   projectId: string;
 }
 
-interface Comment {
-  id: string;
-  content: string;
-  user_name: string;
-  created_at: string;
-}
 
-export function TaskModal({ task, isOpen, onClose, onSave, projectId }: TaskModalProps) {
+export function TaskModal({ task, isOpen, onClose, updateTask, projectId }: TaskModalProps) {
   const [formData, setFormData] = useState({
     title: task?.title || '',
     description: task?.description || '',
@@ -64,13 +76,96 @@ export function TaskModal({ task, isOpen, onClose, onSave, projectId }: TaskModa
   });
 
   const [activeTab, setActiveTab] = useState('description');
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [newComment, setNewComment] = useState('');
   const [availableTags, setAvailableTags] = useState<Tag[]>([]);
   const [availableUsers, setAvailableUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isUpdatingFromRealTime, setIsUpdatingFromRealTime] = useState(false);
+  const [assigneeSearchOpen, setAssigneeSearchOpen] = useState(false);
+  const [assigneeSearch, setAssigneeSearch] = useState('');
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  // Hooks pour les commentaires et pièces jointes
+  const {
+    comments,
+    loading: commentsLoading,
+    createComment,
+    updateComment,
+    deleteComment,
+    addReaction,
+    removeReaction,
+    getReactionsSummary
+  } = useTaskComments(task?.id || '');
+
+  const {
+    attachments,
+    loading: attachmentsLoading,
+    uploadFile,
+    deleteAttachment,
+    downloadAttachment,
+    previewAttachment,
+    commentOnAttachment
+  } = useTaskAttachments(task?.id || '');
 
   const supabase = createClientComponentClient();
+
+  // Gestionnaire des mises à jour temps réel de la tâche (simplifié)
+  const handleRealTimeTaskUpdate = useCallback((payload: { eventType: string; new: any }) => {
+    const { eventType, new: newRecord } = payload;
+    
+    if (eventType === 'UPDATE' && newRecord && !isUpdatingFromRealTime) {
+      setIsUpdatingFromRealTime(true);
+      
+      setFormData(prev => ({
+        ...prev,
+        title: newRecord.title || prev.title,
+        description: newRecord.description || prev.description,
+        status: newRecord.status || prev.status,
+        priority: newRecord.priority || prev.priority,
+        due_date: newRecord.due_date ? new Date(newRecord.due_date).toISOString().split('T')[0] : prev.due_date
+      }));
+      
+      setTimeout(() => setIsUpdatingFromRealTime(false), 200);
+    }
+  }, [isUpdatingFromRealTime]);
+
+  // Gestionnaire simplifié des relations temps réel
+  const handleRealTimeRelationsUpdate = useCallback(async (relationType: 'assignees' | 'tags') => {
+    if (!task?.id || isUpdatingFromRealTime) return;
+    
+    setIsUpdatingFromRealTime(true);
+    
+    try {
+      if (relationType === 'assignees') {
+        const { data } = await supabase
+          .from('task_assignees')
+          .select('user_id')
+          .eq('task_id', task.id);
+        
+        if (data) {
+          setFormData(prev => ({
+            ...prev,
+            assignee_ids: data.map(a => a.user_id)
+          }));
+        }
+      } else if (relationType === 'tags') {
+        const { data } = await supabase
+          .from('task_tags')
+          .select('tag_id')
+          .eq('task_id', task.id);
+        
+        if (data) {
+          setFormData(prev => ({
+            ...prev,
+            tag_ids: data.map(t => t.tag_id)
+          }));
+        }
+      }
+    } catch (err) {
+      console.error('Erreur relation update:', err);
+    } finally {
+      setTimeout(() => setIsUpdatingFromRealTime(false), 200);
+    }
+  }, [task?.id, supabase, isUpdatingFromRealTime]);
 
   // Charger les données nécessaires
   useEffect(() => {
@@ -112,17 +207,10 @@ export function TaskModal({ task, isOpen, onClose, onSave, projectId }: TaskModa
       
       setAvailableUsers(transformedUsers);
 
-      // Charger les commentaires si on modifie une tâche existante
-      if (task && task.id) {
-        // TODO: Implémenter la récupération des commentaires
-        setComments([
-          {
-            id: '1',
-            content: 'Great progress on this task!',
-            user_name: 'John Doe',
-            created_at: new Date().toISOString()
-          }
-        ]);
+      // Récupérer l'utilisateur actuel
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setCurrentUserId(user.id);
       }
 
     } catch (error) {
@@ -132,33 +220,133 @@ export function TaskModal({ task, isOpen, onClose, onSave, projectId }: TaskModa
     }
   };
 
-  // Auto-sauvegarde quand les données changent
+  // Référence des valeurs précédentes pour détecter les changements
+  const prevFormData = useRef(formData)
+  
+  // Auto-sauvegarde avec debounce pour éviter les conflits
   useEffect(() => {
-    if (isOpen && task) {
-      const timeoutId = setTimeout(() => {
-        onSave({
-          ...task,
-          ...formData,
-          dueDate: formData.due_date ? new Date(formData.due_date).toISOString() : undefined,
-        });
-      }, 500); // Délai de 500ms pour éviter trop de sauvegardes
-
-      return () => clearTimeout(timeoutId);
+    if (isOpen && task?.id && updateTask && !isUpdatingFromRealTime) {
+      const hasChanged = JSON.stringify(formData) !== JSON.stringify(prevFormData.current)
+      
+      if (hasChanged) {
+        const timeoutId = setTimeout(async () => {
+          try {
+            await updateTask({
+              id: task.id,
+              title: formData.title,
+              description: formData.description,
+              priority: formData.priority,
+              status: formData.status,
+              dueDate: formData.due_date || null,
+              assigneeIds: formData.assignee_ids,
+              tagIds: formData.tag_ids
+            })
+            prevFormData.current = formData
+          } catch (err) {
+            console.error('Erreur auto-sauvegarde:', err)
+          }
+        }, 300) // Délai de 300ms pour éviter les saves trop fréquentes
+        
+        return () => clearTimeout(timeoutId)
+      }
     }
-  }, [formData, isOpen, onSave, task]);
+  }, [formData, isOpen, task?.id, updateTask, isUpdatingFromRealTime])
 
-  const addComment = () => {
-    if (newComment.trim()) {
-      const comment: Comment = {
-        id: Date.now().toString(),
-        content: newComment.trim(),
-        user_name: 'Current User', // TODO: Récupérer le vrai nom de l'utilisateur
-        created_at: new Date().toISOString()
-      };
-      setComments([...comments, comment]);
-      setNewComment('');
+  // Écouter les changements temps réel (version stable)
+  useEffect(() => {
+    if (!isOpen || !task?.id) return
+
+    const channel = supabase
+      .channel(`task-modal-${task.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'tasks',
+          filter: `id=eq.${task.id}`
+        },
+        handleRealTimeTaskUpdate
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'task_assignees',
+          filter: `task_id=eq.${task.id}`
+        },
+        () => handleRealTimeRelationsUpdate('assignees')
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'task_tags',
+          filter: `task_id=eq.${task.id}`
+        },
+        () => handleRealTimeRelationsUpdate('tags')
+      )
+      .subscribe()
+
+    return () => supabase.removeChannel(channel)
+  }, [isOpen, task?.id, handleRealTimeTaskUpdate, handleRealTimeRelationsUpdate])
+
+  const handleCreateComment = useCallback(async (content: string, mentions: any[]) => {
+    if (!task?.id) return;
+    try {
+      await createComment({ content, mentions });
+    } catch (error) {
+      console.error('Erreur lors de la création du commentaire:', error);
     }
-  };
+  }, [task?.id, createComment]);
+
+  const handleReplyToComment = useCallback(async (parentCommentId: string, content: string, mentions: any[]) => {
+    if (!task?.id) return;
+    try {
+      // Pour créer une réponse, on utilise createComment avec parentCommentId
+      await createComment({ content, mentions, parentCommentId });
+      // Pas besoin de gérer replyingTo ici car c'est géré dans CommentItem
+    } catch (error) {
+      console.error('Erreur lors de la réponse:', error);
+    }
+  }, [task?.id, createComment]);
+
+  const handleEditComment = useCallback(async (commentId: string, content: string, mentions: any[]) => {
+    try {
+      await updateComment(commentId, content, mentions);
+      // Pas besoin de gérer editingComment ici car c'est géré dans CommentItem
+    } catch (error) {
+      console.error('Erreur lors de la modification:', error);
+    }
+  }, [updateComment]);
+
+  const handleToggleReaction = useCallback(async (commentId: string, emoji: string) => {
+    try {
+      const reactions = getReactionsSummary(commentId);
+      const existingReaction = reactions.find(r => r.emoji === emoji);
+      
+      if (existingReaction?.hasUserReacted) {
+        await removeReaction(commentId, emoji);
+      } else {
+        await addReaction(commentId, emoji);
+      }
+    } catch (error) {
+      console.error('Erreur lors de la réaction:', error);
+    }
+  }, [addReaction, removeReaction, getReactionsSummary]);
+
+  const handleUploadFiles = useCallback(async (files: File[]) => {
+    if (!task?.id) return;
+    try {
+      for (const file of files) {
+        await uploadFile(file);
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'upload:', error);
+    }
+  }, [task?.id, uploadFile]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('fr-FR', {
@@ -177,7 +365,30 @@ export function TaskModal({ task, isOpen, onClose, onSave, projectId }: TaskModa
         ? prev.assignee_ids.filter(id => id !== userId)
         : [...prev.assignee_ids, userId]
     }));
+    setAssigneeSearchOpen(false);
   };
+
+  const removeAssignee = (userId: string) => {
+    setFormData(prev => ({
+      ...prev,
+      assignee_ids: prev.assignee_ids.filter(id => id !== userId)
+    }));
+  };
+
+  // Filtrer les utilisateurs pour la recherche
+  const filteredUsers = useMemo(() => {
+    return availableUsers.filter(user => 
+      !formData.assignee_ids.includes(user.id) &&
+      (user.firstName.toLowerCase().includes(assigneeSearch.toLowerCase()) ||
+       user.lastName.toLowerCase().includes(assigneeSearch.toLowerCase()) ||
+       user.email.toLowerCase().includes(assigneeSearch.toLowerCase()))
+    );
+  }, [availableUsers, formData.assignee_ids, assigneeSearch]);
+
+  // Obtenir les utilisateurs assignés
+  const assignedUsers = useMemo(() => {
+    return availableUsers.filter(user => formData.assignee_ids.includes(user.id));
+  }, [availableUsers, formData.assignee_ids]);
 
   const toggleTag = (tagId: string) => {
     setFormData(prev => ({
@@ -238,11 +449,11 @@ export function TaskModal({ task, isOpen, onClose, onSave, projectId }: TaskModa
                       </TabsTrigger>
                       <TabsTrigger value="discussion" className="flex items-center gap-2">
                         <IconMessage className="h-4 w-4" />
-                        Discussion ({comments.length})
+                        Discussion ({comments?.length || 0})
                       </TabsTrigger>
                       <TabsTrigger value="attachments" className="flex items-center gap-2">
                         <IconPaperclip className="h-4 w-4" />
-                        Pièces jointes
+                        Pièces jointes ({attachments?.length || 0})
                       </TabsTrigger>
                     </TabsList>
 
@@ -260,58 +471,90 @@ export function TaskModal({ task, isOpen, onClose, onSave, projectId }: TaskModa
                       </div>
                     </TabsContent>
 
-                    <TabsContent value="discussion" className="mt-4">
-                      <div className="space-y-4 h-80 overflow-y-auto">
-                        {comments.length === 0 ? (
-                          <div className="text-center text-gray-500 py-8">
-                            Aucun commentaire pour le moment
-                          </div>
-                        ) : (
-                          <div className="space-y-3">
-                            {comments.map((comment) => (
-                              <div key={comment.id} className="flex gap-3">
-                                <Avatar className="h-8 w-8">
-                                  <AvatarFallback className="text-xs">
-                                    {comment.user_name.split(' ').map(n => n[0]).join('')}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <div className="flex-1">
-                                  <div className="flex items-center gap-2 mb-1">
-                                    <span className="font-medium text-sm">{comment.user_name}</span>
-                                    <span className="text-xs text-gray-500">
-                                      {formatDate(comment.created_at)}
-                                    </span>
-                                  </div>
-                                  <p className="text-sm text-gray-700">{comment.content}</p>
-                                </div>
+                    <TabsContent value="discussion" className="mt-4 flex flex-col h-96">
+                      {commentsLoading ? (
+                        <div className="flex-1 flex items-center justify-center">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="flex-1 space-y-4 overflow-y-auto mb-4">
+                            {(comments?.length || 0) === 0 ? (
+                              <div className="text-center text-gray-500 py-8">
+                                Aucun commentaire pour le moment
                               </div>
-                            ))}
+                            ) : (
+                              <div className="space-y-4">
+                                {(comments || []).map((comment) => (
+                                  <CommentItem
+                                    key={comment.id}
+                                    comment={comment}
+                                    currentUserId={currentUserId}
+                                    onReply={handleReplyToComment}
+                                    onEdit={handleEditComment}
+                                    onDelete={() => deleteComment(comment.id)}
+                                    onReaction={(emoji) => handleToggleReaction(comment.id, emoji)}
+                                    onRemoveReaction={(emoji) => handleToggleReaction(comment.id, emoji)}
+                                    getReactionsSummary={getReactionsSummary}
+                                  />
+                                ))}
+                              </div>
+                            )}
                           </div>
-                        )}
-                      </div>
-                      
-                      <div className="flex gap-2 mt-4">
-                        <Input
-                          value={newComment}
-                          onChange={(e) => setNewComment(e.target.value)}
-                          placeholder="Ajouter un commentaire..."
-                          onKeyDown={(e) => e.key === 'Enter' && addComment()}
-                        />
-                        <Button onClick={addComment} size="sm">
-                          <IconSend className="h-4 w-4" />
-                        </Button>
-                      </div>
+                          
+                          <div className="border-t pt-4">
+                            <CommentEditor
+                              placeholder="Ajouter un commentaire..."
+                              onSubmit={handleCreateComment}
+                              availableUsers={availableUsers}
+                              availableAttachments={attachments}
+                            />
+                          </div>
+                        </>
+                      )}
                     </TabsContent>
 
-                    <TabsContent value="attachments" className="mt-4">
-                      <div className="text-center py-12">
-                        <IconPaperclip className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                        <p className="text-gray-500 mb-4">Aucune pièce jointe</p>
-                        <Button variant="outline">
-                          <IconPlus className="h-4 w-4 mr-2" />
-                          Ajouter des fichiers
-                        </Button>
-                      </div>
+                    <TabsContent value="attachments" className="mt-4 flex flex-col h-96">
+                      {attachmentsLoading ? (
+                        <div className="flex-1 flex items-center justify-center">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="mb-4">
+                            <FileUploader
+                              onFilesSelected={handleUploadFiles}
+                              uploading={attachmentsLoading}
+                              accept="*/*"
+                              multiple={true}
+                              maxSize={50}
+                            />
+                          </div>
+                          
+                          <div className="flex-1 overflow-y-auto">
+                            {(attachments?.length || 0) === 0 ? (
+                              <div className="text-center text-gray-500 py-8">
+                                <IconPaperclip className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                                <p>Aucune pièce jointe pour le moment</p>
+                              </div>
+                            ) : (
+                              <div className="grid grid-cols-1 gap-4">
+                                {(attachments || []).map((attachment) => (
+                                  <AttachmentCard
+                                    key={attachment.id}
+                                    attachment={attachment}
+                                    currentUserId={currentUserId}
+                                    onDownload={() => downloadAttachment(attachment.id)}
+                                    onDelete={() => deleteAttachment(attachment.id)}
+                                    onPreview={() => previewAttachment(attachment.id)}
+                                    onComment={() => commentOnAttachment(attachment.id)}
+                                  />
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      )}
                     </TabsContent>
                   </Tabs>
                 </div>
@@ -326,27 +569,73 @@ export function TaskModal({ task, isOpen, onClose, onSave, projectId }: TaskModa
                     <IconUser className="h-4 w-4" />
                     Assignés
                   </Label>
-                  <div className="space-y-2">
-                    {availableUsers.slice(0, 4).map((user) => (
-                      <div key={user.id} className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          id={`user-${user.id}`}
-                          checked={formData.assignee_ids.includes(user.id)}
-                          onChange={() => toggleAssignee(user.id)}
-                          className="rounded"
-                        />
-                        <label htmlFor={`user-${user.id}`} className="text-sm flex items-center gap-2 cursor-pointer">
-                          <Avatar className="h-6 w-6">
-                            <AvatarFallback className="text-xs">
+                  
+                  {/* Pillules des utilisateurs assignés */}
+                  {assignedUsers.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {assignedUsers.map((user) => (
+                        <div key={user.id} className="flex items-center gap-2 bg-gray-100 text-gray-700 px-3 py-1.5 rounded-full text-sm">
+                          <Avatar className="h-5 w-5">
+                            <AvatarFallback className="text-xs bg-gray-200 text-gray-600">
                               {user.firstName?.[0]}{user.lastName?.[0]}
                             </AvatarFallback>
                           </Avatar>
-                          {user.firstName} {user.lastName}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
+                          <span className="font-medium">{user.firstName} {user.lastName}</span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="h-4 w-4 p-0 hover:bg-gray-200 rounded-full"
+                            onClick={() => removeAssignee(user.id)}
+                          >
+                            <IconX className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {/* Dropdown avec recherche */}
+                  <Popover open={assigneeSearchOpen} onOpenChange={setAssigneeSearchOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start text-sm text-gray-500 hover:text-gray-700"
+                      >
+                        <IconPlus className="h-4 w-4 mr-2" />
+                        Ajouter un assigné
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-80 p-0" align="start">
+                      <Command>
+                        <CommandInput
+                          placeholder="Rechercher un utilisateur..."
+                          value={assigneeSearch}
+                          onValueChange={setAssigneeSearch}
+                        />
+                        <CommandEmpty>Aucun utilisateur trouvé.</CommandEmpty>
+                        <CommandGroup className="max-h-48 overflow-y-auto">
+                          {filteredUsers.map((user) => (
+                            <CommandItem
+                              key={user.id}
+                              onSelect={() => toggleAssignee(user.id)}
+                              className="flex items-center gap-3 p-3 cursor-pointer"
+                            >
+                              <Avatar className="h-8 w-8">
+                                <AvatarFallback className="text-sm">
+                                  {user.firstName?.[0]}{user.lastName?.[0]}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex flex-col">
+                                <span className="font-medium">{user.firstName} {user.lastName}</span>
+                                <span className="text-xs text-gray-500">{user.email}</span>
+                              </div>
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                 </div>
 
                 <Separator />

@@ -15,10 +15,11 @@ interface KanbanColumnProps {
   tasks: TaskExtended[]
   title: string
   onCreateTask: () => void
+  onEditTask: (task: TaskExtended) => void
 }
 
 
-export function KanbanColumn({ status, tasks, title, onCreateTask }: KanbanColumnProps) {
+export function KanbanColumn({ status, tasks, title, onCreateTask, onEditTask }: KanbanColumnProps) {
   const { setNodeRef, isOver } = useDroppable({
     id: status,
   })
@@ -56,13 +57,15 @@ export function KanbanColumn({ status, tasks, title, onCreateTask }: KanbanColum
       <CardContent>
         <div
           ref={setNodeRef}
-          className={`space-y-4 min-h-96 ${
+          className={`space-y-4 min-h-[200px] ${
+            tasks.length === 0 ? 'min-h-96' : 'min-h-fit'
+          } ${
             isOver ? 'bg-background/60 border-2 border-dashed border-muted-foreground/30 rounded-lg p-2' : ''
           }`}
         >
           <SortableContext items={tasks.map(task => task.id)} strategy={verticalListSortingStrategy}>
             {tasks.map((task) => (
-              <TaskCard key={task.id} task={task} />
+              <TaskCard key={task.id} task={task} onEdit={() => onEditTask(task)} />
             ))}
           </SortableContext>
           
@@ -72,6 +75,21 @@ export function KanbanColumn({ status, tasks, title, onCreateTask }: KanbanColum
               <div className="text-sm mb-3">No tasks currently. Board is empty</div>
               <Button size="sm" variant="outline" onClick={onCreateTask}>
                 Create Task
+              </Button>
+            </div>
+          )}
+          
+          {/* Bouton d'ajout en bas pour colonnes avec tâches */}
+          {tasks.length > 0 && (
+            <div className="pt-3 border-t border-gray-200/50">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={onCreateTask}
+                className="w-full justify-start text-muted-foreground hover:text-foreground hover:bg-background/80 transition-colors"
+              >
+                <IconPlus className="h-4 w-4 mr-2" />
+                Add task
               </Button>
             </div>
           )}
