@@ -528,10 +528,6 @@ export default function SettingsPage() {
       <div className="flex bg-gray-50 -mx-4 lg:-mx-6 -my-4 md:-my-6 h-[calc(100vh-var(--header-height))]">
         {/* Settings Sidebar */}
         <div className="w-64 bg-white border-r flex flex-col h-full">
-          <div className="p-6 border-b">
-            <h1 className="text-xl font-semibold">Settings</h1>
-          </div>
-
           <div className="flex-1 p-4 overflow-y-auto">
             <div className="space-y-6">
               <div>
