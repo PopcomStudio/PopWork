@@ -75,6 +75,69 @@ src/
 - **Maximum function length**: 30 lines
 - **Maximum file length**: 300 lines
 
+### Page Creation Template
+**CRITICAL**: Every new page MUST use the PageLayout component to integrate properly with the app layout.
+
+**PREFERRED METHOD** - Use the PageLayout wrapper:
+```tsx
+import { PageLayout } from "@/components/PageLayout"
+import { YourPageComponent } from "@/features/your-feature/components/YourPageComponent"
+
+export default function YourPage() {
+  return (
+    <PageLayout>
+      <YourPageComponent />
+    </PageLayout>
+  )
+}
+```
+
+**ALTERNATIVE METHOD** - Manual layout (only if you need custom layout logic):
+```tsx
+import { AppSidebar } from "@/components/app-sidebar"
+import { SiteHeader } from "@/components/site-header"
+import {
+  SidebarInset,
+  SidebarProvider,
+} from "@/components/ui/sidebar"
+import { YourPageComponent } from "@/features/your-feature/components/YourPageComponent"
+
+export default function YourPage() {
+  return (
+    <SidebarProvider
+      style={
+        {
+          "--sidebar-width": "calc(var(--spacing) * 72)",
+          "--header-height": "calc(var(--spacing) * 12)",
+        } as React.CSSProperties
+      }
+    >
+      <AppSidebar variant="inset" />
+      <SidebarInset>
+        <SiteHeader />
+        <div className="flex flex-1 flex-col">
+          <div className="@container/main flex flex-1 flex-col gap-2">
+            <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+              <div className="px-4 lg:px-6">
+                <YourPageComponent />
+              </div>
+            </div>
+          </div>
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
+  )
+}
+```
+
+**NEVER create pages that replace the entire layout** - always use PageLayout or the manual template to maintain:
+- Main navigation sidebar (AppSidebar)
+- Site header (SiteHeader)  
+- Consistent spacing and responsive design
+- Container queries (@container/main)
+
+This pattern ensures pages integrate seamlessly with the existing app layout rather than opening in "full-screen" mode.
+
 ### UI/UX Patterns
 - **Responsive design** with Tailwind CSS container queries (`@container`)
 - **Loading states** with skeleton components for better UX
