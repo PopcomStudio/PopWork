@@ -20,6 +20,7 @@ import {
 } from "@tabler/icons-react"
 
 import { useAuth } from "@/features/auth/hooks/use-auth"
+import { useProfile } from "@/features/settings/hooks/use-profile"
 
 import { NavDocuments } from "@/components/nav-documents"
 import { NavMain } from "@/components/nav-main"
@@ -117,11 +118,12 @@ const staticData = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { user, loading } = useAuth()
+  const { user, loading: authLoading } = useAuth()
+  const { profile, loading: profileLoading } = useProfile()
 
   // Construire les données utilisateur
-  const firstName = user?.user_metadata?.first_name
-  const lastName = user?.user_metadata?.last_name
+  const firstName = profile?.first_name || user?.user_metadata?.first_name
+  const lastName = profile?.last_name || user?.user_metadata?.last_name
   const fullName = firstName && lastName 
     ? `${firstName} ${lastName}`
     : user?.email?.split('@')[0] || "Utilisateur"
@@ -129,11 +131,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const userData = {
     name: fullName,
     email: user?.email || "",
-    avatar: user?.user_metadata?.avatar_url || "/avatars/shadcn.jpeg",
+    avatar: profile?.avatar_url || user?.user_metadata?.avatar_url || "/avatars/shadcn.jpeg",
     initials: firstName && lastName 
       ? `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
       : (user?.email?.charAt(0) || "U").toUpperCase(),
   }
+  
+  const loading = authLoading || profileLoading
 
   return (
     <Sidebar collapsible="icon" {...props}>
