@@ -18,6 +18,7 @@ import {
 	IconUserCheck,
 	IconFolderOpen,
 	IconSearch,
+	IconBriefcase,
 } from "@tabler/icons-react";
 
 import {
@@ -29,104 +30,34 @@ import {
 	CommandList,
 	CommandSeparator,
 } from "@/components/ui/command";
+import { useProjects } from "@/features/projects/hooks/use-projects";
+import { Badge } from "@/components/ui/badge";
 
-interface NavigationItem {
-	title: string;
-	url: string;
-	icon: React.ComponentType<{ className?: string }>;
-	category: string;
-}
 
-const navigationItems: NavigationItem[] = [
-	{
-		title: "Dashboard",
-		url: "/dashboard",
-		icon: IconDashboard,
-		category: "Pages principales",
-	},
-	{
-		title: "Projets & Tâches",
-		url: "/projects",
-		icon: IconFolder,
-		category: "Pages principales",
-	},
-	{
-		title: "Time Tracking",
-		url: "/time-tracking",
-		icon: IconClock,
-		category: "Pages principales",
-	},
-	{
-		title: "Facturation",
-		url: "/invoicing",
-		icon: IconFileInvoice,
-		category: "Pages principales",
-	},
-	{
-		title: "Équipe",
-		url: "/team",
-		icon: IconUsers,
-		category: "Pages principales",
-	},
-	{
-		title: "Calendrier",
-		url: "/calendar",
-		icon: IconCalendar,
-		category: "Pages principales",
-	},
-	{
-		title: "Entreprises",
-		url: "/entreprises",
-		icon: IconBuilding,
-		category: "Clients",
-	},
-	{
-		title: "Services",
-		url: "/services",
-		icon: IconPhone,
-		category: "Clients",
-	},
-	{
-		title: "Contacts",
-		url: "/contacts",
-		icon: IconUserCheck,
-		category: "Clients",
-	},
-	{
-		title: "Coffre-fort RH",
-		url: "/documents",
-		icon: IconFolderOpen,
-		category: "Ressources",
-	},
-	{
-		title: "Congés",
-		url: "/leaves",
-		icon: IconBeach,
-		category: "Ressources",
-	},
-	{
-		title: "Notifications",
-		url: "/notifications",
-		icon: IconBell,
-		category: "Ressources",
-	},
-	{
-		title: "Historique",
-		url: "/audit-log",
-		icon: IconHistory,
-		category: "Paramètres",
-	},
-	{
-		title: "Paramètres",
-		url: "/settings",
-		icon: IconSettings,
-		category: "Paramètres",
-	},
+// Onglets principaux de la sidebar
+const mainTabs = [
+	{ title: "Dashboard", url: "/dashboard", icon: IconDashboard },
+	{ title: "Projets & Tâches", url: "/projects", icon: IconFolder },
+	{ title: "Time Tracking", url: "/time-tracking", icon: IconClock },
+	{ title: "Facturation", url: "/invoicing", icon: IconFileInvoice },
+	{ title: "Équipe", url: "/team", icon: IconUsers },
+	{ title: "Calendrier", url: "/calendar", icon: IconCalendar },
+	{ title: "Entreprises", url: "/entreprises", icon: IconBuilding },
+	{ title: "Services", url: "/services", icon: IconPhone },
+	{ title: "Contacts", url: "/contacts", icon: IconUserCheck },
+	{ title: "Coffre-fort RH", url: "/documents", icon: IconFolderOpen },
+	{ title: "Congés", url: "/leaves", icon: IconBeach },
+	{ title: "Notifications", url: "/notifications", icon: IconBell },
+	{ title: "Historique", url: "/audit-log", icon: IconHistory },
+	{ title: "Paramètres", url: "/settings", icon: IconSettings },
 ];
+
 
 export function CmdKNavigation() {
 	const [open, setOpen] = React.useState(false);
+	const [search, setSearch] = React.useState("");
 	const router = useRouter();
+	const { projects } = useProjects();
 
 	React.useEffect(() => {
 		const down = (e: KeyboardEvent) => {
@@ -142,19 +73,36 @@ export function CmdKNavigation() {
 
 	const runCommand = React.useCallback((command: () => void) => {
 		setOpen(false);
+		setSearch("");
 		command();
 	}, []);
 
-	const groupedItems = navigationItems.reduce(
-		(acc, item) => {
-			if (!acc[item.category]) {
-				acc[item.category] = [];
-			}
-			acc[item.category].push(item);
-			return acc;
-		},
-		{} as Record<string, NavigationItem[]>,
-	);
+	// Filtrer les projets basé sur la recherche
+	const filteredProjects = React.useMemo(() => {
+		if (!search.trim()) return [];
+		
+		const searchLower = search.toLowerCase();
+		return projects
+			.filter(project => 
+				project.name.toLowerCase().includes(searchLower) ||
+				project.company_name?.toLowerCase().includes(searchLower) ||
+				project.service_name?.toLowerCase().includes(searchLower)
+			)
+			.slice(0, 10);
+	}, [projects, search]);
+
+	// Filtrer les onglets basé sur la recherche
+	const filteredTabs = React.useMemo(() => {
+		if (!search.trim()) return [];
+		
+		const searchLower = search.toLowerCase();
+		return mainTabs.filter(tab =>
+			tab.title.toLowerCase().includes(searchLower)
+		);
+	}, [search]);
+
+	// Détermine si on affiche les onglets ou les résultats de recherche
+	const showMainTabs = !search.trim();
 
 	return (
 		<>
@@ -169,32 +117,114 @@ export function CmdKNavigation() {
 					<span className="text-xs">⌘</span>K
 				</kbd>
 			</button>
-			<CommandDialog open={open} onOpenChange={setOpen}>
-				<CommandInput placeholder="Rechercher une page ou un projet..." />
+			<CommandDialog open={open} onOpenChange={(newOpen) => {
+				setOpen(newOpen);
+				if (!newOpen) setSearch("");
+			}}>
+				<CommandInput 
+					placeholder="Rechercher une page ou un projet..." 
+					value={search}
+					onValueChange={setSearch}
+				/>
 				<CommandList>
 					<CommandEmpty>Aucun résultat trouvé.</CommandEmpty>
-					{Object.entries(groupedItems).map(([category, items], index) => (
-						<React.Fragment key={category}>
-							{index > 0 && <CommandSeparator />}
-							<CommandGroup heading={category}>
-								{items.map((item) => {
-									const Icon = item.icon;
-									return (
-										<CommandItem
-											key={item.url}
-											value={`${item.title} ${item.category}`}
-											onSelect={() => {
-												runCommand(() => router.push(item.url));
-											}}
-										>
-											<Icon className="mr-2 h-4 w-4" />
-											<span>{item.title}</span>
-										</CommandItem>
-									);
-								})}
-							</CommandGroup>
-						</React.Fragment>
-					))}
+					
+					{/* Afficher les onglets principaux quand aucune recherche */}
+					{showMainTabs ? (
+						<CommandGroup heading="Navigation">
+							{mainTabs.map((tab) => {
+								const Icon = tab.icon;
+								return (
+									<CommandItem
+										key={tab.url}
+										value={tab.title}
+										onSelect={() => {
+											runCommand(() => router.push(tab.url));
+										}}
+									>
+										<Icon className="mr-2 h-4 w-4" />
+										<span>{tab.title}</span>
+									</CommandItem>
+								);
+							})}
+						</CommandGroup>
+					) : (
+						<>
+							{/* Section Projets - affichée en premier */}
+							{filteredProjects.length > 0 && (
+								<>
+									<CommandGroup heading="Projets">
+										{filteredProjects.map((project) => (
+											<CommandItem
+												key={`project-${project.id}`}
+												value={`projet ${project.name} ${project.company_name} ${project.service_name}`}
+												onSelect={() => {
+													runCommand(() => router.push(`/projects/${project.id}`));
+												}}
+											>
+												<IconBriefcase className="mr-2 h-4 w-4" />
+												<div className="flex flex-1 items-center justify-between">
+													<div className="flex flex-col">
+														<span>{project.name}</span>
+														{(project.company_name || project.service_name) && (
+															<span className="text-xs text-muted-foreground">
+																{project.company_name} 
+																{project.company_name && project.service_name && " • "}
+																{project.service_name}
+															</span>
+														)}
+													</div>
+													<Badge 
+														variant={
+															project.status === 'active' ? 'default' :
+															project.status === 'completed' ? 'secondary' :
+															project.status === 'archived' ? 'outline' :
+															'secondary'
+														}
+														className="ml-2"
+													>
+														{project.status === 'active' ? 'Actif' :
+														 project.status === 'completed' ? 'Terminé' :
+														 project.status === 'archived' ? 'Archivé' :
+														 'Brouillon'}
+													</Badge>
+												</div>
+											</CommandItem>
+										))}
+									</CommandGroup>
+									{filteredTabs.length > 0 && <CommandSeparator />}
+								</>
+							)}
+							
+							{/* Section Pages - affichée après les projets */}
+							{filteredTabs.length > 0 && (
+								<CommandGroup heading="Pages">
+									{filteredTabs.map((tab) => {
+										const Icon = tab.icon;
+										return (
+											<CommandItem
+												key={tab.url}
+												value={tab.title}
+												onSelect={() => {
+													runCommand(() => router.push(tab.url));
+												}}
+											>
+												<Icon className="mr-2 h-4 w-4" />
+												<span>{tab.title}</span>
+											</CommandItem>
+										);
+									})}
+								</CommandGroup>
+							)}
+							
+							{/* Message si aucun résultat */}
+							{filteredProjects.length === 0 && filteredTabs.length === 0 && (
+								<div className="py-6 text-center text-sm text-muted-foreground">
+									Aucun résultat trouvé pour "{search}"
+								</div>
+							)}
+						</>
+					)}
 				</CommandList>
 			</CommandDialog>
 		</>
