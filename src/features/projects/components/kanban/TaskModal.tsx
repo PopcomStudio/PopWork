@@ -21,21 +21,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { 
   IconCalendar, 
@@ -44,8 +31,7 @@ import {
   IconFlag,
   IconMessage,
   IconPaperclip,
-  IconPlus,
-  IconX
+  IconPlus
 } from '@tabler/icons-react';
 import { createClientComponentClient } from '@/lib/supabase';
 import { CommentItem } from '../discussion/CommentItem';
@@ -80,9 +66,8 @@ export function TaskModal({ task, isOpen, onClose, updateTask, projectId }: Task
   const [availableUsers, setAvailableUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [isUpdatingFromRealTime, setIsUpdatingFromRealTime] = useState(false);
-  const [assigneeSearchOpen, setAssigneeSearchOpen] = useState(false);
-  const [assigneeSearch, setAssigneeSearch] = useState('');
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [assigneeSearch, setAssigneeSearch] = useState('');
 
   // Hooks pour les commentaires et pièces jointes
   const {
@@ -190,7 +175,7 @@ export function TaskModal({ task, isOpen, onClose, updateTask, projectId }: Task
       // Charger les utilisateurs (pour les assignés)
       const { data: usersData, error: usersError } = await supabase
         .from('users')
-        .select('id, first_name, last_name, email, role_id, created_at, updated_at');
+        .select('id, first_name, last_name, email, role_id, created_at, updated_at, avatar_url');
 
       if (usersError) throw usersError;
       
@@ -202,7 +187,8 @@ export function TaskModal({ task, isOpen, onClose, updateTask, projectId }: Task
         email: user.email,
         roleId: user.role_id || '',
         createdAt: user.created_at || new Date().toISOString(),
-        updatedAt: user.updated_at || new Date().toISOString()
+        updatedAt: user.updated_at || new Date().toISOString(),
+        avatarUrl: user.avatar_url
       }));
       
       setAvailableUsers(transformedUsers);
@@ -365,30 +351,22 @@ export function TaskModal({ task, isOpen, onClose, updateTask, projectId }: Task
         ? prev.assignee_ids.filter(id => id !== userId)
         : [...prev.assignee_ids, userId]
     }));
-    setAssigneeSearchOpen(false);
   };
 
-  const removeAssignee = (userId: string) => {
-    setFormData(prev => ({
-      ...prev,
-      assignee_ids: prev.assignee_ids.filter(id => id !== userId)
-    }));
-  };
-
-  // Filtrer les utilisateurs pour la recherche
-  const filteredUsers = useMemo(() => {
-    return availableUsers.filter(user => 
-      !formData.assignee_ids.includes(user.id) &&
-      (user.firstName.toLowerCase().includes(assigneeSearch.toLowerCase()) ||
-       user.lastName.toLowerCase().includes(assigneeSearch.toLowerCase()) ||
-       user.email.toLowerCase().includes(assigneeSearch.toLowerCase()))
-    );
-  }, [availableUsers, formData.assignee_ids, assigneeSearch]);
-
-  // Obtenir les utilisateurs assignés
+  // Utilisateurs assignés pour affichage
   const assignedUsers = useMemo(() => {
     return availableUsers.filter(user => formData.assignee_ids.includes(user.id));
   }, [availableUsers, formData.assignee_ids]);
+
+  // Utilisateurs filtrés par recherche
+  const filteredUsers = useMemo(() => {
+    return availableUsers
+      .filter(user => !formData.assignee_ids.includes(user.id))
+      .filter(user => {
+        const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
+        return fullName.includes(assigneeSearch.toLowerCase());
+      });
+  }, [availableUsers, formData.assignee_ids, assigneeSearch]);
 
   const toggleTag = (tagId: string) => {
     setFormData(prev => ({
@@ -570,78 +548,77 @@ export function TaskModal({ task, isOpen, onClose, updateTask, projectId }: Task
                     Assignés
                   </Label>
                   
-                  {/* Pillules des utilisateurs assignés */}
+                  {/* Assignés sélectionnés en badges */}
                   {assignedUsers.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mb-3">
+                    <div className="flex flex-wrap gap-1.5">
                       {assignedUsers.map((user) => (
-                        <div key={user.id} className="flex items-center gap-2 bg-gray-100 text-gray-700 px-3 py-1.5 rounded-full text-sm">
-                          <Avatar className="h-5 w-5">
-                            <AvatarFallback className="text-xs bg-gray-200 text-gray-600">
+                        <Badge key={user.id} variant="secondary" className="inline-flex items-center gap-1.5 pr-1">
+                          <Avatar className="h-4 w-4">
+                            {user.avatarUrl && <AvatarImage src={user.avatarUrl} />}
+                            <AvatarFallback className="text-[10px]">
                               {user.firstName?.[0]}{user.lastName?.[0]}
                             </AvatarFallback>
                           </Avatar>
-                          <span className="font-medium">{user.firstName} {user.lastName}</span>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="h-4 w-4 p-0 hover:bg-gray-200 rounded-full"
-                            onClick={() => removeAssignee(user.id)}
+                          <span className="text-xs">{user.firstName} {user.lastName}</span>
+                          <button
+                            className="ml-1 text-muted-foreground hover:text-foreground transition-colors"
+                            onClick={() => toggleAssignee(user.id)}
                           >
-                            <IconX className="h-3 w-3" />
-                          </Button>
-                        </div>
+                            ×
+                          </button>
+                        </Badge>
                       ))}
                     </div>
                   )}
-                  
-                  {/* Dropdown avec recherche */}
-                  <Popover open={assigneeSearchOpen} onOpenChange={setAssigneeSearchOpen}>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="w-full justify-start text-sm text-gray-500 hover:text-gray-700"
-                      >
+
+                  {/* Sélecteur avec recherche pour ajouter des assignés */}
+                  <Select 
+                    value="" 
+                    onValueChange={(value) => {
+                      if (value && !formData.assignee_ids.includes(value)) {
+                        toggleAssignee(value);
+                        setAssigneeSearch(''); // Reset search after selection
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="w-full">
+                      <div className="flex items-center">
                         <IconPlus className="h-4 w-4 mr-2" />
-                        Ajouter un assigné
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-80 p-0" align="start">
-                      <Command>
-                        <CommandInput
+                        <span className="text-gray-500">Ajouter un assigné</span>
+                      </div>
+                    </SelectTrigger>
+                    <SelectContent className="max-h-[300px]">
+                      <div className="px-3 py-2 border-b">
+                        <Input
                           placeholder="Rechercher un utilisateur..."
                           value={assigneeSearch}
-                          onValueChange={setAssigneeSearch}
+                          onChange={(e) => setAssigneeSearch(e.target.value)}
+                          className="h-8 text-sm"
                         />
-                        <CommandList>
-                          <CommandEmpty>Aucun utilisateur trouvé.</CommandEmpty>
-                          <CommandGroup>
-                            {filteredUsers.map((user) => (
-                              <CommandItem
-                                key={user.id}
-                                value={user.id}
-                                onSelect={() => {
-                                  toggleAssignee(user.id);
-                                  setAssigneeSearch('');
-                                }}
-                                className="flex items-center gap-3 p-3 cursor-pointer"
-                              >
-                                <Avatar className="h-8 w-8">
-                                  <AvatarFallback className="text-sm">
+                      </div>
+                      <div className="max-h-[200px] overflow-y-auto">
+                        {filteredUsers.length === 0 ? (
+                          <div className="px-3 py-4 text-sm text-gray-500 text-center">
+                            {assigneeSearch ? 'Aucun utilisateur trouvé' : 'Aucun utilisateur disponible'}
+                          </div>
+                        ) : (
+                          filteredUsers.map((user) => (
+                            <SelectItem key={user.id} value={user.id}>
+                              <div className="flex items-center gap-2">
+                                <Avatar className="h-6 w-6">
+                                  {user.avatarUrl && <AvatarImage src={user.avatarUrl} />}
+                                  <AvatarFallback className="text-xs">
                                     {user.firstName?.[0]}{user.lastName?.[0]}
                                   </AvatarFallback>
                                 </Avatar>
-                                <div className="flex flex-col">
-                                  <span className="font-medium">{user.firstName} {user.lastName}</span>
-                                  <span className="text-xs text-gray-500">{user.email}</span>
-                                </div>
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
+                                {user.firstName} {user.lastName}
+                              </div>
+                            </SelectItem>
+                          ))
+                        )}
+                      </div>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <Separator />

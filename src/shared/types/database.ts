@@ -8,6 +8,7 @@ export interface User {
   roleId: string
   createdAt: string
   updatedAt: string
+  avatarUrl?: string
 }
 
 export interface Role {
