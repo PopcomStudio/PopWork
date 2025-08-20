@@ -44,7 +44,6 @@ import {
   IconFlag,
   IconMessage,
   IconPaperclip,
-  IconSend,
   IconPlus,
   IconX
 } from '@tabler/icons-react';
@@ -84,7 +83,6 @@ export function TaskModal({ task, isOpen, onClose, updateTask, projectId }: Task
   const [assigneeSearchOpen, setAssigneeSearchOpen] = useState(false);
   const [assigneeSearch, setAssigneeSearch] = useState('');
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const popoverContentRef = useRef<HTMLDivElement>(null);
 
   // Hooks pour les commentaires et pièces jointes
   const {
@@ -387,86 +385,6 @@ export function TaskModal({ task, isOpen, onClose, updateTask, projectId }: Task
     );
   }, [availableUsers, formData.assignee_ids, assigneeSearch]);
 
-  // Gestionnaire pour forcer le scroll avec la molette dans le dropdown des assignés
-  useEffect(() => {
-    if (!assigneeSearchOpen) return;
-
-    // Délai pour s'assurer que le DOM est monté
-    const timeoutId = setTimeout(() => {
-      const popoverContent = popoverContentRef.current;
-      if (!popoverContent) return;
-
-      const handleWheel = (e: WheelEvent) => {
-        // Vérifier si la souris est au-dessus du popover
-        const target = e.target as Element;
-        if (!popoverContent.contains(target)) {
-          return;
-        }
-        
-        // Trouver l'élément scrollable dans le popover - essayer plusieurs sélecteurs
-        const scrollableSelectors = [
-          '[cmdk-list]',
-          '[data-cmdk-list]', 
-          '.overflow-y-auto',
-          '.max-h-\\[300px\\]',
-          '[role="listbox"]',
-          '.scroll-area-viewport',
-          '[data-radix-scroll-area-viewport]'
-        ];
-        
-        let scrollableElement = null;
-        for (const selector of scrollableSelectors) {
-          scrollableElement = popoverContent.querySelector(selector);
-          if (scrollableElement && scrollableElement.scrollHeight > scrollableElement.clientHeight) {
-            break;
-          }
-          scrollableElement = null;
-        }
-        
-        // Si aucun élément scrollable spécifique trouvé, essayer le popover lui-même
-        if (!scrollableElement) {
-          const commandElement = popoverContent.querySelector('[cmdk-root]') || 
-                                popoverContent.querySelector('div[role="combobox"]') ||
-                                popoverContent.firstElementChild;
-          if (commandElement && commandElement.scrollHeight > commandElement.clientHeight) {
-            scrollableElement = commandElement;
-          }
-        }
-        
-        if (scrollableElement) {
-          e.preventDefault();
-          e.stopPropagation();
-          e.stopImmediatePropagation();
-          
-          // Calculer le nouveau scrollTop
-          const deltaY = e.deltaY;
-          const newScrollTop = scrollableElement.scrollTop + deltaY;
-          const maxScroll = scrollableElement.scrollHeight - scrollableElement.clientHeight;
-          
-          // Appliquer le scroll avec les limites
-          scrollableElement.scrollTop = Math.max(0, Math.min(newScrollTop, maxScroll));
-          
-          console.log('Scroll applied:', { deltaY, newScrollTop: scrollableElement.scrollTop, maxScroll });
-        } else {
-          console.log('No scrollable element found in popover');
-        }
-      };
-
-      // Attacher l'événement au niveau du PopoverContent ET du document pour plus de robustesse
-      popoverContent.addEventListener('wheel', handleWheel, { passive: false, capture: true });
-      document.addEventListener('wheel', handleWheel, { passive: false, capture: true });
-      
-      return () => {
-        popoverContent.removeEventListener('wheel', handleWheel, { capture: true });
-        document.removeEventListener('wheel', handleWheel, { capture: true });
-      };
-    }, 100);
-
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, [assigneeSearchOpen]);
-
   // Obtenir les utilisateurs assignés
   const assignedUsers = useMemo(() => {
     return availableUsers.filter(user => formData.assignee_ids.includes(user.id));
@@ -688,7 +606,7 @@ export function TaskModal({ task, isOpen, onClose, updateTask, projectId }: Task
                         Ajouter un assigné
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-80 p-0" align="start" ref={popoverContentRef}>
+                    <PopoverContent className="w-80 p-0" align="start">
                       <Command>
                         <CommandInput
                           placeholder="Rechercher un utilisateur..."
@@ -701,7 +619,11 @@ export function TaskModal({ task, isOpen, onClose, updateTask, projectId }: Task
                             {filteredUsers.map((user) => (
                               <CommandItem
                                 key={user.id}
-                                onSelect={() => toggleAssignee(user.id)}
+                                value={user.id}
+                                onSelect={() => {
+                                  toggleAssignee(user.id);
+                                  setAssigneeSearch('');
+                                }}
                                 className="flex items-center gap-3 p-3 cursor-pointer"
                               >
                                 <Avatar className="h-8 w-8">
