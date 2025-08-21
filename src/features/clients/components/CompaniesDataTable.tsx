@@ -21,18 +21,18 @@ import {
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import {
-  IconChevronDown,
-  IconChevronLeft,
-  IconChevronRight,
-  IconChevronsLeft,
-  IconChevronsRight,
-  IconDotsVertical,
-  IconGripVertical,
-  IconPlus,
-  IconSearch,
-  IconEdit,
-  IconTrash,
-} from "@tabler/icons-react"
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  MoreVertical,
+  GripVertical,
+  Plus,
+  Search,
+  Edit,
+  Trash2,
+} from "lucide-react"
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -115,7 +115,7 @@ function DragHandle({ id }: { id: string }) {
       size="icon"
       className="text-muted-foreground size-7 hover:bg-transparent"
     >
-      <IconGripVertical className="text-muted-foreground size-3" />
+      <GripVertical className="text-muted-foreground size-3" />
       <span className="sr-only">Drag to reorder</span>
     </Button>
   )
@@ -262,13 +262,13 @@ export function CompaniesDataTable({
               className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
               size="icon"
             >
-              <IconDotsVertical />
+              <MoreVertical />
               <span className="sr-only">Open menu</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-32">
             <DropdownMenuItem onClick={() => onEditCompany(row.original)}>
-              <IconEdit className="h-4 w-4 mr-2" />
+              <Edit className="h-4 w-4 mr-2" />
               Modifier
             </DropdownMenuItem>
             <DropdownMenuSeparator />
@@ -276,7 +276,7 @@ export function CompaniesDataTable({
               onClick={() => onDeleteCompany(row.original)}
               className="text-destructive"
             >
-              <IconTrash className="h-4 w-4 mr-2" />
+              <Trash2 className="h-4 w-4 mr-2" />
               Supprimer
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -379,7 +379,7 @@ export function CompaniesDataTable({
     <div className="w-full flex-col justify-start">
       <div className="flex items-center justify-between pb-6">
         <div className="flex items-center space-x-2 flex-1 max-w-md">
-          <IconSearch className="h-4 w-4 opacity-50" />
+          <Search className="h-4 w-4 opacity-50" />
           <Input
             placeholder="Rechercher par nom, adresse, SIRET ou email..."
             value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
@@ -393,7 +393,7 @@ export function CompaniesDataTable({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
-                <IconChevronDown />
+                <ChevronDown />
                 <span className="hidden lg:inline">Colonnes</span>
               </Button>
             </DropdownMenuTrigger>
@@ -427,7 +427,7 @@ export function CompaniesDataTable({
             </DropdownMenuContent>
           </DropdownMenu>
           <Button variant="default" size="sm" onClick={onNewCompany}>
-            <IconPlus />
+            <Plus />
             <span className="hidden lg:inline">Nouvelle entreprise</span>
           </Button>
         </div>
@@ -526,7 +526,7 @@ export function CompaniesDataTable({
                 disabled={!table.getCanPreviousPage()}
               >
                 <span className="sr-only">Go to first page</span>
-                <IconChevronsLeft />
+                <ChevronsLeft />
               </Button>
               <Button
                 variant="outline"
@@ -536,7 +536,7 @@ export function CompaniesDataTable({
                 disabled={!table.getCanPreviousPage()}
               >
                 <span className="sr-only">Go to previous page</span>
-                <IconChevronLeft />
+                <ChevronLeft />
               </Button>
               <Button
                 variant="outline"
@@ -546,7 +546,7 @@ export function CompaniesDataTable({
                 disabled={!table.getCanNextPage()}
               >
                 <span className="sr-only">Go to next page</span>
-                <IconChevronRight />
+                <ChevronRight />
               </Button>
               <Button
                 variant="outline"
@@ -556,7 +556,7 @@ export function CompaniesDataTable({
                 disabled={!table.getCanNextPage()}
               >
                 <span className="sr-only">Go to last page</span>
-                <IconChevronsRight />
+                <ChevronsRight />
               </Button>
             </div>
           </div>

@@ -4,25 +4,34 @@ Application web de gestion d'agence construite avec Next.js 15, TypeScript, Shad
 
 ## 🚀 État du projet
 
-✅ **Phase 1 - Fondations (En cours)**
-- [x] Initialisation Next.js 15.4 avec TypeScript
+✅ **Phase 1 - Fondations (TERMINÉE)**
+- [x] Initialisation Next.js 15 avec TypeScript
 - [x] Configuration ShadCN UI avec Tailwind CSS v4
 - [x] Structure feature-based pour l'architecture frontend
 - [x] Types de base de données définis
-- [x] Layout dashboard principal créé
+- [x] Layout dashboard principal créé avec PageLayout component
 - [x] Page d'accueil du dashboard avec statistiques
-- [x] Page projets de base
-- [x] Configuration Supabase de base
-- [ ] Authentification Supabase Auth
-- [ ] Schéma de base de données complet
-- [ ] Système de permissions et rôles
+- [x] Navigation responsive avec AppSidebar
+- [x] Configuration Supabase complète
+- [x] Authentification Supabase Auth avec hooks custom (`useAuth`)
+- [x] Schéma de base de données complet (toutes tables créées)
+- [x] Système de permissions et rôles configurables
+
+🔄 **Phase 2 - Cœur Métier (EN COURS)**
+- [x] Interface de gestion des clients/entreprises/services/contacts
+- [x] Système de projets avec Kanban et assignation d'utilisateurs  
+- [x] Custom hooks pour data fetching (`use-projects.ts`, `use-dashboard-data.ts`)
+- [x] Améliorations récentes : CMD+K optimisé et résolution problèmes d'assignation
+- [ ] Finalisation système complet de tâches (CRUD complet)
+- [ ] Gestion avancée des statuts et priorités des tâches
 
 ## 🛠 Stack Technique
 
-- **Frontend:** Next.js 15.4, TypeScript, React 19
-- **UI:** ShadCN UI, Tailwind CSS v4, Lucide Icons
+- **Frontend:** Next.js 15, TypeScript, React 19
+- **UI:** ShadCN UI, Tailwind CSS v4, Lucide Icons, Radix UI primitives
 - **Backend:** Supabase (Auth, Database, Storage, Realtime)
-- **État:** Zustand (prévu)
+- **Architecture:** Feature-based avec PageLayout component
+- **Hooks:** Custom hooks pour authentification et data fetching  
 - **Graphiques:** Recharts
 - **Email:** Resend
 - **Validation:** Zod + React Hook Form
@@ -93,16 +102,20 @@ src/
 
 ## 📋 Fonctionnalités prévues
 
-### ✅ Implémenté (MVP de base)
-- Dashboard principal avec statistiques
-- Navigation latérale complète
-- Layout responsive
-- Page projets avec données mockées
+### ✅ Implémenté (Phase 1 complète)
+- Dashboard principal avec statistiques et custom hooks
+- Navigation latérale complète avec AppSidebar
+- Layout responsive avec PageLayout component
+- Authentification Supabase avec hooks custom (`useAuth`)
+- Schéma de base de données complet (toutes tables)
+- Système de rôles et permissions configurables
+- Interface Kanban pour projets avec assignation utilisateurs
+- Gestion complète clients/entreprises/services/contacts
 
-### 🔄 En cours (Phase 1)
-- Authentification Supabase
-- Schéma de base de données
-- Système de rôles et permissions
+### 🔄 En cours (Phase 2)
+- Finalisation du système de tâches (CRUD complet)
+- Gestion avancée des statuts et priorités
+- Optimisations d'interface utilisateur
 
 ### 📋 Prochaines phases
 - **Phase 2:** Gestion clients, projets, tâches
@@ -116,20 +129,19 @@ src/
 
 ## 🎯 Prochaines étapes
 
-1. **Configurer Supabase:**
-   - Créer un projet Supabase
-   - Configurer l'authentification
-   - Créer le schéma de base de données
+1. **Phase 2 - Finalisation Cœur Métier:**
+   - Finaliser le CRUD complet des tâches
+   - Optimiser les interactions Kanban 
+   - Améliorer l'UX des assignations d'utilisateurs
 
-2. **Implémenter l'authentification:**
-   - Pages login/register
-   - Protection des routes
-   - Gestion des sessions
+2. **Améliorations continues:**
+   - Tests et validation des nouvelles fonctionnalités
+   - Optimisation des performances
+   - Amélioration de l'accessibilité
 
-3. **Base de données:**
-   - Créer toutes les tables selon `src/shared/types/database.ts`
-   - Configurer les RLS (Row Level Security)
-   - Créer les relations entre tables
+3. **Phase 3 - Préparation:**
+   - Conception du système de time tracking
+   - Architecture de gestion d'équipe
 
 ## 📝 Documentation
 
@@ -141,9 +153,13 @@ src/
 Le projet suit les principes de Clean Architecture et une organisation feature-based pour maintenir la scalabilité et la maintenabilité du code.
 
 **Standards de code :**
-- TypeScript strict
-- Architecture feature-based
+- TypeScript strict mode activé
+- Architecture feature-based avec PageLayout obligatoire pour nouvelles pages
 - Max 30 lignes par fonction
 - Max 300 lignes par fichier
-- Nomenclature claire et descriptive
+- Nomenclature claire et descriptive avec préfixes feature
 - Pas de commentaires (code auto-documenté)
+- Custom hooks pour data fetching et business logic
+- ShadCN UI avec Radix UI primitives pour tous composants
+
+**Dernière mise à jour :** 21 août 2025

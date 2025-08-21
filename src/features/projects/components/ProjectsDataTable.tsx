@@ -21,22 +21,22 @@ import {
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import {
-  IconChevronDown,
-  IconChevronLeft,
-  IconChevronRight,
-  IconChevronsLeft,
-  IconChevronsRight,
-  IconDotsVertical,
-  IconGripVertical,
-  IconPlus,
-  IconSearch,
-  IconEdit,
-  IconTrash,
-  IconCircleCheckFilled,
-  IconClock,
-  IconArchive,
-  IconFileText,
-} from "@tabler/icons-react"
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  MoreVertical,
+  GripVertical,
+  Plus,
+  Search,
+  Edit,
+  Trash2,
+  CheckCircle,
+  Clock,
+  Archive,
+  FileText,
+} from "lucide-react"
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -125,7 +125,7 @@ function DragHandle({ id }: { id: string }) {
       size="icon"
       className="text-muted-foreground size-7 hover:bg-transparent"
     >
-      <IconGripVertical className="text-muted-foreground size-3" />
+      <GripVertical className="text-muted-foreground size-3" />
       <span className="sr-only">Drag to reorder</span>
     </Button>
   )
@@ -151,32 +151,32 @@ export function ProjectsDataTable({
         return {
           label: 'Brouillon',
           variant: 'secondary' as const,
-          icon: IconFileText,
+          icon: FileText,
         }
       case 'active':
         return {
           label: 'Actif',
           variant: 'default' as const,
-          icon: IconClock,
+          icon: Clock,
         }
       case 'completed':
         return {
           label: 'Terminé',
           variant: 'default' as const,
-          icon: IconCircleCheckFilled,
+          icon: CheckCircle,
           className: 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800',
         }
       case 'archived':
         return {
           label: 'Archivé',
           variant: 'outline' as const,
-          icon: IconArchive,
+          icon: Archive,
         }
       default:
         return {
           label: status,
           variant: 'secondary' as const,
-          icon: IconFileText,
+          icon: FileText,
         }
     }
   }
@@ -300,13 +300,13 @@ export function ProjectsDataTable({
               className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
               size="icon"
             >
-              <IconDotsVertical />
+              <MoreVertical />
               <span className="sr-only">Open menu</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-32">
             <DropdownMenuItem onClick={() => onEditProject(row.original)}>
-              <IconEdit className="h-4 w-4 mr-2" />
+              <Edit className="h-4 w-4 mr-2" />
               Modifier
             </DropdownMenuItem>
             <DropdownMenuSeparator />
@@ -314,7 +314,7 @@ export function ProjectsDataTable({
               onClick={() => onDeleteProject(row.original)}
               className="text-destructive"
             >
-              <IconTrash className="h-4 w-4 mr-2" />
+              <Trash2 className="h-4 w-4 mr-2" />
               Supprimer
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -420,7 +420,7 @@ export function ProjectsDataTable({
     <div className="w-full flex-col justify-start">
       <div className="flex items-center justify-between pb-6">
         <div className="flex items-center space-x-2 flex-1 max-w-md">
-          <IconSearch className="h-4 w-4 opacity-50" />
+          <Search className="h-4 w-4 opacity-50" />
           <Input
             placeholder="Rechercher par nom, entreprise ou service..."
             value={globalFilter}
@@ -432,7 +432,7 @@ export function ProjectsDataTable({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
-                <IconChevronDown />
+                <ChevronDown />
                 <span className="hidden lg:inline">Colonnes</span>
               </Button>
             </DropdownMenuTrigger>
@@ -467,7 +467,7 @@ export function ProjectsDataTable({
             </DropdownMenuContent>
           </DropdownMenu>
           <Button variant="default" size="sm" onClick={onNewProject}>
-            <IconPlus />
+            <Plus />
             <span className="hidden lg:inline">Nouveau projet</span>
           </Button>
         </div>
@@ -566,7 +566,7 @@ export function ProjectsDataTable({
                 disabled={!table.getCanPreviousPage()}
               >
                 <span className="sr-only">Go to first page</span>
-                <IconChevronsLeft />
+                <ChevronsLeft />
               </Button>
               <Button
                 variant="outline"
@@ -576,7 +576,7 @@ export function ProjectsDataTable({
                 disabled={!table.getCanPreviousPage()}
               >
                 <span className="sr-only">Go to previous page</span>
-                <IconChevronLeft />
+                <ChevronLeft />
               </Button>
               <Button
                 variant="outline"
@@ -586,7 +586,7 @@ export function ProjectsDataTable({
                 disabled={!table.getCanNextPage()}
               >
                 <span className="sr-only">Go to next page</span>
-                <IconChevronRight />
+                <ChevronRight />
               </Button>
               <Button
                 variant="outline"
@@ -596,7 +596,7 @@ export function ProjectsDataTable({
                 disabled={!table.getCanNextPage()}
               >
                 <span className="sr-only">Go to last page</span>
-                <IconChevronsRight />
+                <ChevronsRight />
               </Button>
             </div>
           </div>

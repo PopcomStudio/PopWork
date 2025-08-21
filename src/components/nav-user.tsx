@@ -3,12 +3,12 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import {
-  IconCreditCard,
-  IconDotsVertical,
-  IconLogout,
-  IconNotification,
-  IconUserCircle,
-} from "@tabler/icons-react"
+  CreditCard,
+  MoreVertical,
+  LogOut,
+  Bell,
+  UserCircle,
+} from "lucide-react"
 
 import {
   Avatar,
@@ -85,7 +85,7 @@ export function NavUser({
                   {user.email}
                 </span>
               </div>
-              <IconDotsVertical className="ml-auto size-4" />
+              <MoreVertical className="ml-auto size-4" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -111,15 +111,15 @@ export function NavUser({
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <IconUserCircle />
+                <UserCircle />
                 Profil
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <IconCreditCard />
+                <CreditCard />
                 Facturation
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <IconNotification />
+                <Bell />
                 Notifications
               </DropdownMenuItem>
             </DropdownMenuGroup>
@@ -128,7 +128,7 @@ export function NavUser({
               onClick={handleLogout}
               disabled={isLoggingOut}
             >
-              <IconLogout />
+              <LogOut />
               {isLoggingOut ? "Déconnexion..." : "Se déconnecter"}
             </DropdownMenuItem>
           </DropdownMenuContent>

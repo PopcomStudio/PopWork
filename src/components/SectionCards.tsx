@@ -1,4 +1,4 @@
-import { IconTrendingDown, IconTrendingUp } from "@tabler/icons-react"
+import { TrendingDown, TrendingUp } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import {
@@ -45,14 +45,14 @@ export function SectionCards({ stats }: SectionCardsProps) {
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
-              <IconTrendingUp />
+              <TrendingUp />
               {revenueGrowth}
             </Badge>
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
-            En hausse ce mois-ci <IconTrendingUp className="size-4" />
+            En hausse ce mois-ci <TrendingUp className="size-4" />
           </div>
           <div className="text-muted-foreground">
             Factures payées ce trimestre
@@ -67,14 +67,14 @@ export function SectionCards({ stats }: SectionCardsProps) {
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
-              {parseFloat(projectGrowth) > 0 ? <IconTrendingUp /> : <IconTrendingDown />}
+              {parseFloat(projectGrowth) > 0 ? <TrendingUp /> : <TrendingDown />}
               {projectGrowth}
             </Badge>
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
-            {parseFloat(projectGrowth) > 0 ? 'En progression' : 'En baisse'} <IconTrendingUp className="size-4" />
+            {parseFloat(projectGrowth) > 0 ? 'En progression' : 'En baisse'} <TrendingUp className="size-4" />
           </div>
           <div className="text-muted-foreground">
             Projets en cours de développement
@@ -89,14 +89,14 @@ export function SectionCards({ stats }: SectionCardsProps) {
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
-              <IconTrendingUp />
+              <TrendingUp />
               {taskCompletion}
             </Badge>
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
-            Productivité élevée <IconTrendingUp className="size-4" />
+            Productivité élevée <TrendingUp className="size-4" />
           </div>
           <div className="text-muted-foreground">Objectifs de l&apos;équipe atteints</div>
         </CardFooter>
@@ -109,14 +109,14 @@ export function SectionCards({ stats }: SectionCardsProps) {
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
-              {parseFloat(invoiceGrowth) > 0 ? <IconTrendingUp /> : <IconTrendingDown />}
+              {parseFloat(invoiceGrowth) > 0 ? <TrendingUp /> : <TrendingDown />}
               {invoiceGrowth}
             </Badge>
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
-            Suivi des paiements <IconTrendingUp className="size-4" />
+            Suivi des paiements <TrendingUp className="size-4" />
           </div>
           <div className="text-muted-foreground">Facturation en cours</div>
         </CardFooter>

@@ -7,7 +7,7 @@
 
 ---
 
-## 📈 Phase 1 - Fondations (Semaine 1-2)
+## 📈 Phase 1 - Fondations (Semaine 1-2) ✅ **TERMINÉE**
 
 ### 🔐 Authentification & Rôles
 - [x] Configurer Supabase Auth
@@ -15,6 +15,7 @@
 - [x] Implémenter le système de permissions configurables
 - [x] Gérer les rôles personnalisables
 - [x] Sécuriser l'auto-assignation des tâches
+- [x] Custom hooks pour authentification (`useAuth`)
 
 ### 🗄️ Schema DB
 - [x] Créer la table `users`
@@ -35,10 +36,13 @@
 - [x] Créer la table `client_feedbacks`
 
 ### 🎨 UI Base
-- [x] Finaliser les composants UI existants
+- [x] Finaliser les composants UI existants (ShadCN UI)
 - [x] Améliorer la structure du dashboard
-- [x] Créer les layouts principaux
-- [x] Implémenter la navigation responsive
+- [x] Créer les layouts principaux (PageLayout component)
+- [x] Implémenter la navigation responsive (AppSidebar)
+- [x] Intégration Tailwind CSS v4
+- [x] Composants avec Radix UI primitives
+- [x] Icons Lucide React
 
 ---
 
@@ -53,10 +57,12 @@
 
 ### 📁 Projets
 - [x] Création/édition de projets
-- [ ] Assignation manuelle des membres
+- [x] Assignation manuelle des membres (récemment implémentée)
 - [x] Liaison entreprise/service
 - [x] Suivi de l'état d'avancement
 - [x] Interface de liste des projets
+- [x] Custom hooks pour data fetching (`use-projects.ts`)
+- [x] Interface Kanban pour gestion projets
 
 ### ✅ Tâches
 - [ ] Création/édition de tâches
@@ -194,11 +200,11 @@
 
 ## 📊 Statistiques d'Avancement
 
-**Total des tâches :** 24/87 (27.6%)
+**Total des tâches :** 30/90 (33.3%)
 
 ### Par Phase
-- Phase 1 : 23/23 (100%) ✅ **TERMINÉE**
-- Phase 2 : 1/19 (5.3%)
+- Phase 1 : 26/26 (100%) ✅ **TERMINÉE**
+- Phase 2 : 4/22 (18.2%) 🔄 **EN COURS**
 - Phase 3 : 0/14 (0%)
 - Phase 4 : 0/12 (0%)
 - Phase 5 : 0/10 (0%)
@@ -211,10 +217,20 @@
 
 ## 🎯 Prochaines Actions
 
-1. **Phase 2 - Cœur Métier** : Interface de gestion des clients et entreprises
-2. **Priorité immédiate** : Créer le module de gestion des entreprises
-3. **Validation** : Tester les CRUD clients avant de passer aux projets
+1. **Phase 2 - Cœur Métier** : Finaliser le système de tâches
+2. **Priorité immédiate** : Implémentation complète du CRUD des tâches
+3. **Validation** : Tester les interactions Kanban et assignation utilisateurs
+4. **Améliorations récentes** : Optimisation de la recherche CMD+K et résolution problèmes d'assignation
 
 ---
 
-*Dernière mise à jour : [Date à actualiser manuellement]* 
+## 🔄 Améliorations Récentes
+
+### Commits récents intégrés:
+- ✅ Résolution des problèmes d'interaction d'assignation et support photo de profil 
+- ✅ Suppression du gestionnaire d'événements wheel problématique du popover d'assignation
+- ✅ Amélioration du CMD+K avec recherche de projets et navigation optimisée
+
+---
+
+*Dernière mise à jour : 21 août 2025* 

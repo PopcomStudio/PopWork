@@ -3,23 +3,23 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import {
-	IconCalendar,
-	IconClock,
-	IconDashboard,
-	IconFileInvoice,
-	IconFolder,
-	IconHistory,
-	IconBell,
-	IconSettings,
-	IconBeach,
-	IconUsers,
-	IconBuilding,
-	IconPhone,
-	IconUserCheck,
-	IconFolderOpen,
-	IconSearch,
-	IconBriefcase,
-} from "@tabler/icons-react";
+	Calendar,
+	Clock,
+	LayoutDashboard,
+	FileText,
+	Folder,
+	History,
+	Bell,
+	Settings,
+	Palmtree,
+	Users,
+	Building,
+	Phone,
+	UserCheck,
+	FolderOpen,
+	Search,
+	Briefcase,
+} from "lucide-react";
 
 import {
 	CommandDialog,
@@ -36,20 +36,20 @@ import { Badge } from "@/components/ui/badge";
 
 // Onglets principaux de la sidebar
 const mainTabs = [
-	{ title: "Dashboard", url: "/dashboard", icon: IconDashboard },
-	{ title: "Projets & Tâches", url: "/projects", icon: IconFolder },
-	{ title: "Time Tracking", url: "/time-tracking", icon: IconClock },
-	{ title: "Facturation", url: "/invoicing", icon: IconFileInvoice },
-	{ title: "Équipe", url: "/team", icon: IconUsers },
-	{ title: "Calendrier", url: "/calendar", icon: IconCalendar },
-	{ title: "Entreprises", url: "/entreprises", icon: IconBuilding },
-	{ title: "Services", url: "/services", icon: IconPhone },
-	{ title: "Contacts", url: "/contacts", icon: IconUserCheck },
-	{ title: "Coffre-fort RH", url: "/documents", icon: IconFolderOpen },
-	{ title: "Congés", url: "/leaves", icon: IconBeach },
-	{ title: "Notifications", url: "/notifications", icon: IconBell },
-	{ title: "Historique", url: "/audit-log", icon: IconHistory },
-	{ title: "Paramètres", url: "/settings", icon: IconSettings },
+	{ title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+	{ title: "Projets & Tâches", url: "/projects", icon: Folder },
+	{ title: "Time Tracking", url: "/time-tracking", icon: Clock },
+	{ title: "Facturation", url: "/invoicing", icon: FileText },
+	{ title: "Équipe", url: "/team", icon: Users },
+	{ title: "Calendrier", url: "/calendar", icon: Calendar },
+	{ title: "Entreprises", url: "/entreprises", icon: Building },
+	{ title: "Services", url: "/services", icon: Phone },
+	{ title: "Contacts", url: "/contacts", icon: UserCheck },
+	{ title: "Coffre-fort RH", url: "/documents", icon: FolderOpen },
+	{ title: "Congés", url: "/leaves", icon: Palmtree },
+	{ title: "Notifications", url: "/notifications", icon: Bell },
+	{ title: "Historique", url: "/audit-log", icon: History },
+	{ title: "Paramètres", url: "/settings", icon: Settings },
 ];
 
 
@@ -110,7 +110,7 @@ export function CmdKNavigation() {
 				onClick={() => setOpen(true)}
 				className="inline-flex items-center gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
 			>
-				<IconSearch className="h-4 w-4" />
+				<Search className="h-4 w-4" />
 				<span className="hidden sm:inline">Recherche rapide...</span>
 				<span className="inline sm:hidden">Recherche...</span>
 				<kbd className="pointer-events-none ml-auto hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
@@ -162,7 +162,7 @@ export function CmdKNavigation() {
 													runCommand(() => router.push(`/projects/${project.id}`));
 												}}
 											>
-												<IconBriefcase className="mr-2 h-4 w-4" />
+												<Briefcase className="mr-2 h-4 w-4" />
 												<div className="flex flex-1 items-center justify-between">
 													<div className="flex flex-col">
 														<span>{project.name}</span>

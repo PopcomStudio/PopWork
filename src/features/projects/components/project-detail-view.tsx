@@ -3,22 +3,22 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import {
-  IconArrowLeft,
-  IconBuilding,
-  IconCalendar,
-  IconCircleCheckFilled,
-  IconClock,
-  IconArchive,
-  IconFileText,
-  IconEdit,
-  IconUsers,
-  IconListCheck,
-  IconColumns,
-  IconTimeline,
-  IconFolder,
-  IconInfoCircle,
-  IconSettings,
-} from '@tabler/icons-react'
+  ArrowLeft,
+  Building,
+  Calendar,
+  CheckCircle,
+  Clock,
+  Archive,
+  FileText,
+  Edit,
+  Users,
+  ListChecks,
+  Columns,
+  Activity,
+  Folder,
+  Info,
+  Settings,
+} from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -235,35 +235,35 @@ export function ProjectDetailView({ projectId }: ProjectDetailViewProps) {
         return {
           label: 'Brouillon',
           variant: 'secondary' as const,
-          icon: IconFileText,
+          icon: FileText,
           className: 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700',
         }
       case 'active':
         return {
           label: 'Actif',
           variant: 'default' as const,
-          icon: IconClock,
+          icon: Clock,
           className: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800',
         }
       case 'completed':
         return {
           label: 'Terminé',
           variant: 'default' as const,
-          icon: IconCircleCheckFilled,
+          icon: CheckCircle,
           className: 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800',
         }
       case 'archived':
         return {
           label: 'Archivé',
           variant: 'outline' as const,
-          icon: IconArchive,
+          icon: Archive,
           className: 'bg-gray-100 text-gray-600 border-gray-300 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600',
         }
       default:
         return {
           label: status,
           variant: 'secondary' as const,
-          icon: IconFileText,
+          icon: FileText,
           className: '',
         }
     }
@@ -306,7 +306,7 @@ export function ProjectDetailView({ projectId }: ProjectDetailViewProps) {
       <div className="space-y-6">
         <div className="flex items-center gap-4">
           <Button variant="ghost" onClick={() => router.push('/projects')}>
-            <IconArrowLeft className="h-4 w-4 mr-2" />
+            <ArrowLeft className="h-4 w-4 mr-2" />
             Retour aux projets
           </Button>
         </div>
@@ -334,7 +334,7 @@ export function ProjectDetailView({ projectId }: ProjectDetailViewProps) {
             </Badge>
           </div>
           <Button variant="outline" onClick={handleEditClick}>
-            <IconEdit className="h-4 w-4 mr-2" />
+            <Edit className="h-4 w-4 mr-2" />
             Modifier
           </Button>
         </div>
@@ -343,31 +343,31 @@ export function ProjectDetailView({ projectId }: ProjectDetailViewProps) {
         <Tabs defaultValue="information" className="w-full">
           <TabsList className="grid grid-cols-7">
             <TabsTrigger value="information" className="flex items-center gap-2">
-              <IconInfoCircle className="h-4 w-4" />
+              <Info className="h-4 w-4" />
               Information
             </TabsTrigger>
             <TabsTrigger value="members" className="flex items-center gap-2">
-              <IconUsers className="h-4 w-4" />
+              <Users className="h-4 w-4" />
               Membres
             </TabsTrigger>
             <TabsTrigger value="kanban" className="flex items-center gap-2">
-              <IconColumns className="h-4 w-4" />
+              <Columns className="h-4 w-4" />
               Kanban
             </TabsTrigger>
             <TabsTrigger value="gantt" className="flex items-center gap-2">
-              <IconTimeline className="h-4 w-4" />
+              <Activity className="h-4 w-4" />
               Gant
             </TabsTrigger>
             <TabsTrigger value="calendar" className="flex items-center gap-2">
-              <IconCalendar className="h-4 w-4" />
+              <Calendar className="h-4 w-4" />
               Calendrier
             </TabsTrigger>
             <TabsTrigger value="files" className="flex items-center gap-2">
-              <IconFolder className="h-4 w-4" />
+              <Folder className="h-4 w-4" />
               Fichiers
             </TabsTrigger>
             <TabsTrigger value="administration" className="flex items-center gap-2">
-              <IconSettings className="h-4 w-4" />
+              <Settings className="h-4 w-4" />
               Administration
             </TabsTrigger>
           </TabsList>
@@ -381,7 +381,7 @@ export function ProjectDetailView({ projectId }: ProjectDetailViewProps) {
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <IconFileText className="h-5 w-5" />
+                      <FileText className="h-5 w-5" />
                       Informations générales
                     </CardTitle>
                   </CardHeader>
@@ -390,7 +390,7 @@ export function ProjectDetailView({ projectId }: ProjectDetailViewProps) {
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-muted-foreground">Entreprise</label>
                         <div className="flex items-center gap-2">
-                          <IconBuilding className="h-4 w-4 text-muted-foreground" />
+                          <Building className="h-4 w-4 text-muted-foreground" />
                           <span>{project.company_name}</span>
                         </div>
                       </div>
@@ -401,14 +401,14 @@ export function ProjectDetailView({ projectId }: ProjectDetailViewProps) {
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-muted-foreground">Créé le</label>
                         <div className="flex items-center gap-2">
-                          <IconCalendar className="h-4 w-4 text-muted-foreground" />
+                          <Calendar className="h-4 w-4 text-muted-foreground" />
                           <span>{new Date(project.created_at).toLocaleDateString('fr-FR')}</span>
                         </div>
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-muted-foreground">Dernière modification</label>
                         <div className="flex items-center gap-2">
-                          <IconCalendar className="h-4 w-4 text-muted-foreground" />
+                          <Calendar className="h-4 w-4 text-muted-foreground" />
                           <span>{new Date(project.updated_at).toLocaleDateString('fr-FR')}</span>
                         </div>
                       </div>
@@ -426,7 +426,7 @@ export function ProjectDetailView({ projectId }: ProjectDetailViewProps) {
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <IconListCheck className="h-5 w-5" />
+                      <ListChecks className="h-5 w-5" />
                       Progression du projet
                     </CardTitle>
                   </CardHeader>
@@ -459,15 +459,15 @@ export function ProjectDetailView({ projectId }: ProjectDetailViewProps) {
                   </CardHeader>
                   <CardContent className="space-y-2">
                     <Button variant="outline" size="sm" className="w-full justify-start">
-                      <IconListCheck className="h-4 w-4 mr-2" />
+                      <ListChecks className="h-4 w-4 mr-2" />
                       Voir les tâches
                     </Button>
                     <Button variant="outline" size="sm" className="w-full justify-start">
-                      <IconCalendar className="h-4 w-4 mr-2" />
+                      <Calendar className="h-4 w-4 mr-2" />
                       Planning
                     </Button>
                     <Button variant="outline" size="sm" className="w-full justify-start">
-                      <IconFileText className="h-4 w-4 mr-2" />
+                      <FileText className="h-4 w-4 mr-2" />
                       Documents
                     </Button>
                   </CardContent>
@@ -479,16 +479,16 @@ export function ProjectDetailView({ projectId }: ProjectDetailViewProps) {
           {/* Onglet Membres */}
           <TabsContent value="members" className="space-y-6 mt-6">
             <div className="flex items-center gap-2 mb-6">
-              <IconUsers className="h-5 w-5" />
+              <Users className="h-5 w-5" />
               <h2 className="text-xl font-semibold">Équipe assignée ({assignedMembers.length})</h2>
             </div>
             
             {assignedMembers.length === 0 ? (
               <div className="text-center py-16">
-                <IconUsers className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                 <p className="text-muted-foreground">Aucun membre assigné à ce projet</p>
                 <Button variant="outline" onClick={handleEditClick} className="mt-4">
-                  <IconEdit className="h-4 w-4 mr-2" />
+                  <Edit className="h-4 w-4 mr-2" />
                   Assigner des membres
                 </Button>
               </div>
@@ -530,12 +530,12 @@ export function ProjectDetailView({ projectId }: ProjectDetailViewProps) {
           {/* Onglet Gant */}
           <TabsContent value="gantt" className="space-y-6 mt-6">
             <div className="flex items-center gap-2 mb-6">
-              <IconTimeline className="h-5 w-5" />
+              <Activity className="h-5 w-5" />
               <h2 className="text-xl font-semibold">Diagramme de Gant</h2>
             </div>
             
             <div className="text-center py-16">
-              <IconTimeline className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <Activity className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <p className="text-muted-foreground mb-2">Diagramme de Gant en cours de développement</p>
               <p className="text-sm text-muted-foreground">Ici s&apos;affichera la planification temporelle du projet</p>
             </div>
@@ -544,12 +544,12 @@ export function ProjectDetailView({ projectId }: ProjectDetailViewProps) {
           {/* Onglet Calendrier */}
           <TabsContent value="calendar" className="space-y-6 mt-6">
             <div className="flex items-center gap-2 mb-6">
-              <IconCalendar className="h-5 w-5" />
+              <Calendar className="h-5 w-5" />
               <h2 className="text-xl font-semibold">Calendrier du projet</h2>
             </div>
             
             <div className="text-center py-16">
-              <IconCalendar className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <Calendar className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <p className="text-muted-foreground mb-2">Vue calendrier en cours de développement</p>
               <p className="text-sm text-muted-foreground">Ici s&apos;affichera le planning des tâches et échéances</p>
             </div>
@@ -558,12 +558,12 @@ export function ProjectDetailView({ projectId }: ProjectDetailViewProps) {
           {/* Onglet Fichiers */}
           <TabsContent value="files" className="space-y-6 mt-6">
             <div className="flex items-center gap-2 mb-6">
-              <IconFolder className="h-5 w-5" />
+              <Folder className="h-5 w-5" />
               <h2 className="text-xl font-semibold">Documents et fichiers</h2>
             </div>
             
             <div className="text-center py-16">
-              <IconFolder className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <Folder className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <p className="text-muted-foreground mb-2">Gestion des fichiers en cours de développement</p>
               <p className="text-sm text-muted-foreground">Ici s&apos;affichera l&apos;espace de stockage des documents projet</p>
             </div>
@@ -571,12 +571,12 @@ export function ProjectDetailView({ projectId }: ProjectDetailViewProps) {
                      {/* Onglet Administration */}
            <TabsContent value="administration" className="space-y-6 mt-6">
              <div className="flex items-center gap-2 mb-6">
-               <IconSettings className="h-5 w-5" />
+               <Settings className="h-5 w-5" />
                <h2 className="text-xl font-semibold">Administration du projet</h2>
              </div>
              
              <div className="text-center py-16">
-               <IconSettings className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+               <Settings className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                <p className="text-muted-foreground mb-2">Administration du projet en cours de développement</p>
                <p className="text-sm text-muted-foreground">Ici s&apos;affichera les paramètres du projet</p>
              </div>
@@ -589,7 +589,7 @@ export function ProjectDetailView({ projectId }: ProjectDetailViewProps) {
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <IconEdit className="h-5 w-5" />
+              <Edit className="h-5 w-5" />
               Modifier le projet
             </DialogTitle>
           </DialogHeader>

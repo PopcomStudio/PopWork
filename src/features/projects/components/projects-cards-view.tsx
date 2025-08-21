@@ -3,15 +3,15 @@
 import * as React from "react"
 import { useRouter } from 'next/navigation'
 import {
-  IconSearch,
-  IconPlus,
-  IconCircleCheckFilled,
-  IconClock,
-  IconArchive,
-  IconFileText,
-  IconBuilding,
-  IconUsers,
-} from "@tabler/icons-react"
+  Search,
+  Plus,
+  CheckCircle,
+  Clock,
+  Archive,
+  FileText,
+  Building,
+  Users,
+} from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -39,35 +39,35 @@ export function ProjectsCardsView({
         return {
           label: 'Brouillon',
           variant: 'secondary' as const,
-          icon: IconFileText,
+          icon: FileText,
           className: 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700',
         }
       case 'active':
         return {
           label: 'Actif',
           variant: 'default' as const,
-          icon: IconClock,
+          icon: Clock,
           className: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800',
         }
       case 'completed':
         return {
           label: 'Terminé',
           variant: 'default' as const,
-          icon: IconCircleCheckFilled,
+          icon: CheckCircle,
           className: 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800',
         }
       case 'archived':
         return {
           label: 'Archivé',
           variant: 'outline' as const,
-          icon: IconArchive,
+          icon: Archive,
           className: 'bg-gray-100 text-gray-600 border-gray-300 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600',
         }
       default:
         return {
           label: status,
           variant: 'secondary' as const,
-          icon: IconFileText,
+          icon: FileText,
           className: '',
         }
     }
@@ -91,7 +91,7 @@ export function ProjectsCardsView({
       {/* Barre de recherche et bouton nouveau projet */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2 flex-1 max-w-md">
-          <IconSearch className="h-4 w-4 opacity-50" />
+          <Search className="h-4 w-4 opacity-50" />
           <Input
             placeholder="Rechercher par nom, entreprise ou service..."
             value={globalFilter}
@@ -100,7 +100,7 @@ export function ProjectsCardsView({
           />
         </div>
         <Button variant="default" size="sm" onClick={onNewProject}>
-          <IconPlus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 mr-2" />
           Nouveau projet
         </Button>
       </div>
@@ -131,7 +131,7 @@ export function ProjectsCardsView({
                       {project.name}
                     </CardTitle>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <IconBuilding className="h-4 w-4" />
+                      <Building className="h-4 w-4" />
                       <span className="truncate">{project.company_name}</span>
                     </div>
                   </div>
@@ -169,7 +169,7 @@ export function ProjectsCardsView({
 
                   {/* Assignés */}
                   <div className="flex items-center gap-2">
-                    <IconUsers className="h-4 w-4 text-muted-foreground" />
+                    <Users className="h-4 w-4 text-muted-foreground" />
                     <div className="flex -space-x-1">
                       {/* Afficher les avatars des premiers membres */}
                       <Avatar className="h-6 w-6 border-2 border-background">

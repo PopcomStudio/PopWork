@@ -7,12 +7,12 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { 
-  IconDownload, 
-  IconTrash, 
-  IconMessage, 
-  IconEye,
-  IconDots
-} from '@tabler/icons-react'
+  Download, 
+  Trash2, 
+  MessageSquare, 
+  Eye,
+  MoreHorizontal
+} from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -129,25 +129,25 @@ export function AttachmentCard({
                 size="sm" 
                 className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
               >
-                <IconDots className="h-4 w-4" />
+                <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               {isImage && (
                 <>
                   <DropdownMenuItem onClick={() => onPreview?.(attachment)}>
-                    <IconEye className="h-4 w-4 mr-2" />
+                    <Eye className="h-4 w-4 mr-2" />
                     Prévisualiser
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                 </>
               )}
               <DropdownMenuItem onClick={() => onDownload?.(attachment)}>
-                <IconDownload className="h-4 w-4 mr-2" />
+                <Download className="h-4 w-4 mr-2" />
                 Télécharger
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onComment?.(attachment.id)}>
-                <IconMessage className="h-4 w-4 mr-2" />
+                <MessageSquare className="h-4 w-4 mr-2" />
                 Commenter
               </DropdownMenuItem>
               {isOwner && (
@@ -157,7 +157,7 @@ export function AttachmentCard({
                     onClick={() => onDelete?.(attachment.id)}
                     className="text-red-600 hover:text-red-700"
                   >
-                    <IconTrash className="h-4 w-4 mr-2" />
+                    <Trash2 className="h-4 w-4 mr-2" />
                     Supprimer
                   </DropdownMenuItem>
                 </>
@@ -186,7 +186,7 @@ export function AttachmentCard({
               className="h-6 px-2 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50"
               onClick={() => onComment?.(attachment.id)}
             >
-              <IconMessage className="h-3 w-3 mr-1" />
+              <MessageSquare className="h-3 w-3 mr-1" />
               {attachment.commentsCount}
             </Button>
           )}
@@ -200,7 +200,7 @@ export function AttachmentCard({
             className="h-7 px-2 text-xs"
             onClick={() => onDownload?.(attachment)}
           >
-            <IconDownload className="h-3 w-3 mr-1" />
+            <Download className="h-3 w-3 mr-1" />
             Télécharger
           </Button>
           <Button
@@ -209,7 +209,7 @@ export function AttachmentCard({
             className="h-7 px-2 text-xs"
             onClick={() => onComment?.(attachment.id)}
           >
-            <IconMessage className="h-3 w-3 mr-1" />
+            <MessageSquare className="h-3 w-3 mr-1" />
             Commenter
           </Button>
           {isImage && (
@@ -219,7 +219,7 @@ export function AttachmentCard({
               className="h-7 px-2 text-xs"
               onClick={() => onPreview?.(attachment)}
             >
-              <IconEye className="h-3 w-3 mr-1" />
+              <Eye className="h-3 w-3 mr-1" />
               Voir
             </Button>
           )}

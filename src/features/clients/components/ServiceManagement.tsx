@@ -19,7 +19,7 @@ import { Icons } from '@/components/ui/icons'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useServices, type Service, type CreateServiceData } from '../hooks/use-services'
 import { useCompaniesList } from '../hooks/use-companies-list'
-import { IconPhone } from '@tabler/icons-react'
+import { Phone } from 'lucide-react'
 import {
   Select,
   SelectContent,
@@ -141,7 +141,7 @@ export function ServiceManagement() {
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <IconPhone className="h-5 w-5" />
+              <Phone className="h-5 w-5" />
               {editingService ? 'Modifier le service' : 'Nouveau service'}
             </DialogTitle>
           </DialogHeader>

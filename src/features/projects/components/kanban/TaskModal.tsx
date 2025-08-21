@@ -25,14 +25,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { 
-  IconCalendar, 
-  IconUser, 
-  IconTag,
-  IconFlag,
-  IconMessage,
-  IconPaperclip,
-  IconPlus
-} from '@tabler/icons-react';
+  Calendar, 
+  User as UserIcon, 
+  Tag as TagIcon,
+  Flag,
+  MessageSquare,
+  Paperclip,
+  Plus
+} from 'lucide-react';
 import { createClientComponentClient } from '@/lib/supabase';
 import { CommentItem } from '../discussion/CommentItem';
 import { CommentEditor } from '../discussion/CommentEditor';
@@ -422,15 +422,15 @@ export function TaskModal({ task, isOpen, onClose, updateTask, projectId }: Task
                   <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full">
                     <TabsList className="grid w-full grid-cols-3">
                       <TabsTrigger value="description" className="flex items-center gap-2">
-                        <IconMessage className="h-4 w-4" />
+                        <MessageSquare className="h-4 w-4" />
                         Description
                       </TabsTrigger>
                       <TabsTrigger value="discussion" className="flex items-center gap-2">
-                        <IconMessage className="h-4 w-4" />
+                        <MessageSquare className="h-4 w-4" />
                         Discussion ({comments?.length || 0})
                       </TabsTrigger>
                       <TabsTrigger value="attachments" className="flex items-center gap-2">
-                        <IconPaperclip className="h-4 w-4" />
+                        <Paperclip className="h-4 w-4" />
                         Pièces jointes ({attachments?.length || 0})
                       </TabsTrigger>
                     </TabsList>
@@ -512,7 +512,7 @@ export function TaskModal({ task, isOpen, onClose, updateTask, projectId }: Task
                           <div className="flex-1 overflow-y-auto">
                             {(attachments?.length || 0) === 0 ? (
                               <div className="text-center text-gray-500 py-8">
-                                <IconPaperclip className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                                <Paperclip className="h-12 w-12 text-gray-300 mx-auto mb-4" />
                                 <p>Aucune pièce jointe pour le moment</p>
                               </div>
                             ) : (
@@ -544,7 +544,7 @@ export function TaskModal({ task, isOpen, onClose, updateTask, projectId }: Task
                 {/* Assignés */}
                 <div className="space-y-3">
                   <Label className="text-sm font-medium flex items-center gap-2">
-                    <IconUser className="h-4 w-4" />
+                    <UserIcon className="h-4 w-4" />
                     Assignés
                   </Label>
                   
@@ -583,7 +583,7 @@ export function TaskModal({ task, isOpen, onClose, updateTask, projectId }: Task
                   >
                     <SelectTrigger className="w-full">
                       <div className="flex items-center">
-                        <IconPlus className="h-4 w-4 mr-2" />
+                        <Plus className="h-4 w-4 mr-2" />
                         <span className="text-gray-500">Ajouter un assigné</span>
                       </div>
                     </SelectTrigger>
@@ -626,7 +626,7 @@ export function TaskModal({ task, isOpen, onClose, updateTask, projectId }: Task
                 {/* Date d'échéance */}
                 <div className="space-y-3">
                   <Label className="text-sm font-medium flex items-center gap-2">
-                    <IconCalendar className="h-4 w-4" />
+                    <Calendar className="h-4 w-4" />
                     Deadline
                   </Label>
                   <Input
@@ -663,7 +663,7 @@ export function TaskModal({ task, isOpen, onClose, updateTask, projectId }: Task
                 {/* Priorité */}
                 <div className="space-y-3">
                   <Label className="text-sm font-medium flex items-center gap-2">
-                    <IconFlag className="h-4 w-4" />
+                    <Flag className="h-4 w-4" />
                     Priorité
                   </Label>
                   <Select
@@ -687,7 +687,7 @@ export function TaskModal({ task, isOpen, onClose, updateTask, projectId }: Task
                 {/* Tags */}
                 <div className="space-y-3">
                   <Label className="text-sm font-medium flex items-center gap-2">
-                    <IconTag className="h-4 w-4" />
+                    <TagIcon className="h-4 w-4" />
                     Tags
                   </Label>
                   <div className="flex flex-wrap gap-2">

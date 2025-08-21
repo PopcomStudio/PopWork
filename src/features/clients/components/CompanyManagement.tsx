@@ -19,7 +19,7 @@ import { Icons } from '@/components/ui/icons'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 
 import { useCompanies, type Company, type CreateCompanyData } from '../hooks/use-companies'
-import { IconBuilding } from '@tabler/icons-react'
+import { Building } from 'lucide-react'
 
 const companyFormSchema = z.object({
   name: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
@@ -134,7 +134,7 @@ export function CompanyManagement() {
             <DialogContent className="sm:max-w-2xl">
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
-                  <IconBuilding className="h-5 w-5" />
+                  <Building className="h-5 w-5" />
                   {editingCompany ? 'Modifier l\'entreprise' : 'Nouvelle entreprise'}
                 </DialogTitle>
               </DialogHeader>

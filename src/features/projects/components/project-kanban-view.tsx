@@ -20,16 +20,16 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import {
-  IconPlus,
-  IconEdit,
-  IconTrash,
-  IconClock,
-  IconAlertTriangle,
-  IconFlag,
-  IconCalendar,
-  IconUser,
-  IconGripVertical,
-} from '@tabler/icons-react'
+  Plus,
+  Edit,
+  Trash2,
+  Clock,
+  AlertTriangle,
+  Flag,
+  Calendar,
+  User,
+  GripVertical,
+} from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -122,7 +122,7 @@ function SortableTask({ task, onEdit, onDelete }: SortableTaskProps) {
           <div className="flex items-center gap-1 ml-2">
             {/* Indicateur de drag visible */}
             <div className="cursor-grab active:cursor-grabbing p-1 rounded opacity-50 group-hover:opacity-100 transition-opacity pointer-events-none">
-              <IconGripVertical className="h-3 w-3 text-muted-foreground" />
+              <GripVertical className="h-3 w-3 text-muted-foreground" />
             </div>
             {/* Bouton de suppression */}
             <Button
@@ -134,7 +134,7 @@ function SortableTask({ task, onEdit, onDelete }: SortableTaskProps) {
               }}
               className="h-6 w-6 p-0 text-red-500 hover:text-red-700 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110 pointer-events-auto"
             >
-              <IconTrash className="h-3 w-3" />
+              <Trash2 className="h-3 w-3" />
             </Button>
             {/* Bouton d'édition */}
             <Button
@@ -146,7 +146,7 @@ function SortableTask({ task, onEdit, onDelete }: SortableTaskProps) {
               }}
               className="h-6 w-6 p-0 text-blue-500 hover:text-blue-700 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110 pointer-events-auto"
             >
-              <IconEdit className="h-3 w-3" />
+              <Edit className="h-3 w-3" />
             </Button>
           </div>
         </div>
@@ -172,7 +172,7 @@ function SortableTask({ task, onEdit, onDelete }: SortableTaskProps) {
             {/* Date d'échéance */}
             {task.due_date && (
               <Badge variant="outline" className="text-xs">
-                <IconCalendar className="h-3 w-3 mr-1" />
+                <Calendar className="h-3 w-3 mr-1" />
                 {new Date(task.due_date).toLocaleDateString('fr-FR')}
               </Badge>
             )}
@@ -239,7 +239,7 @@ function DroppableColumn({ column, tasks, onCreateTask, onEditTask, onDeleteTask
             onClick={onCreateTask}
             className="w-full justify-start text-muted-foreground hover:text-foreground transition-all duration-200 hover:bg-accent/50"
           >
-            <IconPlus className="h-4 w-4 mr-2" />
+            <Plus className="h-4 w-4 mr-2" />
             Ajouter une tâche
           </Button>
         </CardHeader>
@@ -283,14 +283,14 @@ function DroppableColumn({ column, tasks, onCreateTask, onEditTask, onDeleteTask
               {isOver ? (
                 <>
                   <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                    <IconPlus className="h-4 w-4 text-primary" />
+                    <Plus className="h-4 w-4 text-primary" />
                   </div>
                   <p className="text-sm font-medium text-primary">Déposez la tâche ici</p>
                 </>
               ) : (
                 <>
                   <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                    <IconPlus className="h-4 w-4" />
+                    <Plus className="h-4 w-4" />
                   </div>
                   <p className="text-sm">Aucune tâche</p>
                 </>
@@ -308,25 +308,25 @@ function getPriorityInfo(priority: string) {
     case 'high':
       return {
         label: 'Haute',
-        icon: IconAlertTriangle,
+        icon: AlertTriangle,
         color: 'text-red-600 bg-red-50 border-red-200',
       }
     case 'medium':
       return {
         label: 'Moyenne',
-        icon: IconFlag,
+        icon: Flag,
         color: 'text-orange-600 bg-orange-50 border-orange-200',
       }
     case 'low':
       return {
         label: 'Basse',
-        icon: IconFlag,
+        icon: Flag,
         color: 'text-green-600 bg-green-50 border-green-200',
       }
     default:
       return {
         label: 'Moyenne',
-        icon: IconFlag,
+        icon: Flag,
         color: 'text-gray-600 bg-gray-50 border-gray-200',
       }
   }
@@ -543,7 +543,7 @@ export function ProjectKanbanView({ projectId }: ProjectKanbanViewProps) {
           </Badge>
         </div>
         <Button onClick={handleCreateTask}>
-          <IconPlus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 mr-2" />
           Nouvelle tâche
         </Button>
       </div>
@@ -578,7 +578,7 @@ export function ProjectKanbanView({ projectId }: ProjectKanbanViewProps) {
                   </h5>
                   <div className="flex items-center gap-1 ml-2">
                     <div className="p-1 rounded opacity-75">
-                      <IconGripVertical className="h-3 w-3 text-primary" />
+                      <GripVertical className="h-3 w-3 text-primary" />
                     </div>
                   </div>
                 </div>
@@ -592,12 +592,12 @@ export function ProjectKanbanView({ projectId }: ProjectKanbanViewProps) {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Badge variant="outline" className={`text-xs ${getPriorityInfo(activeTask.priority).color}`}>
-                      <IconFlag className="h-3 w-3 mr-1" />
+                      <Flag className="h-3 w-3 mr-1" />
                       {getPriorityInfo(activeTask.priority).label}
                     </Badge>
                     {activeTask.due_date && (
                       <Badge variant="outline" className="text-xs">
-                        <IconCalendar className="h-3 w-3 mr-1" />
+                        <Calendar className="h-3 w-3 mr-1" />
                         {new Date(activeTask.due_date).toLocaleDateString('fr-FR')}
                       </Badge>
                     )}

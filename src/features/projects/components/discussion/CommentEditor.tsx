@@ -4,7 +4,7 @@ import React, { useState, useRef, useCallback, useEffect } from 'react'
 import { CommentMention, MentionSuggestion, MentionMatch } from '../../types/kanban'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { IconSend, IconX } from '@tabler/icons-react'
+import { Send, X } from 'lucide-react'
 import { MentionDropdown } from './MentionDropdown'
 
 interface CommentEditorProps {
@@ -231,7 +231,7 @@ export function CommentEditor({
                 size="sm"
                 onClick={handleCancel}
               >
-                <IconX className="h-4 w-4 mr-1" />
+                <X className="h-4 w-4 mr-1" />
                 Annuler
               </Button>
             )}
@@ -240,7 +240,7 @@ export function CommentEditor({
               onClick={handleSubmit}
               disabled={isEmpty}
             >
-              <IconSend className="h-4 w-4 mr-1" />
+              <Send className="h-4 w-4 mr-1" />
               {submitLabel}
             </Button>
           </div>
