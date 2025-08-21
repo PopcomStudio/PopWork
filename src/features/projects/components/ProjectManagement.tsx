@@ -20,7 +20,7 @@ import { Icons } from '@/components/ui/icons'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useProjects, type Project, type CreateProjectData } from '../hooks/use-projects'
 import { useServicesList } from '../../clients/hooks/use-services-list'
-import { IconFolder } from '@tabler/icons-react'
+import { Folder } from 'lucide-react'
 import {
   Select,
   SelectContent,
@@ -143,7 +143,7 @@ export function ProjectManagement() {
         <DialogContent className="sm:max-w-3xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <IconFolder className="h-5 w-5" />
+              <Folder className="h-5 w-5" />
               {editingProject ? 'Modifier le projet' : 'Nouveau projet'}
             </DialogTitle>
           </DialogHeader>

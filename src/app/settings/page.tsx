@@ -2,15 +2,15 @@
 
 import { useState, useRef } from "react"
 import { 
-  IconUser, 
-  IconBell, 
-  IconWorld, 
-  IconSettings2, 
-  IconUsers, 
-  IconCreditCard,
-  IconShield,
-  IconChevronRight
-} from "@tabler/icons-react"
+  User, 
+  Bell, 
+  Globe, 
+  Settings2, 
+  Users, 
+  CreditCard,
+  Shield,
+  ChevronRight
+} from "lucide-react"
 import { PageLayout } from "@/components/PageLayout"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -35,37 +35,37 @@ const settingSections: SettingSection[] = [
   {
     id: "account",
     title: "Account",
-    icon: IconUser,
+    icon: User,
     category: "general"
   },
   {
     id: "notifications",
     title: "Notifications",
-    icon: IconBell,
+    icon: Bell,
     category: "general"
   },
   {
     id: "language",
     title: "Language & Region",
-    icon: IconWorld,
+    icon: Globe,
     category: "general"
   },
   {
     id: "general",
     title: "General",
-    icon: IconSettings2,
+    icon: Settings2,
     category: "workspace"
   },
   {
     id: "members",
     title: "Members",
-    icon: IconUsers,
+    icon: Users,
     category: "workspace"
   },
   {
     id: "billing",
     title: "Billing",
-    icon: IconCreditCard,
+    icon: CreditCard,
     category: "workspace"
   }
 ]
@@ -553,7 +553,7 @@ export default function SettingsPage() {
                           <Icon className="w-4 h-4 mr-3" />
                           {section.title}
                           {activeSection === section.id && (
-                            <IconChevronRight className="w-4 h-4 ml-auto" />
+                            <ChevronRight className="w-4 h-4 ml-auto" />
                           )}
                         </button>
                       )
@@ -584,7 +584,7 @@ export default function SettingsPage() {
                           <Icon className="w-4 h-4 mr-3" />
                           {section.title}
                           {activeSection === section.id && (
-                            <IconChevronRight className="w-4 h-4 ml-auto" />
+                            <ChevronRight className="w-4 h-4 ml-auto" />
                           )}
                         </button>
                       )

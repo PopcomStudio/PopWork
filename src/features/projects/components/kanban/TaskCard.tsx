@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { IconCalendar, IconMessageCircle, IconLink, IconEdit, IconFlag } from '@tabler/icons-react'
+import { Calendar, MessageCircle, Link, Edit, Flag } from 'lucide-react'
 import { Check } from 'lucide-react'
 
 interface TaskCardProps {
@@ -115,7 +115,7 @@ export function TaskCard({ task, onEdit }: TaskCardProps) {
                 px-2 py-1 text-xs font-medium border-0 rounded-full flex items-center gap-1.5
               `}
             >
-              <IconFlag className={`h-3 w-3 ${priorityStyle.icon}`} />
+              <Flag className={`h-3 w-3 ${priorityStyle.icon}`} />
               {priorityStyle.label}
             </Badge>
             
@@ -155,7 +155,7 @@ export function TaskCard({ task, onEdit }: TaskCardProps) {
                 onEdit()
               }}
             >
-              <IconEdit className="h-3 w-3" />
+              <Edit className="h-3 w-3" />
             </Button>
           )}
         </div>
@@ -179,7 +179,7 @@ export function TaskCard({ task, onEdit }: TaskCardProps) {
             <div className={`flex items-center gap-1.5 text-sm ${
               task.isOverdue ? 'text-red-600' : 'text-gray-500'
             }`}>
-              <IconCalendar className="h-4 w-4" />
+              <Calendar className="h-4 w-4" />
               <span>{formatDate(task.due_date)}</span>
             </div>
           )}
@@ -209,13 +209,13 @@ export function TaskCard({ task, onEdit }: TaskCardProps) {
             <div className="flex items-center gap-4 text-sm text-gray-500">
               {commentsCount > 0 && (
                 <div className="flex items-center gap-1">
-                  <IconMessageCircle className="h-4 w-4" />
+                  <MessageCircle className="h-4 w-4" />
                   <span>{commentsCount}</span>
                 </div>
               )}
               {attachmentsCount > 0 && (
                 <div className="flex items-center gap-1">
-                  <IconLink className="h-4 w-4" />
+                  <Link className="h-4 w-4" />
                   <span>{attachmentsCount}</span>
                 </div>
               )}

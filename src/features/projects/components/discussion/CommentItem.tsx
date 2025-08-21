@@ -6,14 +6,14 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { 
-  IconMessage2, 
-  IconDots, 
-  IconEdit, 
-  IconTrash,
-  IconHeart,
-  IconThumbUp,
-  IconMoodSmile
-} from '@tabler/icons-react'
+  MessageSquare, 
+  MoreHorizontal, 
+  Edit, 
+  Trash2,
+  Heart,
+  ThumbsUp,
+  Smile
+} from 'lucide-react'
 import { ReactionBar } from './ReactionBar'
 import { CommentEditor } from './CommentEditor'
 
@@ -186,7 +186,7 @@ export function CommentItem({
                 onClick={() => setIsReplying(true)}
                 title="Répondre"
               >
-                <IconMessage2 className="h-4 w-4" />
+                <MessageSquare className="h-4 w-4" />
               </Button>
 
               {/* Actions du propriétaire */}
@@ -199,7 +199,7 @@ export function CommentItem({
                     onClick={() => setIsEditing(true)}
                     title="Modifier"
                   >
-                    <IconEdit className="h-4 w-4" />
+                    <Edit className="h-4 w-4" />
                   </Button>
                   <Button
                     variant="ghost"
@@ -208,7 +208,7 @@ export function CommentItem({
                     onClick={() => onDelete?.(comment.id)}
                     title="Supprimer"
                   >
-                    <IconTrash className="h-4 w-4" />
+                    <Trash2 className="h-4 w-4" />
                   </Button>
                 </>
               )}
@@ -220,7 +220,7 @@ export function CommentItem({
                 className="h-7 w-7 p-0 hover:bg-gray-100"
                 title="Plus d'options"
               >
-                <IconDots className="h-4 w-4" />
+                <MoreHorizontal className="h-4 w-4" />
               </Button>
             </div>
           </div>

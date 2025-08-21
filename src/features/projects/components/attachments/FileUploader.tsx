@@ -2,7 +2,7 @@
 
 import React, { useCallback, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { IconUpload, IconX } from '@tabler/icons-react'
+import { Upload, X } from 'lucide-react'
 
 interface FileUploaderProps {
   onFilesSelected: (files: File[]) => void
@@ -94,7 +94,7 @@ export function FileUploader({
       >
         <div className="space-y-4">
           <div className="mx-auto h-12 w-12 text-gray-400">
-            <IconUpload className="h-full w-full" />
+            <Upload className="h-full w-full" />
           </div>
           
           <div>
@@ -133,7 +133,7 @@ export function FileUploader({
         <div className="space-y-2">
           {errors.map((error, index) => (
             <div key={index} className="flex items-center gap-2 text-sm text-red-600 bg-red-50 px-3 py-2 rounded-md">
-              <IconX className="h-4 w-4" />
+              <X className="h-4 w-4" />
               {error}
             </div>
           ))}

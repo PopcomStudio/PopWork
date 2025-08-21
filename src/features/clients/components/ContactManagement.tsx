@@ -19,7 +19,7 @@ import { Icons } from '@/components/ui/icons'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useContacts, type Contact, type CreateContactData } from '../hooks/use-contacts'
 import { useServicesList } from '../hooks/use-services-list'
-import { IconUserCheck } from '@tabler/icons-react'
+import { UserCheck } from 'lucide-react'
 import {
   Select,
   SelectContent,
@@ -144,7 +144,7 @@ export function ContactManagement() {
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <IconUserCheck className="h-5 w-5" />
+              <UserCheck className="h-5 w-5" />
               {editingContact ? 'Modifier le contact' : 'Nouveau contact'}
             </DialogTitle>
           </DialogHeader>

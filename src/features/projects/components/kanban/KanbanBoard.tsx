@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { IconFilter, IconRefresh, IconAlertTriangle } from '@tabler/icons-react'
+import { Filter, RefreshCw, AlertTriangle } from 'lucide-react'
 
 import { useTasks } from '../../hooks/useTasks'
 import { TaskExtended, TaskStatus } from '../../types/kanban'
@@ -195,7 +195,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
   if (error) {
     return (
       <Alert variant="destructive">
-        <IconAlertTriangle className="h-4 w-4" />
+        <AlertTriangle className="h-4 w-4" />
         <AlertDescription>{error}</AlertDescription>
       </Alert>
     )
@@ -215,7 +215,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
             size="sm"
             onClick={() => setShowFilters(!showFilters)}
           >
-            <IconFilter className="h-4 w-4 mr-1" />
+            <Filter className="h-4 w-4 mr-1" />
             Filtres
           </Button>
           <Button
@@ -223,7 +223,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
             size="sm"
             onClick={refreshTasks}
           >
-            <IconRefresh className="h-4 w-4 mr-1" />
+            <RefreshCw className="h-4 w-4 mr-1" />
             Actualiser
           </Button>
         </div>

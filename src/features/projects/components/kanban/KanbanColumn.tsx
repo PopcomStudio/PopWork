@@ -8,7 +8,7 @@ import { TaskExtended, TaskStatus } from '../../types/kanban'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle, CardAction } from '@/components/ui/card'
-import { IconPlus, IconDots } from '@tabler/icons-react'
+import { Plus, MoreHorizontal } from 'lucide-react'
 
 interface KanbanColumnProps {
   status: TaskStatus
@@ -41,14 +41,14 @@ export function KanbanColumn({ status, tasks, title, onCreateTask, onEditTask }:
               className="h-8 w-8 p-0 hover:bg-background/80"
               onClick={onCreateTask}
             >
-              <IconPlus className="h-4 w-4" />
+              <Plus className="h-4 w-4" />
             </Button>
             <Button
               variant="ghost"
               size="sm"
               className="h-8 w-8 p-0 hover:bg-background/80"
             >
-              <IconDots className="h-4 w-4" />
+              <MoreHorizontal className="h-4 w-4" />
             </Button>
           </div>
         </CardAction>
@@ -88,7 +88,7 @@ export function KanbanColumn({ status, tasks, title, onCreateTask, onEditTask }:
                 onClick={onCreateTask}
                 className="w-full justify-start text-muted-foreground hover:text-foreground hover:bg-background/80 transition-colors"
               >
-                <IconPlus className="h-4 w-4 mr-2" />
+                <Plus className="h-4 w-4 mr-2" />
                 Add task
               </Button>
             </div>

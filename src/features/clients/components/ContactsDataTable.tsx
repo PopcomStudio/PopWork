@@ -21,18 +21,18 @@ import {
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import {
-  IconChevronDown,
-  IconChevronLeft,
-  IconChevronRight,
-  IconChevronsLeft,
-  IconChevronsRight,
-  IconDotsVertical,
-  IconGripVertical,
-  IconPlus,
-  IconSearch,
-  IconEdit,
-  IconTrash,
-} from "@tabler/icons-react"
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  MoreVertical,
+  GripVertical,
+  Plus,
+  Search,
+  Edit,
+  Trash2,
+} from "lucide-react"
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -117,7 +117,7 @@ function DragHandle({ id }: { id: string }) {
       size="icon"
       className="text-muted-foreground size-7 hover:bg-transparent"
     >
-      <IconGripVertical className="text-muted-foreground size-3" />
+      <GripVertical className="text-muted-foreground size-3" />
       <span className="sr-only">Drag to reorder</span>
     </Button>
   )
@@ -254,13 +254,13 @@ export function ContactsDataTable({
               className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
               size="icon"
             >
-              <IconDotsVertical />
+              <MoreVertical />
               <span className="sr-only">Open menu</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-32">
             <DropdownMenuItem onClick={() => onEditContact(row.original)}>
-              <IconEdit className="h-4 w-4 mr-2" />
+              <Edit className="h-4 w-4 mr-2" />
               Modifier
             </DropdownMenuItem>
             <DropdownMenuSeparator />
@@ -268,7 +268,7 @@ export function ContactsDataTable({
               onClick={() => onDeleteContact(row.original)}
               className="text-destructive"
             >
-              <IconTrash className="h-4 w-4 mr-2" />
+              <Trash2 className="h-4 w-4 mr-2" />
               Supprimer
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -374,7 +374,7 @@ export function ContactsDataTable({
     <div className="w-full flex-col justify-start">
       <div className="flex items-center justify-between pb-6">
         <div className="flex items-center space-x-2 flex-1 max-w-md">
-          <IconSearch className="h-4 w-4 opacity-50" />
+          <Search className="h-4 w-4 opacity-50" />
           <Input
             placeholder="Rechercher par nom, email ou service..."
             value={globalFilter}
@@ -386,7 +386,7 @@ export function ContactsDataTable({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
-                <IconChevronDown />
+                <ChevronDown />
                 <span className="hidden lg:inline">Colonnes</span>
               </Button>
             </DropdownMenuTrigger>
@@ -420,7 +420,7 @@ export function ContactsDataTable({
             </DropdownMenuContent>
           </DropdownMenu>
           <Button variant="default" size="sm" onClick={onNewContact}>
-            <IconPlus />
+            <Plus />
             <span className="hidden lg:inline">Nouveau contact</span>
           </Button>
         </div>
@@ -519,7 +519,7 @@ export function ContactsDataTable({
                 disabled={!table.getCanPreviousPage()}
               >
                 <span className="sr-only">Go to first page</span>
-                <IconChevronsLeft />
+                <ChevronsLeft />
               </Button>
               <Button
                 variant="outline"
@@ -529,7 +529,7 @@ export function ContactsDataTable({
                 disabled={!table.getCanPreviousPage()}
               >
                 <span className="sr-only">Go to previous page</span>
-                <IconChevronLeft />
+                <ChevronLeft />
               </Button>
               <Button
                 variant="outline"
@@ -539,7 +539,7 @@ export function ContactsDataTable({
                 disabled={!table.getCanNextPage()}
               >
                 <span className="sr-only">Go to next page</span>
-                <IconChevronRight />
+                <ChevronRight />
               </Button>
               <Button
                 variant="outline"
@@ -549,7 +549,7 @@ export function ContactsDataTable({
                 disabled={!table.getCanNextPage()}
               >
                 <span className="sr-only">Go to last page</span>
-                <IconChevronsRight />
+                <ChevronsRight />
               </Button>
             </div>
           </div>
