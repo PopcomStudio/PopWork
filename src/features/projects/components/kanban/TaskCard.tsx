@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Calendar, MessageCircle, Link, Edit, Flag } from 'lucide-react'
 import { Check } from 'lucide-react'
+import { TaskTimer } from '@/features/time-tracking/components/TaskTimer'
 
 interface TaskCardProps {
   task: TaskExtended
@@ -203,31 +204,34 @@ export function TaskCard({ task, onEdit }: TaskCardProps) {
           
         </div>
 
-        {/* Footer avec stats */}
-        {(commentsCount > 0 || attachmentsCount > 0 || totalProgress > 0) && (
-          <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-            <div className="flex items-center gap-4 text-sm text-gray-500">
-              {commentsCount > 0 && (
-                <div className="flex items-center gap-1">
-                  <MessageCircle className="h-4 w-4" />
-                  <span>{commentsCount}</span>
-                </div>
-              )}
-              {attachmentsCount > 0 && (
-                <div className="flex items-center gap-1">
-                  <Link className="h-4 w-4" />
-                  <span>{attachmentsCount}</span>
-                </div>
-              )}
-            </div>
+        {/* Footer avec stats et timer */}
+        <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+          <div className="flex items-center gap-4 text-sm text-gray-500">
+            {commentsCount > 0 && (
+              <div className="flex items-center gap-1">
+                <MessageCircle className="h-4 w-4" />
+                <span>{commentsCount}</span>
+              </div>
+            )}
+            {attachmentsCount > 0 && (
+              <div className="flex items-center gap-1">
+                <Link className="h-4 w-4" />
+                <span>{attachmentsCount}</span>
+              </div>
+            )}
             {totalProgress > 0 && (
-              <div className="flex items-center gap-1 text-sm text-gray-500">
+              <div className="flex items-center gap-1">
                 <Check className="h-4 w-4" />
                 <span>{currentProgress}/{totalProgress}</span>
               </div>
             )}
           </div>
-        )}
+          
+          {/* Timer component */}
+          <div onClick={(e) => e.stopPropagation()}>
+            <TaskTimer taskId={task.id} compact showTotal />
+          </div>
+        </div>
       </CardContent>
     </Card>
   )
