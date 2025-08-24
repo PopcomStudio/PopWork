@@ -98,6 +98,36 @@ export interface TaskTimer {
   createdAt: string
 }
 
+export interface TimeEntry {
+  id: string
+  task_id: string
+  user_id: string
+  start_time: string
+  end_time?: string
+  duration?: number
+  description?: string
+  created_at: string
+  updated_at: string
+}
+
+export interface TaskTimeSummary {
+  task_id: string
+  unique_contributors: number
+  total_duration: number
+  first_entry: string
+  last_entry: string
+}
+
+export interface UserTaskTimeSummary {
+  task_id: string
+  user_id: string
+  entry_count: number
+  total_duration: number
+  avg_duration: number
+  first_entry: string
+  last_entry: string
+}
+
 export interface Tag {
   id: string
   name: string
