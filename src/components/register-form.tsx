@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import Image from "next/image"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -35,66 +35,189 @@ export function RegisterForm({
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
+  const [invitationData, setInvitationData] = useState<{
+    email: string
+    role_id?: string
+    team_id?: string
+    invited_by?: string
+  } | null>(null)
+  
   const router = useRouter()
+  const searchParams = useSearchParams()
 
   const {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerFormSchema),
   })
+
+  // Cette page est exclusivement pour les invitations
+  useEffect(() => {
+    console.log('🚀 RegisterForm useEffect triggered')
+    
+    // Lire les paramètres depuis le hash (#) au lieu des query params (?)
+    const hash = window.location.hash
+    console.log('🔗 URL hash:', hash)
+    
+    if (!hash) {
+      console.log('❌ Pas d\'invitation valide (pas de hash), redirection dans 3s...')
+      setError("Accès non autorisé. L'inscription n'est possible que sur invitation.")
+      setTimeout(() => {
+        console.log('🔄 Redirection vers /login...')
+        router.push('/login')
+      }, 3000)
+      return
+    }
+
+    // Parser les paramètres du hash
+    const hashParams = new URLSearchParams(hash.substring(1)) // Enlever le # du début
+    const accessToken = hashParams.get('access_token')
+    const type = hashParams.get('type')
+    
+    console.log('📝 Access token:', accessToken ? 'Présent' : 'Absent')
+    console.log('📝 Type:', type)
+    
+    if (!accessToken || type !== 'invite') {
+      console.log('❌ Paramètres d\'invitation invalides, redirection dans 3s...')
+      setError("Accès non autorisé. L'inscription n'est possible que sur invitation.")
+      setTimeout(() => {
+        console.log('🔄 Redirection vers /login...')
+        router.push('/login')
+      }, 3000)
+      return
+    }
+
+    console.log('✅ Invitation détectée, traitement...')
+    handleInvitationFromToken(accessToken)
+  }, [router])
+
+  const handleInvitationFromToken = async (accessToken: string) => {
+    try {
+      setIsLoading(true)
+      
+      console.log('🔧 Décodage du token d\'accès...')
+      
+      // Décoder le JWT pour extraire les métadonnées (sans vérification pour lecture seulement)
+      const tokenParts = accessToken.split('.')
+      if (tokenParts.length !== 3) {
+        throw new Error('Token JWT invalide')
+      }
+      
+      const payload = JSON.parse(atob(tokenParts[1]))
+      console.log('📦 Payload JWT décodé:', payload)
+      
+      // Vérifier si l'utilisateur est déjà confirmé
+      if (payload.email_verified) {
+        console.log('✅ Utilisateur déjà confirmé, redirection dashboard')
+        router.push('/dashboard')
+        return
+      }
+
+      // Récupérer les métadonnées de l'invitation depuis le JWT
+      const userMetadata = payload.user_metadata || {}
+      console.log('📝 Métadonnées utilisateur:', userMetadata)
+      
+      const inviteData = {
+        email: payload.email || userMetadata.email || '',
+        role_id: userMetadata.role_id || null,
+        team_id: userMetadata.team_id || null,
+        invited_by: userMetadata.invited_by || null
+      }
+      
+      console.log('🎯 Données d\'invitation finales:', inviteData)
+      setInvitationData(inviteData)
+      
+      // Pré-remplir l'email si disponible
+      if (inviteData.email) {
+        console.log('📧 Pré-remplissage de l\'email:', inviteData.email)
+        setValue('email', inviteData.email)
+      }
+    } catch (err) {
+      console.error('💥 Erreur traitement invitation:', err)
+      setError(err instanceof Error ? err.message : "Erreur lors du traitement de l'invitation")
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true)
     setError(null)
     setSuccess(null)
 
+    if (!invitationData) {
+      setError("Données d'invitation manquantes")
+      setIsLoading(false)
+      return
+    }
+
     try {
-      const { error: signUpError, data: authData } = await supabase.auth.signUp({
-        email: data.email,
-        password: data.password,
-        options: {
-          data: {
-            first_name: data.firstName,
-            last_name: data.lastName,
-          },
+      console.log('🚀 Envoi des données d\'inscription à l\'API...')
+      
+      // Appeler notre API server-side pour gérer l'inscription
+      const response = await fetch('/api/auth/complete-registration', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          roleId: invitationData.role_id,
+          teamId: invitationData.team_id
+        })
       })
 
-      if (signUpError) {
-        throw new Error(signUpError.message)
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Erreur lors de l\'inscription')
       }
 
-      if (authData?.user?.email_confirmed_at) {
-        // Utilisateur connecté immédiatement
-        router.push("/dashboard")
+      console.log('✅ Inscription réussie:', result)
+      
+      // Maintenant se connecter avec les credentials
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
+      })
+
+      if (signInError) {
+        console.error('❌ Erreur connexion après inscription:', signInError)
+        setSuccess("Compte créé avec succès ! Veuillez vous reconnecter.")
+        setTimeout(() => router.push("/login"), 2000)
       } else {
-        // Email de confirmation envoyé
-        setSuccess("Un email de confirmation a été envoyé à votre adresse email. Vérifiez votre boîte de réception.")
+        console.log('✅ Connexion automatique réussie')
+        router.push("/dashboard")
       }
+
     } catch (err) {
+      console.error('💥 Erreur inscription:', err)
       setError(err instanceof Error ? err.message : "Une erreur est survenue")
     } finally {
       setIsLoading(false)
     }
   }
 
-  const handleGoogleSignUp = async () => {
-    try {
-      setIsLoading(true)
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/dashboard`
-        }
-      })
-      if (error) throw error
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur de connexion Google")
-    } finally {
-      setIsLoading(false)
-    }
+  // Affichage si pas d'invitation valide
+  if (!invitationData && !error) {
+    return (
+      <div className={cn("flex flex-col gap-6", className)} {...props}>
+        <Card className="overflow-hidden p-0">
+          <CardContent className="p-6 md:p-8 text-center">
+            <div className="flex flex-col items-center gap-4">
+              <Icons.spinner className="h-8 w-8 animate-spin" />
+              <p>Vérification de votre invitation...</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
   }
 
   return (
@@ -104,10 +227,15 @@ export function RegisterForm({
           <form onSubmit={handleSubmit(onSubmit)} className="p-6 md:p-8">
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
-                <h1 className="text-2xl font-bold">Rejoignez PopWork</h1>
+                <h1 className="text-2xl font-bold">Accepter l'invitation</h1>
                 <p className="text-muted-foreground text-balance">
-                  Créez votre compte et commencez à collaborer
+                  Créez votre mot de passe pour rejoindre l'équipe
                 </p>
+                {invitationData?.email && (
+                  <p className="text-sm text-green-600 mt-2">
+                    Invitation pour : {invitationData.email}
+                  </p>
+                )}
               </div>
 
               {error && (
@@ -157,7 +285,9 @@ export function RegisterForm({
                   type="email"
                   placeholder="votre@email.com"
                   {...register("email")}
-                  disabled={isLoading}
+                  disabled={true}
+                  readOnly={true}
+                  className="bg-muted"
                 />
                 {errors.email && (
                   <p className="text-sm text-destructive">{errors.email.message}</p>
@@ -194,42 +324,8 @@ export function RegisterForm({
 
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading && <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />}
-                Créer le compte
+                Accepter l'invitation
               </Button>
-
-              <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
-                <span className="bg-card text-muted-foreground relative z-10 px-2">
-                  Ou continuer avec
-                </span>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4">
-                <Button 
-                  variant="outline" 
-                  type="button" 
-                  className="w-full"
-                  onClick={handleGoogleSignUp}
-                  disabled={isLoading}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-4 h-4">
-                    <path
-                      d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"
-                      fill="currentColor"
-                    />
-                  </svg>
-                  S&apos;inscrire avec Google
-                </Button>
-              </div>
-
-              <div className="text-center text-sm">
-                Déjà un compte ?{" "}
-                <a
-                  href="/login"
-                  className="underline underline-offset-4 hover:text-primary"
-                >
-                  Se connecter
-                </a>
-              </div>
             </div>
           </form>
           <div className="bg-muted relative hidden md:block">
@@ -255,4 +351,4 @@ export function RegisterForm({
       </div>
     </div>
   )
-} 
+}
