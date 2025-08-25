@@ -1,5 +1,5 @@
-import { UserManagement } from '@/features/admin/components/user-management'
+import { UserManagementEnhanced } from '@/features/admin/components/user-management-enhanced'
 
 export default function AdminUsersPage() {
-  return <UserManagement />
+  return <UserManagementEnhanced />
 } 
