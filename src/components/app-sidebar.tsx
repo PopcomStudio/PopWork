@@ -21,6 +21,7 @@ import {
 
 import { useAuth } from "@/features/auth/hooks/use-auth"
 import { useProfile } from "@/features/settings/hooks/use-profile"
+import { useTranslation } from "@/features/translation/hooks/use-translation"
 
 import { NavDocuments } from "@/components/nav-documents"
 import { NavMain } from "@/components/nav-main"
@@ -36,90 +37,92 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 
-const staticData = {
+// Moved outside component to avoid re-creating on each render
+const getStaticData = (t: (key: string) => string) => ({
   navMain: [
     {
-      title: "Dashboard",
+      title: t("navigation.dashboard"),
       url: "/dashboard",
       icon: LayoutDashboard,
     },
     {
-      title: "Projets & Tâches",
+      title: t("navigation.projects"),
       url: "/projects",
       icon: Folder,
     },
     {
-      title: "Time Tracking",
+      title: t("navigation.timeTracking"),
       url: "/time-tracking",
       icon: Clock,
     },
     {
-      title: "Facturation",
+      title: t("navigation.invoicing"),
       url: "/invoicing",
       icon: FileText,
     },
     {
-      title: "Équipe",
+      title: t("navigation.team"),
       url: "/team",
       icon: Users,
     },
     {
-      title: "Calendrier",
+      title: t("navigation.calendar"),
       url: "/calendar",
       icon: Calendar,
     },
   ],
   navClients: [
     {
-      name: "Entreprises",
+      name: t("navigation.companies"),
       url: "/entreprises",
       icon: Building,
     },
     {
-      name: "Services",
+      name: t("navigation.services"),
       url: "/services", 
       icon: Phone,
     },
     {
-      name: "Contacts",
+      name: t("navigation.contacts"),
       url: "/contacts",
       icon: UserCheck,
     },
   ],
   navSecondary: [
     {
-      title: "Historique",
+      title: t("navigation.history"),
       url: "/audit-log",
       icon: History,
     },
     {
-      title: "Paramètres",
+      title: t("navigation.settings"),
       url: "/settings",
       icon: Settings,
     },
   ],
   documents: [
     {
-      name: "Coffre-fort RH",
+      name: t("navigation.documents"),
       url: "/documents",
       icon: FolderOpen,
     },
     {
-      name: "Congés",
+      name: t("navigation.leaves"),
       url: "/leaves",
       icon: Palmtree,
     },
     {
-      name: "Notifications",
+      name: t("navigation.notifications"),
       url: "/notifications",
       icon: Bell,
     },
   ],
-}
+})
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user, loading: authLoading } = useAuth()
   const { profile, loading: profileLoading } = useProfile()
+  const { t } = useTranslation()
 
   // Construire les données utilisateur
   const firstName = profile?.first_name || user?.user_metadata?.first_name
@@ -157,10 +160,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={staticData.navMain} />
-        <NavDocuments items={staticData.navClients} title="Clients" showActions={false} />
-        <NavDocuments items={staticData.documents} title="Ressources" showActions={false} />
-        <NavSecondary items={staticData.navSecondary} className="mt-auto" />
+        <NavMain items={getStaticData(t).navMain} />
+        <NavDocuments items={getStaticData(t).navClients} title={t("navigation.clients")} showActions={false} />
+        <NavDocuments items={getStaticData(t).documents} title={t("navigation.resources")} showActions={false} />
+        <NavSecondary items={getStaticData(t).navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
         {!loading && <NavUser user={userData} />}

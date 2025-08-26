@@ -1,0 +1,373 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "select": "Select",
+    "upload": "Upload",
+    "download": "Download",
+    "export": "Export",
+    "import": "Import",
+    "refresh": "Refresh",
+    "filter": "Filter",
+    "sort": "Sort",
+    "view": "View",
+    "actions": "Actions",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "projects": "Projects",
+    "clients": "Clients",
+    "calendar": "Calendar",
+    "tasks": "Tasks",
+    "documents": "Documents",
+    "reports": "Reports",
+    "settings": "Settings",
+    "admin": "Admin",
+    "help": "Help",
+    "logout": "Logout",
+    "timeTracking": "Time Tracking",
+    "invoicing": "Invoicing",
+    "team": "Team",
+    "companies": "Companies",
+    "services": "Services",
+    "contacts": "Contacts",
+    "leaves": "Leaves",
+    "history": "History",
+    "notifications": "Notifications",
+    "resources": "Resources"
+  },
+  "settings": {
+    "title": "Settings",
+    "sections": {
+      "account": {
+        "title": "Account",
+        "subtitle": "Manage your account settings and preferences",
+        "profile": {
+          "title": "My Profile",
+          "firstName": "First Name",
+          "lastName": "Last Name",
+          "email": "Email",
+          "changeImage": "Change Image",
+          "removeImage": "Remove Image",
+          "imageRequirements": "We support PNGs, JPEGs and WebP under 10MB.",
+          "uploading": "Uploading...",
+          "enterFirstName": "Enter your first name",
+          "enterLastName": "Enter your last name"
+        },
+        "security": {
+          "title": "Account Security",
+          "password": "Password",
+          "changeEmail": "Change email",
+          "changePassword": "Change password",
+          "twoFactor": "2-Step Verification",
+          "twoFactorDescription": "Add an additional layer of security to your account during login."
+        },
+        "management": {
+          "title": "Account Management",
+          "logoutAllDevices": "Log out of all devices",
+          "logoutAllDevicesDescription": "Log out of all other active sessions on other devices besides this one.",
+          "deleteAccount": "Delete my account",
+          "deleteAccountDescription": "Permanently delete the account and remove access from all workspaces.",
+          "logout": "Log out",
+          "delete": "Delete Account"
+        }
+      },
+      "notifications": {
+        "title": "Notifications",
+        "subtitle": "Configure how you receive notifications",
+        "email": {
+          "title": "Email notifications",
+          "description": "Receive email updates about your projects and tasks"
+        },
+        "push": {
+          "title": "Push notifications",
+          "description": "Receive push notifications on your device"
+        },
+        "taskReminders": {
+          "title": "Task reminders",
+          "description": "Get reminded about upcoming task deadlines"
+        },
+        "weeklyReports": {
+          "title": "Weekly reports",
+          "description": "Receive weekly productivity reports"
+        }
+      },
+      "language": {
+        "title": "Language & Region",
+        "subtitle": "Customize your language and regional settings",
+        "language": {
+          "title": "Language",
+          "description": "Select your preferred interface language"
+        },
+        "timezone": {
+          "title": "Timezone",
+          "description": "Set your local timezone"
+        },
+        "dateFormat": {
+          "title": "Date format",
+          "description": "Choose how dates are displayed"
+        },
+        "translation": {
+          "title": "Automatic Translation",
+          "subtitle": "Content translation settings",
+          "autoTranslate": {
+            "title": "Auto-translate",
+            "description": "Automatically translate content to your language"
+          },
+          "showOriginal": {
+            "title": "Show original text",
+            "description": "Display original text alongside translations"
+          },
+          "translationService": {
+            "title": "Translation service",
+            "description": "Choose which translation service to use"
+          },
+          "excludedDomains": {
+            "title": "Excluded domains",
+            "description": "Don't translate content from these domains",
+            "placeholder": "Example: code, proper nouns, acronyms"
+          }
+        }
+      },
+      "general": {
+        "title": "General",
+        "subtitle": "General workspace settings",
+        "workspaceName": {
+          "title": "Workspace name"
+        },
+        "darkMode": {
+          "title": "Dark mode",
+          "description": "Use dark theme across the application"
+        },
+        "compactMode": {
+          "title": "Compact mode",
+          "description": "Use a more compact layout to show more content"
+        }
+      },
+      "members": {
+        "title": "Members",
+        "subtitle": "Manage team members and permissions",
+        "teamMembers": {
+          "title": "Team members",
+          "description": "Invite and manage your team members"
+        },
+        "inviteMember": "Invite member",
+        "owner": "Owner",
+        "admin": "Admin",
+        "member": "Member"
+      },
+      "billing": {
+        "title": "Billing",
+        "subtitle": "Manage your subscription and billing information",
+        "currentPlan": {
+          "title": "Current Plan",
+          "professional": "Professional",
+          "price": "€29/month"
+        },
+        "changePlan": "Change plan",
+        "paymentMethod": {
+          "title": "Payment method"
+        },
+        "update": "Update"
+      }
+    },
+    "categories": {
+      "general": "General Settings",
+      "workspace": "Workspace Settings"
+    },
+    "sidebar": {
+      "account": "Account",
+      "notifications": "Notifications",
+      "languageRegion": "Language & Region",
+      "general": "General",
+      "members": "Members",
+      "billing": "Billing"
+    },
+    "messages": {
+      "avatarUpdated": "Avatar updated successfully!",
+      "avatarRemoved": "Avatar removed successfully!"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Login",
+      "email": "Email address",
+      "password": "Password",
+      "rememberMe": "Remember me",
+      "forgotPassword": "Forgot password?",
+      "submit": "Sign in",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign up"
+    },
+    "signup": {
+      "title": "Create account",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email address",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "terms": "I agree to the terms of service",
+      "submit": "Create account",
+      "hasAccount": "Already have an account?",
+      "login": "Sign in"
+    },
+    "forgotPassword": {
+      "title": "Forgot password",
+      "description": "Enter your email address and we'll send you a link to reset your password.",
+      "email": "Email address",
+      "submit": "Send link",
+      "backToLogin": "Back to login"
+    },
+    "resetPassword": {
+      "title": "Reset password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm password",
+      "submit": "Reset"
+    }
+  },
+  "dashboard": {
+    "welcome": "Welcome, {{name}}",
+    "overview": "Overview",
+    "recentProjects": "Recent Projects",
+    "upcomingTasks": "Upcoming Tasks",
+    "statistics": {
+      "activeProjects": "Active Projects",
+      "completedTasks": "Completed Tasks",
+      "totalClients": "Total Clients",
+      "revenue": "Revenue"
+    },
+    "cards": {
+      "revenue": {
+        "title": "Revenue",
+        "trending": "Rising this month",
+        "description": "Paid invoices this quarter"
+      },
+      "activeProjects": {
+        "title": "Active Projects",
+        "trendingUp": "Trending up",
+        "trendingDown": "Trending down",
+        "description": "Projects in development"
+      },
+      "completedTasks": {
+        "title": "Completed Tasks",
+        "trending": "High productivity",
+        "description": "Team objectives achieved"
+      },
+      "pendingInvoices": {
+        "title": "Pending Invoices",
+        "trending": "Payment tracking",
+        "description": "Billing in progress"
+      }
+    },
+    "error": "Error loading data"
+  },
+  "projects": {
+    "title": "Projects",
+    "newProject": "New Project",
+    "allProjects": "All Projects",
+    "activeProjects": "Active Projects",
+    "completedProjects": "Completed Projects",
+    "status": {
+      "active": "Active",
+      "completed": "Completed",
+      "onHold": "On Hold",
+      "cancelled": "Cancelled"
+    },
+    "fields": {
+      "name": "Project Name",
+      "client": "Client",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "budget": "Budget",
+      "status": "Status",
+      "description": "Description",
+      "team": "Team"
+    }
+  },
+  "clients": {
+    "title": "Clients",
+    "newClient": "New Client",
+    "allClients": "All Clients",
+    "fields": {
+      "name": "Name",
+      "company": "Company",
+      "email": "Email",
+      "phone": "Phone",
+      "address": "Address",
+      "website": "Website",
+      "notes": "Notes"
+    }
+  },
+  "calendar": {
+    "title": "Calendar",
+    "today": "Today",
+    "month": "Month",
+    "week": "Week",
+    "day": "Day",
+    "newEvent": "New Event",
+    "events": "Events",
+    "tasks": "Tasks"
+  },
+  "tasks": {
+    "title": "Tasks",
+    "newTask": "New Task",
+    "allTasks": "All Tasks",
+    "myTasks": "My Tasks",
+    "status": {
+      "todo": "To Do",
+      "inProgress": "In Progress",
+      "done": "Done",
+      "cancelled": "Cancelled"
+    },
+    "priority": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "urgent": "Urgent"
+    },
+    "fields": {
+      "title": "Title",
+      "description": "Description",
+      "assignee": "Assignee",
+      "dueDate": "Due Date",
+      "priority": "Priority",
+      "status": "Status",
+      "project": "Project",
+      "tags": "Tags"
+    }
+  },
+  "messages": {
+    "success": {
+      "saved": "Successfully saved",
+      "deleted": "Successfully deleted",
+      "updated": "Successfully updated",
+      "created": "Successfully created",
+      "sent": "Successfully sent"
+    },
+    "error": {
+      "general": "An error occurred",
+      "network": "Network error",
+      "validation": "Validation error",
+      "unauthorized": "Unauthorized",
+      "notFound": "Not found"
+    },
+    "confirm": {
+      "delete": "Are you sure you want to delete this item?",
+      "unsavedChanges": "You have unsaved changes. Do you want to continue?"
+    }
+  }
+}
