@@ -8,8 +8,8 @@ import {
   Settings2, 
   Users, 
   CreditCard,
-  Shield,
-  ChevronRight
+  ChevronRight,
+  Languages
 } from "lucide-react"
 import { PageLayout } from "@/components/PageLayout"
 import { Button } from "@/components/ui/button"
@@ -23,6 +23,9 @@ import { useAuth } from "@/features/auth/hooks/use-auth"
 import { useProfile } from "@/features/settings/hooks/use-profile"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { ImageCropModal } from "@/components/ImageCropModal"
+import { useTranslation, type Language } from "@/features/translation/contexts/translation-context"
+import { Badge } from "@/components/ui/badge"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface SettingSection {
   id: string
@@ -31,40 +34,41 @@ interface SettingSection {
   category: "general" | "workspace"
 }
 
-const settingSections: SettingSection[] = [
+// Settings sections are now defined inside the component to use translations
+const getSettingSections = (t: (key: string) => string): SettingSection[] => [
   {
     id: "account",
-    title: "Account",
+    title: t("settings.sidebar.account"),
     icon: User,
     category: "general"
   },
   {
     id: "notifications",
-    title: "Notifications",
+    title: t("settings.sidebar.notifications"),
     icon: Bell,
     category: "general"
   },
   {
     id: "language",
-    title: "Language & Region",
+    title: t("settings.sidebar.languageRegion"),
     icon: Globe,
     category: "general"
   },
   {
     id: "general",
-    title: "General",
+    title: t("settings.sidebar.general"),
     icon: Settings2,
     category: "workspace"
   },
   {
     id: "members",
-    title: "Members",
+    title: t("settings.sidebar.members"),
     icon: Users,
     category: "workspace"
   },
   {
     id: "billing",
-    title: "Billing",
+    title: t("settings.sidebar.billing"),
     icon: CreditCard,
     category: "workspace"
   }
@@ -80,6 +84,7 @@ export default function SettingsPage() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { user } = useAuth()
   const { profile, updating, updateProfile, uploadAvatar, removeAvatar } = useProfile()
+  const { t, language, setLanguage, availableLanguages } = useTranslation()
 
   const firstName = profile?.first_name || user?.user_metadata?.first_name || ""
   const lastName = profile?.last_name || user?.user_metadata?.last_name || ""
@@ -118,7 +123,7 @@ export default function SettingsPage() {
     if (result.error) {
       setError(result.error)
     } else {
-      setSuccess("Avatar mis à jour avec succès !")
+      setSuccess(t("settings.messages.avatarUpdated"))
       setTimeout(() => setSuccess(""), 3000)
     }
     setSelectedImageFile(null)
@@ -135,7 +140,7 @@ export default function SettingsPage() {
     if (result.error) {
       setError(result.error)
     } else {
-      setSuccess("Avatar supprimé avec succès !")
+      setSuccess(t("settings.messages.avatarRemoved"))
       setTimeout(() => setSuccess(""), 3000)
     }
   }
@@ -146,16 +151,16 @@ export default function SettingsPage() {
         return (
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-semibold mb-1">Account Settings</h2>
+              <h2 className="text-2xl font-semibold mb-1">{t("settings.sections.account.title")}</h2>
               <p className="text-sm text-muted-foreground">
-                Manage your account settings and preferences
+                {t("settings.sections.account.subtitle")}
               </p>
             </div>
 
             <Separator />
 
             <div>
-              <h3 className="text-lg font-medium mb-4">My Profile</h3>
+              <h3 className="text-lg font-medium mb-4">{t("settings.sections.account.profile.title")}</h3>
               
               {error && (
                 <Alert variant="destructive" className="mb-4">
@@ -188,7 +193,7 @@ export default function SettingsPage() {
                     onClick={() => fileInputRef.current?.click()}
                     disabled={updating}
                   >
-                    {updating ? "Uploading..." : "Change Image"}
+                    {updating ? t("settings.sections.account.profile.uploading") : t("settings.sections.account.profile.changeImage")}
                   </Button>
                   <Button 
                     variant="ghost" 
@@ -197,34 +202,34 @@ export default function SettingsPage() {
                     onClick={handleRemoveAvatar}
                     disabled={updating || !avatarUrl}
                   >
-                    Remove Image
+                    {t("settings.sections.account.profile.removeImage")}
                   </Button>
                 </div>
               </div>
               <p className="text-xs text-muted-foreground mb-6">
-                We support PNGs, JPEGs and WebP under 10MB.
+                {t("settings.sections.account.profile.imageRequirements")}
               </p>
 
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name</Label>
+                  <Label htmlFor="firstName">{t("settings.sections.account.profile.firstName")}</Label>
                   <Input
                     id="firstName"
                     value={formData.firstName || firstName}
                     onChange={(e) => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
                     onBlur={handleProfileUpdate}
-                    placeholder="Enter your first name"
+                    placeholder={t("settings.sections.account.profile.enterFirstName")}
                     disabled={updating}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name</Label>
+                  <Label htmlFor="lastName">{t("settings.sections.account.profile.lastName")}</Label>
                   <Input
                     id="lastName"
                     value={formData.lastName || lastName}
                     onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
                     onBlur={handleProfileUpdate}
-                    placeholder="Enter your last name"
+                    placeholder={t("settings.sections.account.profile.enterLastName")}
                     disabled={updating}
                   />
                 </div>
@@ -234,34 +239,34 @@ export default function SettingsPage() {
             <Separator />
 
             <div>
-              <h3 className="text-lg font-medium mb-4">Account Security</h3>
+              <h3 className="text-lg font-medium mb-4">{t("settings.sections.account.security.title")}</h3>
               
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label>Email</Label>
+                    <Label>{t("settings.sections.account.profile.email")}</Label>
                     <p className="text-sm text-muted-foreground mt-1">{email}</p>
                   </div>
                   <Button variant="outline" size="sm">
-                    Change email
+                    {t("settings.sections.account.security.changeEmail")}
                   </Button>
                 </div>
 
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label>Password</Label>
+                    <Label>{t("settings.sections.account.security.password")}</Label>
                     <p className="text-sm text-muted-foreground mt-1">••••••••</p>
                   </div>
                   <Button variant="outline" size="sm">
-                    Change password
+                    {t("settings.sections.account.security.changePassword")}
                   </Button>
                 </div>
 
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
-                    <Label>2-Step Verifications</Label>
+                    <Label>{t("settings.sections.account.security.twoFactor")}</Label>
                     <p className="text-sm text-muted-foreground">
-                      Add an additional layer of security to your account during login.
+                      {t("settings.sections.account.security.twoFactorDescription")}
                     </p>
                   </div>
                   <Switch />
@@ -272,30 +277,30 @@ export default function SettingsPage() {
             <Separator />
 
             <div>
-              <h3 className="text-lg font-medium mb-4">Account Management</h3>
+              <h3 className="text-lg font-medium mb-4">{t("settings.sections.account.management.title")}</h3>
               
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
-                    <Label>Log out of all devices</Label>
+                    <Label>{t("settings.sections.account.management.logoutAllDevices")}</Label>
                     <p className="text-sm text-muted-foreground">
-                      Log out of all other active sessions on other devices besides this one.
+                      {t("settings.sections.account.management.logoutAllDevicesDescription")}
                     </p>
                   </div>
                   <Button variant="outline" size="sm">
-                    Log out
+                    {t("settings.sections.account.management.logout")}
                   </Button>
                 </div>
 
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
-                    <Label className="text-red-600">Delete my account</Label>
+                    <Label className="text-red-600">{t("settings.sections.account.management.deleteAccount")}</Label>
                     <p className="text-sm text-muted-foreground">
-                      Permanently delete the account and remove access from all workspaces.
+                      {t("settings.sections.account.management.deleteAccountDescription")}
                     </p>
                   </div>
                   <Button variant="destructive" size="sm">
-                    Delete Account
+                    {t("settings.sections.account.management.delete")}
                   </Button>
                 </div>
               </div>
@@ -307,9 +312,9 @@ export default function SettingsPage() {
         return (
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-semibold mb-1">Notifications</h2>
+              <h2 className="text-2xl font-semibold mb-1">{t("settings.sections.notifications.title")}</h2>
               <p className="text-sm text-muted-foreground">
-                Configure how you receive notifications
+                {t("settings.sections.notifications.subtitle")}
               </p>
             </div>
 
@@ -318,9 +323,9 @@ export default function SettingsPage() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <Label>Email notifications</Label>
+                  <Label>{t("settings.sections.notifications.email.title")}</Label>
                   <p className="text-sm text-muted-foreground">
-                    Receive email updates about your projects and tasks
+                    {t("settings.sections.notifications.email.description")}
                   </p>
                 </div>
                 <Switch defaultChecked />
@@ -328,9 +333,9 @@ export default function SettingsPage() {
 
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <Label>Push notifications</Label>
+                  <Label>{t("settings.sections.notifications.push.title")}</Label>
                   <p className="text-sm text-muted-foreground">
-                    Receive push notifications on your device
+                    {t("settings.sections.notifications.push.description")}
                   </p>
                 </div>
                 <Switch />
@@ -338,9 +343,9 @@ export default function SettingsPage() {
 
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <Label>Task reminders</Label>
+                  <Label>{t("settings.sections.notifications.taskReminders.title")}</Label>
                   <p className="text-sm text-muted-foreground">
-                    Get reminded about upcoming task deadlines
+                    {t("settings.sections.notifications.taskReminders.description")}
                   </p>
                 </div>
                 <Switch defaultChecked />
@@ -348,9 +353,9 @@ export default function SettingsPage() {
 
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <Label>Weekly reports</Label>
+                  <Label>{t("settings.sections.notifications.weeklyReports.title")}</Label>
                   <p className="text-sm text-muted-foreground">
-                    Receive weekly productivity reports
+                    {t("settings.sections.notifications.weeklyReports.description")}
                   </p>
                 </div>
                 <Switch defaultChecked />
@@ -363,40 +368,125 @@ export default function SettingsPage() {
         return (
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-semibold mb-1">Language & Region</h2>
+              <h2 className="text-2xl font-semibold mb-1">{t("settings.sections.language.title")}</h2>
               <p className="text-sm text-muted-foreground">
-                Customize your language and regional settings
+                {t("settings.sections.language.subtitle")}
               </p>
             </div>
 
             <Separator />
 
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label>Language</Label>
-                <select className="w-full p-2 border rounded-md">
-                  <option value="fr">Français</option>
-                  <option value="en">English</option>
-                  <option value="es">Español</option>
-                </select>
+            <div className="space-y-6">
+              <div className="space-y-4">
+                <div>
+                  <Label className="text-base font-medium">{t("settings.sections.language.language.title")}</Label>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    {t("settings.sections.language.language.description")}
+                  </p>
+                  <Select value={language} onValueChange={(value) => setLanguage(value as Language)}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select language" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableLanguages.map((lang) => (
+                        <SelectItem key={lang.code} value={lang.code}>
+                          <div className="flex items-center space-x-2">
+                            <Languages className="w-4 h-4" />
+                            <span>{lang.name}</span>
+                            {language === lang.code && (
+                              <Badge variant="secondary" className="ml-2">
+                                {language === "fr" ? "Actuel" : "Current"}
+                              </Badge>
+                            )}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label className="text-base font-medium">{t("settings.sections.language.timezone.title")}</Label>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    {t("settings.sections.language.timezone.description")}
+                  </p>
+                  <Select defaultValue="Europe/Paris">
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select timezone" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Europe/Paris">Europe/Paris (UTC+1)</SelectItem>
+                      <SelectItem value="America/New_York">America/New_York (UTC-5)</SelectItem>
+                      <SelectItem value="Asia/Tokyo">Asia/Tokyo (UTC+9)</SelectItem>
+                      <SelectItem value="Australia/Sydney">Australia/Sydney (UTC+11)</SelectItem>
+                      <SelectItem value="America/Los_Angeles">America/Los_Angeles (UTC-8)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label className="text-base font-medium">{t("settings.sections.language.dateFormat.title")}</Label>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    {t("settings.sections.language.dateFormat.description")}
+                  </p>
+                  <Select defaultValue="dd/mm/yyyy">
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select date format" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="dd/mm/yyyy">
+                        <span className="font-mono">31/12/2024</span>
+                        <span className="text-muted-foreground ml-2">(DD/MM/YYYY)</span>
+                      </SelectItem>
+                      <SelectItem value="mm/dd/yyyy">
+                        <span className="font-mono">12/31/2024</span>
+                        <span className="text-muted-foreground ml-2">(MM/DD/YYYY)</span>
+                      </SelectItem>
+                      <SelectItem value="yyyy-mm-dd">
+                        <span className="font-mono">2024-12-31</span>
+                        <span className="text-muted-foreground ml-2">(YYYY-MM-DD)</span>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <Label>Timezone</Label>
-                <select className="w-full p-2 border rounded-md">
-                  <option value="Europe/Paris">Europe/Paris (UTC+1)</option>
-                  <option value="America/New_York">America/New_York (UTC-5)</option>
-                  <option value="Asia/Tokyo">Asia/Tokyo (UTC+9)</option>
-                </select>
-              </div>
+              <Separator />
 
-              <div className="space-y-2">
-                <Label>Date format</Label>
-                <select className="w-full p-2 border rounded-md">
-                  <option value="dd/mm/yyyy">DD/MM/YYYY</option>
-                  <option value="mm/dd/yyyy">MM/DD/YYYY</option>
-                  <option value="yyyy-mm-dd">YYYY-MM-DD</option>
-                </select>
+              {/* Language Preview */}
+              <div>
+                <h3 className="text-lg font-semibold mb-1">
+                  {language === "fr" ? "Aperçu" : "Preview"}
+                </h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  {language === "fr" 
+                    ? "Voyez comment le contenu apparaît dans votre langue sélectionnée"
+                    : "See how content appears in your selected language"}
+                </p>
+                <div className="p-4 bg-muted/50 rounded-lg space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">Navigation:</span>
+                    <div className="flex space-x-2">
+                      {["navigation.dashboard", "navigation.projects", "navigation.settings"].map(key => (
+                        <Badge key={key} variant="outline">{t(key)}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                  <Separator />
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">Message:</span>
+                    <span className="text-sm text-muted-foreground">{t("messages.success.saved")}</span>
+                  </div>
+                  <Separator />
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">Actions:</span>
+                    <div className="flex space-x-2">
+                      {["common.save", "common.cancel", "common.delete"].map(key => (
+                        <Badge key={key} variant="secondary">{t(key)}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -406,9 +496,9 @@ export default function SettingsPage() {
         return (
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-semibold mb-1">General</h2>
+              <h2 className="text-2xl font-semibold mb-1">{t("settings.sections.general.title")}</h2>
               <p className="text-sm text-muted-foreground">
-                General workspace settings
+                {t("settings.sections.general.subtitle")}
               </p>
             </div>
 
@@ -416,15 +506,15 @@ export default function SettingsPage() {
 
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label>Workspace name</Label>
+                <Label>{t("settings.sections.general.workspaceName.title")}</Label>
                 <Input defaultValue="PopWork Agency" />
               </div>
 
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <Label>Dark mode</Label>
+                  <Label>{t("settings.sections.general.darkMode.title")}</Label>
                   <p className="text-sm text-muted-foreground">
-                    Use dark theme across the application
+                    {t("settings.sections.general.darkMode.description")}
                   </p>
                 </div>
                 <Switch />
@@ -432,9 +522,9 @@ export default function SettingsPage() {
 
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <Label>Compact mode</Label>
+                  <Label>{t("settings.sections.general.compactMode.title")}</Label>
                   <p className="text-sm text-muted-foreground">
-                    Use a more compact layout to show more content
+                    {t("settings.sections.general.compactMode.description")}
                   </p>
                 </div>
                 <Switch />
@@ -447,9 +537,9 @@ export default function SettingsPage() {
         return (
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-semibold mb-1">Members</h2>
+              <h2 className="text-2xl font-semibold mb-1">{t("settings.sections.members.title")}</h2>
               <p className="text-sm text-muted-foreground">
-                Manage team members and permissions
+                {t("settings.sections.members.subtitle")}
               </p>
             </div>
 
@@ -458,12 +548,12 @@ export default function SettingsPage() {
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <div>
-                  <h3 className="font-medium">Team members</h3>
+                  <h3 className="font-medium">{t("settings.sections.members.teamMembers.title")}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Invite and manage your team members
+                    {t("settings.sections.members.teamMembers.description")}
                   </p>
                 </div>
-                <Button>Invite member</Button>
+                <Button>{t("settings.sections.members.inviteMember")}</Button>
               </div>
 
               <div className="space-y-3">
@@ -477,7 +567,7 @@ export default function SettingsPage() {
                       <p className="text-sm text-muted-foreground">{email}</p>
                     </div>
                   </div>
-                  <div className="text-sm text-muted-foreground">Owner</div>
+                  <div className="text-sm text-muted-foreground">{t("settings.sections.members.owner")}</div>
                 </div>
               </div>
             </div>
@@ -488,9 +578,9 @@ export default function SettingsPage() {
         return (
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-semibold mb-1">Billing</h2>
+              <h2 className="text-2xl font-semibold mb-1">{t("settings.sections.billing.title")}</h2>
               <p className="text-sm text-muted-foreground">
-                Manage your subscription and billing information
+                {t("settings.sections.billing.subtitle")}
               </p>
             </div>
 
@@ -498,20 +588,20 @@ export default function SettingsPage() {
 
             <div className="space-y-4">
               <div className="p-4 border rounded-lg">
-                <h3 className="font-medium mb-2">Current Plan</h3>
-                <p className="text-2xl font-bold mb-1">Professional</p>
-                <p className="text-sm text-muted-foreground mb-4">€29/month</p>
-                <Button variant="outline">Change plan</Button>
+                <h3 className="font-medium mb-2">{t("settings.sections.billing.currentPlan.title")}</h3>
+                <p className="text-2xl font-bold mb-1">{t("settings.sections.billing.currentPlan.professional")}</p>
+                <p className="text-sm text-muted-foreground mb-4">{t("settings.sections.billing.currentPlan.price")}</p>
+                <Button variant="outline">{t("settings.sections.billing.changePlan")}</Button>
               </div>
 
               <div className="space-y-2">
-                <Label>Payment method</Label>
+                <Label>{t("settings.sections.billing.paymentMethod.title")}</Label>
                 <div className="p-3 border rounded-lg flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     <div className="w-8 h-5 bg-blue-600 rounded"></div>
                     <span>•••• •••• •••• 4242</span>
                   </div>
-                  <Button variant="ghost" size="sm">Update</Button>
+                  <Button variant="ghost" size="sm">{t("settings.sections.billing.update")}</Button>
                 </div>
               </div>
             </div>
@@ -532,10 +622,10 @@ export default function SettingsPage() {
             <div className="space-y-6">
               <div>
                 <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">
-                  General Settings
+                  {t("settings.categories.general")}
                 </h3>
                 <div className="space-y-1">
-                  {settingSections
+                  {getSettingSections(t)
                     .filter(section => section.category === "general")
                     .map((section) => {
                       const Icon = section.icon
@@ -563,10 +653,10 @@ export default function SettingsPage() {
 
               <div>
                 <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">
-                  Workspace Settings
+                  {t("settings.categories.workspace")}
                 </h3>
                 <div className="space-y-1">
-                  {settingSections
+                  {getSettingSections(t)
                     .filter(section => section.category === "workspace")
                     .map((section) => {
                       const Icon = section.icon

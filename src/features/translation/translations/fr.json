@@ -1,0 +1,373 @@
+{
+  "common": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "add": "Ajouter",
+    "search": "Rechercher",
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "confirm": "Confirmer",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "close": "Fermer",
+    "select": "Sélectionner",
+    "upload": "Télécharger",
+    "download": "Télécharger",
+    "export": "Exporter",
+    "import": "Importer",
+    "refresh": "Actualiser",
+    "filter": "Filtrer",
+    "sort": "Trier",
+    "view": "Voir",
+    "actions": "Actions",
+    "yes": "Oui",
+    "no": "Non"
+  },
+  "navigation": {
+    "dashboard": "Tableau de bord",
+    "projects": "Projets",
+    "clients": "Clients",
+    "calendar": "Calendrier",
+    "tasks": "Tâches",
+    "documents": "Documents",
+    "reports": "Rapports",
+    "settings": "Paramètres",
+    "admin": "Administration",
+    "help": "Aide",
+    "logout": "Déconnexion",
+    "timeTracking": "Time Tracking",
+    "invoicing": "Facturation",
+    "team": "Équipe",
+    "companies": "Entreprises",
+    "services": "Services",
+    "contacts": "Contacts",
+    "leaves": "Congés",
+    "history": "Historique",
+    "notifications": "Notifications",
+    "resources": "Ressources"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "sections": {
+      "account": {
+        "title": "Compte",
+        "subtitle": "Gérer les paramètres et préférences de votre compte",
+        "profile": {
+          "title": "Mon profil",
+          "firstName": "Prénom",
+          "lastName": "Nom",
+          "email": "Email",
+          "changeImage": "Changer l'image",
+          "removeImage": "Supprimer l'image",
+          "imageRequirements": "Nous supportons les PNG, JPEG et WebP de moins de 10MB.",
+          "uploading": "Téléchargement...",
+          "enterFirstName": "Entrez votre prénom",
+          "enterLastName": "Entrez votre nom"
+        },
+        "security": {
+          "title": "Sécurité du compte",
+          "password": "Mot de passe",
+          "changeEmail": "Changer l'email",
+          "changePassword": "Changer le mot de passe",
+          "twoFactor": "Vérification en 2 étapes",
+          "twoFactorDescription": "Ajoutez une couche de sécurité supplémentaire à votre compte lors de la connexion."
+        },
+        "management": {
+          "title": "Gestion du compte",
+          "logoutAllDevices": "Se déconnecter de tous les appareils",
+          "logoutAllDevicesDescription": "Se déconnecter de toutes les autres sessions actives sur d'autres appareils sauf celui-ci.",
+          "deleteAccount": "Supprimer mon compte",
+          "deleteAccountDescription": "Supprimer définitivement le compte et retirer l'accès de tous les espaces de travail.",
+          "logout": "Se déconnecter",
+          "delete": "Supprimer le compte"
+        }
+      },
+      "notifications": {
+        "title": "Notifications",
+        "subtitle": "Configurer comment vous recevez les notifications",
+        "email": {
+          "title": "Notifications par email",
+          "description": "Recevoir des mises à jour par email sur vos projets et tâches"
+        },
+        "push": {
+          "title": "Notifications push",
+          "description": "Recevoir des notifications push sur votre appareil"
+        },
+        "taskReminders": {
+          "title": "Rappels de tâches",
+          "description": "Être rappelé des échéances de tâches à venir"
+        },
+        "weeklyReports": {
+          "title": "Rapports hebdomadaires",
+          "description": "Recevoir des rapports de productivité hebdomadaires"
+        }
+      },
+      "language": {
+        "title": "Langue et région",
+        "subtitle": "Personnaliser vos paramètres de langue et de région",
+        "language": {
+          "title": "Langue",
+          "description": "Sélectionner votre langue préférée pour l'interface"
+        },
+        "timezone": {
+          "title": "Fuseau horaire",
+          "description": "Définir votre fuseau horaire local"
+        },
+        "dateFormat": {
+          "title": "Format de date",
+          "description": "Choisir le format d'affichage des dates"
+        },
+        "translation": {
+          "title": "Traduction automatique",
+          "subtitle": "Paramètres de traduction du contenu",
+          "autoTranslate": {
+            "title": "Traduction automatique",
+            "description": "Traduire automatiquement le contenu dans votre langue"
+          },
+          "showOriginal": {
+            "title": "Afficher le texte original",
+            "description": "Afficher le texte original en parallèle de la traduction"
+          },
+          "translationService": {
+            "title": "Service de traduction",
+            "description": "Choisir le service de traduction à utiliser"
+          },
+          "excludedDomains": {
+            "title": "Domaines exclus",
+            "description": "Ne pas traduire le contenu de ces domaines",
+            "placeholder": "Exemple: code, noms propres, acronymes"
+          }
+        }
+      },
+      "general": {
+        "title": "Général",
+        "subtitle": "Paramètres généraux de l'espace de travail",
+        "workspaceName": {
+          "title": "Nom de l'espace de travail"
+        },
+        "darkMode": {
+          "title": "Mode sombre",
+          "description": "Utiliser le thème sombre dans toute l'application"
+        },
+        "compactMode": {
+          "title": "Mode compact",
+          "description": "Utiliser une mise en page plus compacte pour afficher plus de contenu"
+        }
+      },
+      "members": {
+        "title": "Membres",
+        "subtitle": "Gérer les membres de l'équipe et les permissions",
+        "teamMembers": {
+          "title": "Membres de l'équipe",
+          "description": "Inviter et gérer les membres de votre équipe"
+        },
+        "inviteMember": "Inviter un membre",
+        "owner": "Propriétaire",
+        "admin": "Administrateur",
+        "member": "Membre"
+      },
+      "billing": {
+        "title": "Facturation",
+        "subtitle": "Gérer votre abonnement et les informations de facturation",
+        "currentPlan": {
+          "title": "Plan actuel",
+          "professional": "Professionnel",
+          "price": "€29/mois"
+        },
+        "changePlan": "Changer de plan",
+        "paymentMethod": {
+          "title": "Méthode de paiement"
+        },
+        "update": "Mettre à jour"
+      }
+    },
+    "categories": {
+      "general": "Paramètres généraux",
+      "workspace": "Paramètres de l'espace de travail"
+    },
+    "sidebar": {
+      "account": "Compte",
+      "notifications": "Notifications",
+      "languageRegion": "Langue et région",
+      "general": "Général",
+      "members": "Membres",
+      "billing": "Facturation"
+    },
+    "messages": {
+      "avatarUpdated": "Avatar mis à jour avec succès !",
+      "avatarRemoved": "Avatar supprimé avec succès !"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Connexion",
+      "email": "Adresse email",
+      "password": "Mot de passe",
+      "rememberMe": "Se souvenir de moi",
+      "forgotPassword": "Mot de passe oublié ?",
+      "submit": "Se connecter",
+      "noAccount": "Pas encore de compte ?",
+      "signUp": "S'inscrire"
+    },
+    "signup": {
+      "title": "Créer un compte",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "email": "Adresse email",
+      "password": "Mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "terms": "J'accepte les conditions d'utilisation",
+      "submit": "Créer mon compte",
+      "hasAccount": "Déjà un compte ?",
+      "login": "Se connecter"
+    },
+    "forgotPassword": {
+      "title": "Mot de passe oublié",
+      "description": "Entrez votre adresse email et nous vous enverrons un lien pour réinitialiser votre mot de passe.",
+      "email": "Adresse email",
+      "submit": "Envoyer le lien",
+      "backToLogin": "Retour à la connexion"
+    },
+    "resetPassword": {
+      "title": "Réinitialiser le mot de passe",
+      "newPassword": "Nouveau mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "submit": "Réinitialiser"
+    }
+  },
+  "dashboard": {
+    "welcome": "Bienvenue, {{name}}",
+    "overview": "Vue d'ensemble",
+    "recentProjects": "Projets récents",
+    "upcomingTasks": "Tâches à venir",
+    "statistics": {
+      "activeProjects": "Projets actifs",
+      "completedTasks": "Tâches terminées",
+      "totalClients": "Clients totaux",
+      "revenue": "Chiffre d'affaires"
+    },
+    "cards": {
+      "revenue": {
+        "title": "Chiffre d'affaires",
+        "trending": "En hausse ce mois-ci",
+        "description": "Factures payées ce trimestre"
+      },
+      "activeProjects": {
+        "title": "Projets actifs",
+        "trendingUp": "En progression",
+        "trendingDown": "En baisse",
+        "description": "Projets en cours de développement"
+      },
+      "completedTasks": {
+        "title": "Tâches terminées",
+        "trending": "Productivité élevée",
+        "description": "Objectifs de l'équipe atteints"
+      },
+      "pendingInvoices": {
+        "title": "Factures en attente",
+        "trending": "Suivi des paiements",
+        "description": "Facturation en cours"
+      }
+    },
+    "error": "Erreur lors du chargement"
+  },
+  "projects": {
+    "title": "Projets",
+    "newProject": "Nouveau projet",
+    "allProjects": "Tous les projets",
+    "activeProjects": "Projets actifs",
+    "completedProjects": "Projets terminés",
+    "status": {
+      "active": "Actif",
+      "completed": "Terminé",
+      "onHold": "En attente",
+      "cancelled": "Annulé"
+    },
+    "fields": {
+      "name": "Nom du projet",
+      "client": "Client",
+      "startDate": "Date de début",
+      "endDate": "Date de fin",
+      "budget": "Budget",
+      "status": "Statut",
+      "description": "Description",
+      "team": "Équipe"
+    }
+  },
+  "clients": {
+    "title": "Clients",
+    "newClient": "Nouveau client",
+    "allClients": "Tous les clients",
+    "fields": {
+      "name": "Nom",
+      "company": "Entreprise",
+      "email": "Email",
+      "phone": "Téléphone",
+      "address": "Adresse",
+      "website": "Site web",
+      "notes": "Notes"
+    }
+  },
+  "calendar": {
+    "title": "Calendrier",
+    "today": "Aujourd'hui",
+    "month": "Mois",
+    "week": "Semaine",
+    "day": "Jour",
+    "newEvent": "Nouvel événement",
+    "events": "Événements",
+    "tasks": "Tâches"
+  },
+  "tasks": {
+    "title": "Tâches",
+    "newTask": "Nouvelle tâche",
+    "allTasks": "Toutes les tâches",
+    "myTasks": "Mes tâches",
+    "status": {
+      "todo": "À faire",
+      "inProgress": "En cours",
+      "done": "Terminé",
+      "cancelled": "Annulé"
+    },
+    "priority": {
+      "low": "Faible",
+      "medium": "Moyenne",
+      "high": "Élevée",
+      "urgent": "Urgente"
+    },
+    "fields": {
+      "title": "Titre",
+      "description": "Description",
+      "assignee": "Assigné à",
+      "dueDate": "Date d'échéance",
+      "priority": "Priorité",
+      "status": "Statut",
+      "project": "Projet",
+      "tags": "Tags"
+    }
+  },
+  "messages": {
+    "success": {
+      "saved": "Enregistré avec succès",
+      "deleted": "Supprimé avec succès",
+      "updated": "Mis à jour avec succès",
+      "created": "Créé avec succès",
+      "sent": "Envoyé avec succès"
+    },
+    "error": {
+      "general": "Une erreur s'est produite",
+      "network": "Erreur de réseau",
+      "validation": "Erreur de validation",
+      "unauthorized": "Non autorisé",
+      "notFound": "Non trouvé"
+    },
+    "confirm": {
+      "delete": "Êtes-vous sûr de vouloir supprimer cet élément ?",
+      "unsavedChanges": "Vous avez des modifications non enregistrées. Voulez-vous continuer ?"
+    }
+  }
+}
