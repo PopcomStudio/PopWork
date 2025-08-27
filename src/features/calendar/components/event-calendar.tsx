@@ -57,8 +57,9 @@ export function EventCalendar({
 }: EventCalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date())
   const [view, setView] = useState<CalendarView>(initialView)
-  const { language, t } = useTranslation()
+  const { language, t, weekStartDay } = useTranslation()
   const locale = language === "fr" ? fr : enUS
+  const weekStart = weekStartDay === 'monday' ? 1 : weekStartDay === 'sunday' ? 0 : 6
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -134,8 +135,8 @@ export function EventCalendar({
     if (view === "month") {
       return format(currentDate, "MMMM yyyy", { locale })
     } else if (view === "week") {
-      const start = startOfWeek(currentDate, { weekStartsOn: 1 })
-      const end = endOfWeek(currentDate, { weekStartsOn: 1 })
+      const start = startOfWeek(currentDate, { weekStartsOn: weekStart })
+      const end = endOfWeek(currentDate, { weekStartsOn: weekStart })
       if (isSameMonth(start, end)) {
         return format(start, "MMMM yyyy", { locale })
       } else {

@@ -51,22 +51,24 @@ export function MonthView({
   onEventSelect,
   onEventCreate,
 }: MonthViewProps) {
-  const { timeFormat, language } = useTranslation()
+  const { timeFormat, language, weekStartDay, workingDays } = useTranslation()
   const days = useMemo(() => {
+    const weekStart = weekStartDay === 'monday' ? 1 : weekStartDay === 'sunday' ? 0 : 6
     const monthStart = startOfMonth(currentDate)
     const monthEnd = endOfMonth(monthStart)
-    const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 })
-    const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 0 })
+    const calendarStart = startOfWeek(monthStart, { weekStartsOn: weekStart })
+    const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: weekStart })
 
     return eachDayOfInterval({ start: calendarStart, end: calendarEnd })
-  }, [currentDate])
+  }, [currentDate, weekStartDay])
 
   const weekdays = useMemo(() => {
+    const weekStart = weekStartDay === 'monday' ? 1 : weekStartDay === 'sunday' ? 0 : 6
     return Array.from({ length: 7 }).map((_, i) => {
-      const date = addDays(startOfWeek(new Date()), i)
+      const date = addDays(startOfWeek(new Date(), { weekStartsOn: weekStart }), i)
       return format(date, "EEE")
     })
-  }, [])
+  }, [weekStartDay])
 
   const weeks = useMemo(() => {
     const result = []
@@ -101,14 +103,19 @@ export function MonthView({
   return (
     <div data-slot="month-view" className="contents">
       <div className="border-border/70 grid grid-cols-7 border-b">
-        {weekdays.map((day) => (
-          <div
-            key={day}
-            className="text-muted-foreground/70 py-2 text-center text-sm"
-          >
-            {day}
-          </div>
-        ))}
+        {weekdays.map((day, index) => {
+          const isWorkingDay = index < workingDays
+          return (
+            <div
+              key={day}
+              className={`py-2 text-center text-sm ${
+                isWorkingDay ? 'text-muted-foreground/70' : 'text-muted-foreground/40 bg-muted/30 dark:bg-muted/10'
+              }`}
+            >
+              {day}
+            </div>
+          )
+        })}
       </div>
       <div className="grid flex-1 auto-rows-fr">
         {weeks.map((week, weekIndex) => (
@@ -125,6 +132,12 @@ export function MonthView({
               const cellId = `month-cell-${day.toISOString()}`
               const allDayEvents = [...spanningEvents, ...dayEvents]
               const allEvents = getAllEventsForDay(events, day)
+              
+              // Check if this is a working day based on the week start and working days setting
+              const dayOfWeek = day.getDay()
+              const weekStart = weekStartDay === 'monday' ? 1 : weekStartDay === 'sunday' ? 0 : 6
+              let adjustedDayIndex = (dayOfWeek - weekStart + 7) % 7
+              const isWorkingDay = adjustedDayIndex < workingDays
 
               const isReferenceCell = weekIndex === 0 && dayIndex === 0
               const visibleCount = isMounted
@@ -139,7 +152,9 @@ export function MonthView({
               return (
                 <div
                   key={day.toString()}
-                  className="group border-border/70 data-outside-cell:bg-muted/25 data-outside-cell:text-muted-foreground/70 border-r border-b last:border-r-0"
+                  className={`group border-border/70 data-outside-cell:bg-muted/25 data-outside-cell:text-muted-foreground/70 border-r border-b last:border-r-0 ${
+                    !isWorkingDay ? 'bg-muted/30 dark:bg-muted/10' : ''
+                  }`}
                   data-today={isToday(day) || undefined}
                   data-outside-cell={!isCurrentMonth || undefined}
                 >
@@ -152,7 +167,9 @@ export function MonthView({
                       onEventCreate(startTime)
                     }}
                   >
-                    <div className="group-data-today:bg-primary group-data-today:text-primary-foreground mt-1 inline-flex size-6 items-center justify-center rounded-full text-sm">
+                    <div className={`group-data-today:bg-primary group-data-today:text-primary-foreground mt-1 inline-flex size-6 items-center justify-center rounded-full text-sm ${
+                      !isWorkingDay ? 'text-muted-foreground' : ''
+                    }`}>
                       {format(day, "d")}
                     </div>
                     <div
