@@ -12,7 +12,8 @@ import {
   subMonths,
   subWeeks,
 } from "date-fns"
-import { fr } from "date-fns/locale"
+import { fr, enUS } from "date-fns/locale"
+import { useTranslation } from "@/features/translation/contexts/translation-context"
 import {
   ChevronDownIcon,
   ChevronLeftIcon,
@@ -56,6 +57,8 @@ export function EventCalendar({
 }: EventCalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date())
   const [view, setView] = useState<CalendarView>(initialView)
+  const { language, t } = useTranslation()
+  const locale = language === "fr" ? fr : enUS
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -129,28 +132,28 @@ export function EventCalendar({
 
   const viewTitle = useMemo(() => {
     if (view === "month") {
-      return format(currentDate, "MMMM yyyy", { locale: fr })
+      return format(currentDate, "MMMM yyyy", { locale })
     } else if (view === "week") {
       const start = startOfWeek(currentDate, { weekStartsOn: 1 })
       const end = endOfWeek(currentDate, { weekStartsOn: 1 })
       if (isSameMonth(start, end)) {
-        return format(start, "MMMM yyyy", { locale: fr })
+        return format(start, "MMMM yyyy", { locale })
       } else {
-        return `${format(start, "MMM", { locale: fr })} - ${format(end, "MMM yyyy", { locale: fr })}`
+        return `${format(start, "MMM", { locale })} - ${format(end, "MMM yyyy", { locale })}`
       }
     } else if (view === "day") {
-      return format(currentDate, "EEEE d MMMM yyyy", { locale: fr })
+      return format(currentDate, "EEEE d MMMM yyyy", { locale })
     } else if (view === "agenda") {
       const start = currentDate
       const end = addDays(currentDate, AgendaDaysToShow - 1)
       if (isSameMonth(start, end)) {
-        return format(start, "MMMM yyyy", { locale: fr })
+        return format(start, "MMMM yyyy", { locale })
       } else {
-        return `${format(start, "MMM", { locale: fr })} - ${format(end, "MMM yyyy", { locale: fr })}`
+        return `${format(start, "MMM", { locale })} - ${format(end, "MMM yyyy", { locale })}`
       }
     }
-    return format(currentDate, "MMMM yyyy", { locale: fr })
-  }, [currentDate, view])
+    return format(currentDate, "MMMM yyyy", { locale })
+  }, [currentDate, view, locale])
 
   return (
     <CalendarDndProvider onEventUpdate={handleEventUpdate} onTaskUpdate={onTaskUpdate}>
@@ -182,21 +185,21 @@ export function EventCalendar({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline">
-                {view === "month" ? "Mois" : 
-                 view === "week" ? "Semaine" : 
-                 view === "day" ? "Jour" : "Agenda"}
+                {view === "month" ? t("calendar.month") : 
+                 view === "week" ? t("calendar.week") : 
+                 view === "day" ? t("calendar.day") : "Agenda"}
                 <ChevronDownIcon className="ml-2 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => setView("month")}>
-                Mois
+                {t("calendar.month")}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setView("week")}>
-                Semaine
+                {t("calendar.week")}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setView("day")}>
-                Jour
+                {t("calendar.day")}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setView("agenda")}>
                 Agenda
@@ -208,7 +211,7 @@ export function EventCalendar({
             onClick={() => handleEventCreate(new Date())}
           >
             <PlusIcon className="mr-2 h-4 w-4" />
-            Nouvel événement
+            {t("calendar.newEvent")}
           </Button>
         </div>
       </div>

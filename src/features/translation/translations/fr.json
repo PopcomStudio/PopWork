@@ -25,7 +25,30 @@
     "view": "Voir",
     "actions": "Actions",
     "yes": "Oui",
-    "no": "Non"
+    "no": "Non",
+    "days": {
+      "monday": "Lundi",
+      "tuesday": "Mardi",
+      "wednesday": "Mercredi",
+      "thursday": "Jeudi",
+      "friday": "Vendredi",
+      "saturday": "Samedi",
+      "sunday": "Dimanche"
+    },
+    "months": {
+      "january": "Janvier",
+      "february": "Février",
+      "march": "Mars",
+      "april": "Avril",
+      "may": "Mai",
+      "june": "Juin",
+      "july": "Juillet",
+      "august": "Août",
+      "september": "Septembre",
+      "october": "Octobre",
+      "november": "Novembre",
+      "december": "Décembre"
+    }
   },
   "navigation": {
     "dashboard": "Tableau de bord",
@@ -125,6 +148,16 @@
           "title": "Format d'heure",
           "description": "Choisir entre le format 12 heures ou 24 heures"
         },
+        "calendar": {
+          "title": "Paramètres du calendrier",
+          "weekStart": "Premier jour de la semaine",
+          "weekStartDescription": "Définir quel jour commence la semaine",
+          "workingDays": "Jours ouvrables",
+          "workingDaysDescription": "Nombre de jours ouvrables dans la semaine",
+          "fiveDays": "5 jours (Lun - Ven)",
+          "sixDays": "6 jours (Lun - Sam)",
+          "sevenDays": "7 jours (tous les jours)"
+        },
         "translation": {
           "title": "Traduction automatique",
           "subtitle": "Paramètres de traduction du contenu",
@@ -152,6 +185,13 @@
         "subtitle": "Paramètres généraux de l'espace de travail",
         "workspaceName": {
           "title": "Nom de l'espace de travail"
+        },
+        "theme": {
+          "title": "Thème de l'application",
+          "description": "Choisir l'apparence de l'application",
+          "light": "Clair",
+          "dark": "Sombre",
+          "system": "Système"
         },
         "darkMode": {
           "title": "Mode sombre",

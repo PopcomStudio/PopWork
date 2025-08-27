@@ -9,8 +9,13 @@ import {
   Users, 
   CreditCard,
   ChevronRight,
-  Languages
+  Languages,
+  Moon,
+  Sun,
+  Monitor,
+  Calendar as CalendarIcon
 } from "lucide-react"
+import { useTheme } from "next-themes"
 import { PageLayout } from "@/components/PageLayout"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -85,6 +90,9 @@ export default function SettingsPage() {
   const { user } = useAuth()
   const { profile, updating, updateProfile, uploadAvatar, removeAvatar } = useProfile()
   const { t, language, setLanguage, timeFormat, setTimeFormat, availableLanguages } = useTranslation()
+  const { theme, setTheme } = useTheme()
+  const [weekStartDay, setWeekStartDay] = useState("monday")
+  const [workingDays, setWorkingDays] = useState(5)
 
   const firstName = profile?.first_name || user?.user_metadata?.first_name || ""
   const lastName = profile?.last_name || user?.user_metadata?.last_name || ""
@@ -473,6 +481,70 @@ export default function SettingsPage() {
                 </div>
               </div>
 
+              <Separator />
+
+              <div>
+                <h3 className="text-lg font-semibold mb-4">
+                  {t("settings.sections.language.calendar.title")}
+                </h3>
+                <div className="space-y-4">
+                  <div>
+                    <Label className="text-base font-medium">{t("settings.sections.language.calendar.weekStart")}</Label>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      {t("settings.sections.language.calendar.weekStartDescription")}
+                    </p>
+                    <Select value={weekStartDay} onValueChange={setWeekStartDay}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select start day" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="monday">
+                          <div className="flex items-center space-x-2">
+                            <CalendarIcon className="w-4 h-4" />
+                            <span>{t("common.days.monday")}</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="sunday">
+                          <div className="flex items-center space-x-2">
+                            <CalendarIcon className="w-4 h-4" />
+                            <span>{t("common.days.sunday")}</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="saturday">
+                          <div className="flex items-center space-x-2">
+                            <CalendarIcon className="w-4 h-4" />
+                            <span>{t("common.days.saturday")}</span>
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label className="text-base font-medium">{t("settings.sections.language.calendar.workingDays")}</Label>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      {t("settings.sections.language.calendar.workingDaysDescription")}
+                    </p>
+                    <Select value={String(workingDays)} onValueChange={(value) => setWorkingDays(Number(value))}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select working days" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="5">
+                          <span>{t("settings.sections.language.calendar.fiveDays")}</span>
+                        </SelectItem>
+                        <SelectItem value="6">
+                          <span>{t("settings.sections.language.calendar.sixDays")}</span>
+                        </SelectItem>
+                        <SelectItem value="7">
+                          <span>{t("settings.sections.language.calendar.sevenDays")}</span>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
         )
@@ -495,14 +567,37 @@ export default function SettingsPage() {
                 <Input defaultValue="PopWork Agency" />
               </div>
 
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <Label>{t("settings.sections.general.darkMode.title")}</Label>
-                  <p className="text-sm text-muted-foreground">
-                    {t("settings.sections.general.darkMode.description")}
-                  </p>
+              <div>
+                <Label className="text-base font-medium">{t("settings.sections.general.theme.title")}</Label>
+                <p className="text-sm text-muted-foreground mb-3">
+                  {t("settings.sections.general.theme.description")}
+                </p>
+                <div className="grid grid-cols-3 gap-3">
+                  <Button
+                    variant={theme === "light" ? "default" : "outline"}
+                    onClick={() => setTheme("light")}
+                    className="w-full"
+                  >
+                    <Sun className="mr-2 h-4 w-4" />
+                    {t("settings.sections.general.theme.light")}
+                  </Button>
+                  <Button
+                    variant={theme === "dark" ? "default" : "outline"}
+                    onClick={() => setTheme("dark")}
+                    className="w-full"
+                  >
+                    <Moon className="mr-2 h-4 w-4" />
+                    {t("settings.sections.general.theme.dark")}
+                  </Button>
+                  <Button
+                    variant={theme === "system" ? "default" : "outline"}
+                    onClick={() => setTheme("system")}
+                    className="w-full"
+                  >
+                    <Monitor className="mr-2 h-4 w-4" />
+                    {t("settings.sections.general.theme.system")}
+                  </Button>
                 </div>
-                <Switch />
               </div>
 
               <div className="flex items-center justify-between">
