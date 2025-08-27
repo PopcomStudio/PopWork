@@ -89,10 +89,8 @@ export default function SettingsPage() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { user } = useAuth()
   const { profile, updating, updateProfile, uploadAvatar, removeAvatar } = useProfile()
-  const { t, language, setLanguage, timeFormat, setTimeFormat, availableLanguages } = useTranslation()
+  const { t, language, setLanguage, timeFormat, setTimeFormat, weekStartDay, setWeekStartDay, workingDays, setWorkingDays, availableLanguages } = useTranslation()
   const { theme, setTheme } = useTheme()
-  const [weekStartDay, setWeekStartDay] = useState("monday")
-  const [workingDays, setWorkingDays] = useState(5)
 
   const firstName = profile?.first_name || user?.user_metadata?.first_name || ""
   const lastName = profile?.last_name || user?.user_metadata?.last_name || ""

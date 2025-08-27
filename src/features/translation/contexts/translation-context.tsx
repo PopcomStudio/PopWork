@@ -10,12 +10,17 @@ type TranslationData = typeof enTranslations
 
 export type Language = "en" | "fr"
 export type TimeFormat = "12h" | "24h"
+export type WeekStartDay = "monday" | "sunday" | "saturday"
 
 interface TranslationContextType {
   language: Language
   setLanguage: (language: Language) => void
   timeFormat: TimeFormat
   setTimeFormat: (format: TimeFormat) => void
+  weekStartDay: WeekStartDay
+  setWeekStartDay: (day: WeekStartDay) => void
+  workingDays: number
+  setWorkingDays: (days: number) => void
   t: (key: string, params?: Record<string, string>) => string
   translations: TranslationData
   availableLanguages: { code: Language; name: string }[]
@@ -31,6 +36,8 @@ const translations: Record<Language, TranslationData> = {
 export function TranslationProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>("fr")
   const [timeFormat, setTimeFormatState] = useState<TimeFormat>("24h")
+  const [weekStartDay, setWeekStartDayState] = useState<WeekStartDay>("monday")
+  const [workingDays, setWorkingDaysState] = useState<number>(5)
   const supabase = createClientComponentClient()
 
   const availableLanguages = [
@@ -52,12 +59,22 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
         setTimeFormatState(savedTimeFormat as TimeFormat)
       }
 
+      const savedWeekStart = localStorage.getItem("week-start-preference")
+      if (savedWeekStart === "monday" || savedWeekStart === "sunday" || savedWeekStart === "saturday") {
+        setWeekStartDayState(savedWeekStart as WeekStartDay)
+      }
+
+      const savedWorkingDays = localStorage.getItem("working-days-preference")
+      if (savedWorkingDays && ["5", "6", "7"].includes(savedWorkingDays)) {
+        setWorkingDaysState(parseInt(savedWorkingDays))
+      }
+
       // Then try to load from user profile
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
         const { data: profile } = await supabase
-          .from("profiles")
-          .select("language_preference, time_format_preference")
+          .from("users")
+          .select("language_preference, time_format_preference, week_start_day, working_days")
           .eq("id", user.id)
           .single()
 
@@ -66,6 +83,12 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
         }
         if (profile?.time_format_preference) {
           setTimeFormatState(profile.time_format_preference as TimeFormat)
+        }
+        if (profile?.week_start_day) {
+          setWeekStartDayState(profile.week_start_day as WeekStartDay)
+        }
+        if (profile?.working_days) {
+          setWorkingDaysState(profile.working_days)
         }
       }
     }
@@ -84,7 +107,7 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
     const { data: { user } } = await supabase.auth.getUser()
     if (user) {
       await supabase
-        .from("profiles")
+        .from("users")
         .update({
           language_preference: newLanguage
         })
@@ -103,9 +126,47 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
     const { data: { user } } = await supabase.auth.getUser()
     if (user) {
       await supabase
-        .from("profiles")
+        .from("users")
         .update({
           time_format_preference: newTimeFormat
+        })
+        .eq("id", user.id)
+    }
+  }, [supabase])
+
+  // Save week start day preference
+  const setWeekStartDay = useCallback(async (newWeekStartDay: WeekStartDay) => {
+    setWeekStartDayState(newWeekStartDay)
+    
+    // Save to localStorage
+    localStorage.setItem("week-start-preference", newWeekStartDay)
+
+    // Save to database
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) {
+      await supabase
+        .from("users")
+        .update({
+          week_start_day: newWeekStartDay
+        })
+        .eq("id", user.id)
+    }
+  }, [supabase])
+
+  // Save working days preference
+  const setWorkingDays = useCallback(async (newWorkingDays: number) => {
+    setWorkingDaysState(newWorkingDays)
+    
+    // Save to localStorage
+    localStorage.setItem("working-days-preference", newWorkingDays.toString())
+
+    // Save to database
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) {
+      await supabase
+        .from("users")
+        .update({
+          working_days: newWorkingDays
         })
         .eq("id", user.id)
     }
@@ -152,6 +213,10 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
         setLanguage,
         timeFormat,
         setTimeFormat,
+        weekStartDay,
+        setWeekStartDay,
+        workingDays,
+        setWorkingDays,
         t,
         translations: translations[language],
         availableLanguages
