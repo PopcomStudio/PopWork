@@ -21,24 +21,24 @@ interface TaskCardProps {
 const getTagStyles = (color: string) => {
   // Conversion basique hex vers classes Tailwind (peut être étendue)
   const colorMap: Record<string, { bg: string; text: string; dot: string }> = {
-    '#8B5CF6': { bg: 'bg-purple-50', text: 'text-purple-600', dot: 'bg-purple-500' }, // Violet
-    '#3B82F6': { bg: 'bg-blue-50', text: 'text-blue-600', dot: 'bg-blue-500' },     // Bleu
-    '#10B981': { bg: 'bg-green-50', text: 'text-green-600', dot: 'bg-green-500' },  // Vert
-    '#F59E0B': { bg: 'bg-orange-50', text: 'text-orange-600', dot: 'bg-orange-500' }, // Orange
-    '#EF4444': { bg: 'bg-red-50', text: 'text-red-600', dot: 'bg-red-500' },       // Rouge
-    '#6B7280': { bg: 'bg-gray-50', text: 'text-gray-600', dot: 'bg-gray-500' },     // Gris
-    '#DC2626': { bg: 'bg-red-50', text: 'text-red-700', dot: 'bg-red-600' },       // Rouge foncé
-    '#059669': { bg: 'bg-green-50', text: 'text-green-700', dot: 'bg-green-600' }   // Vert foncé
+    '#8B5CF6': { bg: 'bg-purple-500/10', text: 'text-purple-600 dark:text-purple-400', dot: 'bg-purple-500' }, // Violet
+    '#3B82F6': { bg: 'bg-blue-500/10', text: 'text-blue-600 dark:text-blue-400', dot: 'bg-blue-500' },     // Bleu
+    '#10B981': { bg: 'bg-green-500/10', text: 'text-green-600 dark:text-green-400', dot: 'bg-green-500' },  // Vert
+    '#F59E0B': { bg: 'bg-orange-500/10', text: 'text-orange-600 dark:text-orange-400', dot: 'bg-orange-500' }, // Orange
+    '#EF4444': { bg: 'bg-red-500/10', text: 'text-red-600 dark:text-red-400', dot: 'bg-red-500' },       // Rouge
+    '#6B7280': { bg: 'bg-gray-500/10', text: 'text-gray-600 dark:text-gray-400', dot: 'bg-gray-500' },     // Gris
+    '#DC2626': { bg: 'bg-red-500/10', text: 'text-red-700 dark:text-red-400', dot: 'bg-red-600' },       // Rouge foncé
+    '#059669': { bg: 'bg-green-500/10', text: 'text-green-700 dark:text-green-400', dot: 'bg-green-600' }   // Vert foncé
   }
   
-  return colorMap[color] || { bg: 'bg-gray-50', text: 'text-gray-600', dot: 'bg-gray-500' }
+  return colorMap[color] || { bg: 'bg-muted/50', text: 'text-muted-foreground', dot: 'bg-muted-foreground' }
 }
 
 const priorityBadgeStyles = {
-  low: { bg: 'bg-blue-50', text: 'text-blue-600', label: 'Faible', icon: 'text-blue-500' },
-  medium: { bg: 'bg-orange-50', text: 'text-orange-600', label: 'Moyenne', icon: 'text-orange-500' },
-  high: { bg: 'bg-red-50', text: 'text-red-600', label: 'Haute', icon: 'text-red-500' },
-  urgent: { bg: 'bg-red-50', text: 'text-red-600', label: 'Urgente', icon: 'text-red-500' }
+  low: { bg: 'bg-blue-500/10', text: 'text-blue-600 dark:text-blue-400', label: 'Faible', icon: 'text-blue-500' },
+  medium: { bg: 'bg-orange-500/10', text: 'text-orange-600 dark:text-orange-400', label: 'Moyenne', icon: 'text-orange-500' },
+  high: { bg: 'bg-red-500/10', text: 'text-red-600 dark:text-red-400', label: 'Haute', icon: 'text-red-500' },
+  urgent: { bg: 'bg-red-500/10', text: 'text-red-600 dark:text-red-400', label: 'Urgente', icon: 'text-red-500' }
 }
 
 export function TaskCard({ task, onEdit }: TaskCardProps) {

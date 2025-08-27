@@ -9,8 +9,13 @@ import {
   Users, 
   CreditCard,
   ChevronRight,
-  Languages
+  Languages,
+  Moon,
+  Sun,
+  Monitor,
+  Calendar as CalendarIcon
 } from "lucide-react"
+import { useTheme } from "next-themes"
 import { PageLayout } from "@/components/PageLayout"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -84,7 +89,8 @@ export default function SettingsPage() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { user } = useAuth()
   const { profile, updating, updateProfile, uploadAvatar, removeAvatar } = useProfile()
-  const { t, language, setLanguage, availableLanguages } = useTranslation()
+  const { t, language, setLanguage, timeFormat, setTimeFormat, weekStartDay, setWeekStartDay, workingDays, setWorkingDays, availableLanguages } = useTranslation()
+  const { theme, setTheme } = useTheme()
 
   const firstName = profile?.first_name || user?.user_metadata?.first_name || ""
   const lastName = profile?.last_name || user?.user_metadata?.last_name || ""
@@ -169,8 +175,8 @@ export default function SettingsPage() {
               )}
               
               {success && (
-                <Alert className="mb-4 border-green-200 bg-green-50">
-                  <AlertDescription className="text-green-800">{success}</AlertDescription>
+                <Alert className="mb-4 border-green-500/50 bg-green-500/10">
+                  <AlertDescription className="text-green-600 dark:text-green-400">{success}</AlertDescription>
                 </Alert>
               )}
               
@@ -449,45 +455,94 @@ export default function SettingsPage() {
                     </SelectContent>
                   </Select>
                 </div>
+
+                <div>
+                  <Label className="text-base font-medium">{t("settings.sections.language.timeFormat.title")}</Label>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    {t("settings.sections.language.timeFormat.description")}
+                  </p>
+                  <Select value={timeFormat} onValueChange={(value) => setTimeFormat(value as "12h" | "24h")}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select time format" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="24h">
+                        <span className="font-mono">14:30</span>
+                        <span className="text-muted-foreground ml-2">(24 {language === "fr" ? "heures" : "hours"})</span>
+                      </SelectItem>
+                      <SelectItem value="12h">
+                        <span className="font-mono">2:30 PM</span>
+                        <span className="text-muted-foreground ml-2">(12 {language === "fr" ? "heures" : "hours"})</span>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               <Separator />
 
-              {/* Language Preview */}
               <div>
-                <h3 className="text-lg font-semibold mb-1">
-                  {language === "fr" ? "Aperçu" : "Preview"}
+                <h3 className="text-lg font-semibold mb-4">
+                  {t("settings.sections.language.calendar.title")}
                 </h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  {language === "fr" 
-                    ? "Voyez comment le contenu apparaît dans votre langue sélectionnée"
-                    : "See how content appears in your selected language"}
-                </p>
-                <div className="p-4 bg-muted/50 rounded-lg space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Navigation:</span>
-                    <div className="flex space-x-2">
-                      {["navigation.dashboard", "navigation.projects", "navigation.settings"].map(key => (
-                        <Badge key={key} variant="outline">{t(key)}</Badge>
-                      ))}
-                    </div>
+                <div className="space-y-4">
+                  <div>
+                    <Label className="text-base font-medium">{t("settings.sections.language.calendar.weekStart")}</Label>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      {t("settings.sections.language.calendar.weekStartDescription")}
+                    </p>
+                    <Select value={weekStartDay} onValueChange={setWeekStartDay}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select start day" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="monday">
+                          <div className="flex items-center space-x-2">
+                            <CalendarIcon className="w-4 h-4" />
+                            <span>{t("common.days.monday")}</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="sunday">
+                          <div className="flex items-center space-x-2">
+                            <CalendarIcon className="w-4 h-4" />
+                            <span>{t("common.days.sunday")}</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="saturday">
+                          <div className="flex items-center space-x-2">
+                            <CalendarIcon className="w-4 h-4" />
+                            <span>{t("common.days.saturday")}</span>
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-                  <Separator />
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Message:</span>
-                    <span className="text-sm text-muted-foreground">{t("messages.success.saved")}</span>
-                  </div>
-                  <Separator />
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Actions:</span>
-                    <div className="flex space-x-2">
-                      {["common.save", "common.cancel", "common.delete"].map(key => (
-                        <Badge key={key} variant="secondary">{t(key)}</Badge>
-                      ))}
-                    </div>
+
+                  <div>
+                    <Label className="text-base font-medium">{t("settings.sections.language.calendar.workingDays")}</Label>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      {t("settings.sections.language.calendar.workingDaysDescription")}
+                    </p>
+                    <Select value={String(workingDays)} onValueChange={(value) => setWorkingDays(Number(value))}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select working days" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="5">
+                          <span>{t("settings.sections.language.calendar.fiveDays")}</span>
+                        </SelectItem>
+                        <SelectItem value="6">
+                          <span>{t("settings.sections.language.calendar.sixDays")}</span>
+                        </SelectItem>
+                        <SelectItem value="7">
+                          <span>{t("settings.sections.language.calendar.sevenDays")}</span>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
               </div>
+
             </div>
           </div>
         )
@@ -510,14 +565,37 @@ export default function SettingsPage() {
                 <Input defaultValue="PopWork Agency" />
               </div>
 
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <Label>{t("settings.sections.general.darkMode.title")}</Label>
-                  <p className="text-sm text-muted-foreground">
-                    {t("settings.sections.general.darkMode.description")}
-                  </p>
+              <div>
+                <Label className="text-base font-medium">{t("settings.sections.general.theme.title")}</Label>
+                <p className="text-sm text-muted-foreground mb-3">
+                  {t("settings.sections.general.theme.description")}
+                </p>
+                <div className="grid grid-cols-3 gap-3">
+                  <Button
+                    variant={theme === "light" ? "default" : "outline"}
+                    onClick={() => setTheme("light")}
+                    className="w-full"
+                  >
+                    <Sun className="mr-2 h-4 w-4" />
+                    {t("settings.sections.general.theme.light")}
+                  </Button>
+                  <Button
+                    variant={theme === "dark" ? "default" : "outline"}
+                    onClick={() => setTheme("dark")}
+                    className="w-full"
+                  >
+                    <Moon className="mr-2 h-4 w-4" />
+                    {t("settings.sections.general.theme.dark")}
+                  </Button>
+                  <Button
+                    variant={theme === "system" ? "default" : "outline"}
+                    onClick={() => setTheme("system")}
+                    className="w-full"
+                  >
+                    <Monitor className="mr-2 h-4 w-4" />
+                    {t("settings.sections.general.theme.system")}
+                  </Button>
                 </div>
-                <Switch />
               </div>
 
               <div className="flex items-center justify-between">
@@ -615,9 +693,9 @@ export default function SettingsPage() {
 
   return (
     <PageLayout>
-      <div className="flex bg-gray-50 -mx-4 lg:-mx-6 -my-4 md:-my-6 h-[calc(100vh-var(--header-height))]">
+      <div className="flex bg-background -mx-4 lg:-mx-6 -my-4 md:-my-6 h-[calc(100vh-var(--header-height))]">
         {/* Settings Sidebar */}
-        <div className="w-64 bg-white border-r flex flex-col h-full">
+        <div className="w-64 bg-card border-r flex flex-col h-full">
           <div className="flex-1 p-4 overflow-y-auto">
             <div className="space-y-6">
               <div>
@@ -636,8 +714,8 @@ export default function SettingsPage() {
                           className={cn(
                             "w-full flex items-center px-3 py-2 text-sm rounded-lg transition-colors text-left",
                             activeSection === section.id
-                              ? "bg-gray-100 text-gray-900"
-                              : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                              ? "bg-accent text-accent-foreground"
+                              : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                           )}
                         >
                           <Icon className="w-4 h-4 mr-3" />
@@ -667,8 +745,8 @@ export default function SettingsPage() {
                           className={cn(
                             "w-full flex items-center px-3 py-2 text-sm rounded-lg transition-colors text-left",
                             activeSection === section.id
-                              ? "bg-gray-100 text-gray-900"
-                              : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                              ? "bg-accent text-accent-foreground"
+                              : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                           )}
                         >
                           <Icon className="w-4 h-4 mr-3" />

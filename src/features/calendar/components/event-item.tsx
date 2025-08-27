@@ -1,10 +1,11 @@
 "use client"
 
-import { format } from "date-fns"
 import { cn } from "@/lib/utils"
 import { getBorderRadiusClasses, getEventColorClasses } from "../utils"
 import type { CalendarEvent, CalendarView } from "../types"
 import { CheckCircle2, Calendar } from "lucide-react"
+import { formatTime } from "@/features/translation/utils/time-format"
+import { useTranslation } from "@/features/translation/contexts/translation-context"
 
 interface EventItemProps {
   event: CalendarEvent
@@ -23,6 +24,7 @@ export function EventItem({
   isLastDay = true,
   children,
 }: EventItemProps) {
+  const { timeFormat, language } = useTranslation()
   const eventStart = new Date(event.start)
   const borderRadius = getBorderRadiusClasses(isFirstDay, isLastDay)
 
@@ -51,7 +53,7 @@ export function EventItem({
           )}
           {!event.allDay && view === "month" && (
             <span className="mr-1 font-medium">
-              {format(eventStart, "h:mm")}
+              {formatTime(eventStart, timeFormat, language)}
             </span>
           )}
           <span className="truncate font-medium">{event.title}</span>

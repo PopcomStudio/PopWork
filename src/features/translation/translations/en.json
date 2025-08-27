@@ -25,7 +25,30 @@
     "view": "View",
     "actions": "Actions",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "days": {
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday"
+    },
+    "months": {
+      "january": "January",
+      "february": "February",
+      "march": "March",
+      "april": "April",
+      "may": "May",
+      "june": "June",
+      "july": "July",
+      "august": "August",
+      "september": "September",
+      "october": "October",
+      "november": "November",
+      "december": "December"
+    }
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -121,6 +144,20 @@
           "title": "Date format",
           "description": "Choose how dates are displayed"
         },
+        "timeFormat": {
+          "title": "Time format",
+          "description": "Choose between 12-hour or 24-hour format"
+        },
+        "calendar": {
+          "title": "Calendar Settings",
+          "weekStart": "First day of week",
+          "weekStartDescription": "Set which day starts the week",
+          "workingDays": "Working days",
+          "workingDaysDescription": "Number of working days in the week",
+          "fiveDays": "5 days (Mon - Fri)",
+          "sixDays": "6 days (Mon - Sat)",
+          "sevenDays": "7 days (all days)"
+        },
         "translation": {
           "title": "Automatic Translation",
           "subtitle": "Content translation settings",
@@ -148,6 +185,13 @@
         "subtitle": "General workspace settings",
         "workspaceName": {
           "title": "Workspace name"
+        },
+        "theme": {
+          "title": "Application Theme",
+          "description": "Choose the app appearance",
+          "light": "Light",
+          "dark": "Dark",
+          "system": "System"
         },
         "darkMode": {
           "title": "Dark mode",

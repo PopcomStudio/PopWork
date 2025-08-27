@@ -58,7 +58,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
               </Alert>
               
               {process.env.NODE_ENV === 'development' && this.state.error && (
-                <div className="mt-4 p-3 bg-gray-100 rounded text-xs font-mono">
+                <div className="mt-4 p-3 bg-muted rounded text-xs font-mono">
                   <strong>Détails de l&apos;erreur:</strong>
                   <pre className="mt-1 whitespace-pre-wrap">
                     {this.state.error.message}
