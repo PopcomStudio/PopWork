@@ -25,7 +25,7 @@ export function KanbanColumn({ status, tasks, title, onCreateTask, onEditTask }:
   })
 
   return (
-    <Card className="h-fit border-none shadow-none bg-gray-50">
+    <Card className="h-fit border-none shadow-none bg-muted/50">
       <CardHeader>
         <CardTitle className="text-base font-semibold flex items-center gap-3">
           {title}
@@ -81,7 +81,7 @@ export function KanbanColumn({ status, tasks, title, onCreateTask, onEditTask }:
           
           {/* Bouton d'ajout en bas pour colonnes avec tâches */}
           {tasks.length > 0 && (
-            <div className="pt-3 border-t border-gray-200/50">
+            <div className="pt-3 border-t border-border/50">
               <Button 
                 variant="ghost" 
                 size="sm" 

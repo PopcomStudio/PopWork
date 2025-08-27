@@ -177,8 +177,8 @@ export default function SettingsPage() {
               )}
               
               {success && (
-                <Alert className="mb-4 border-green-200 bg-green-50">
-                  <AlertDescription className="text-green-800">{success}</AlertDescription>
+                <Alert className="mb-4 border-green-500/50 bg-green-500/10">
+                  <AlertDescription className="text-green-600 dark:text-green-400">{success}</AlertDescription>
                 </Alert>
               )}
               
@@ -695,9 +695,9 @@ export default function SettingsPage() {
 
   return (
     <PageLayout>
-      <div className="flex bg-gray-50 -mx-4 lg:-mx-6 -my-4 md:-my-6 h-[calc(100vh-var(--header-height))]">
+      <div className="flex bg-background -mx-4 lg:-mx-6 -my-4 md:-my-6 h-[calc(100vh-var(--header-height))]">
         {/* Settings Sidebar */}
-        <div className="w-64 bg-white border-r flex flex-col h-full">
+        <div className="w-64 bg-card border-r flex flex-col h-full">
           <div className="flex-1 p-4 overflow-y-auto">
             <div className="space-y-6">
               <div>
@@ -716,8 +716,8 @@ export default function SettingsPage() {
                           className={cn(
                             "w-full flex items-center px-3 py-2 text-sm rounded-lg transition-colors text-left",
                             activeSection === section.id
-                              ? "bg-gray-100 text-gray-900"
-                              : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                              ? "bg-accent text-accent-foreground"
+                              : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                           )}
                         >
                           <Icon className="w-4 h-4 mr-3" />
@@ -747,8 +747,8 @@ export default function SettingsPage() {
                           className={cn(
                             "w-full flex items-center px-3 py-2 text-sm rounded-lg transition-colors text-left",
                             activeSection === section.id
-                              ? "bg-gray-100 text-gray-900"
-                              : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                              ? "bg-accent text-accent-foreground"
+                              : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                           )}
                         >
                           <Icon className="w-4 h-4 mr-3" />

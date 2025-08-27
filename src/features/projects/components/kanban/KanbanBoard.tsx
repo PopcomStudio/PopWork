@@ -176,7 +176,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {KANBAN_COLUMNS.map((column) => (
-            <Card key={column.id} className="bg-gray-50">
+            <Card key={column.id} className="bg-muted/50">
               <CardContent className="p-4">
                 <Skeleton className="h-6 w-24 mb-4" />
                 <div className="space-y-3">
