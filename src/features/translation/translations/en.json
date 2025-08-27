@@ -121,6 +121,10 @@
           "title": "Date format",
           "description": "Choose how dates are displayed"
         },
+        "timeFormat": {
+          "title": "Time format",
+          "description": "Choose between 12-hour or 24-hour format"
+        },
         "translation": {
           "title": "Automatic Translation",
           "subtitle": "Content translation settings",

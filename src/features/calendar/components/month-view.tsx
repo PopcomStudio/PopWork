@@ -13,6 +13,8 @@ import {
   startOfMonth,
   startOfWeek,
 } from "date-fns"
+import { formatTime } from "@/features/translation/utils/time-format"
+import { useTranslation } from "@/features/translation/contexts/translation-context"
 
 import {
   getAllEventsForDay,
@@ -49,6 +51,7 @@ export function MonthView({
   onEventSelect,
   onEventCreate,
 }: MonthViewProps) {
+  const { timeFormat, language } = useTranslation()
   const days = useMemo(() => {
     const monthStart = startOfMonth(currentDate)
     const monthEnd = endOfMonth(monthStart)
@@ -184,9 +187,10 @@ export function MonthView({
                                 <div className="invisible" aria-hidden={true}>
                                   {!event.allDay && (
                                     <span>
-                                      {format(
+                                      {formatTime(
                                         new Date(event.start),
-                                        "h:mm"
+                                        timeFormat,
+                                        language
                                       )}{" "}
                                     </span>
                                   )}

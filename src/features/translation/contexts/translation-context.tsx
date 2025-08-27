@@ -9,10 +9,13 @@ import frTranslations from "../translations/fr.json"
 type TranslationData = typeof enTranslations
 
 export type Language = "en" | "fr"
+export type TimeFormat = "12h" | "24h"
 
 interface TranslationContextType {
   language: Language
   setLanguage: (language: Language) => void
+  timeFormat: TimeFormat
+  setTimeFormat: (format: TimeFormat) => void
   t: (key: string, params?: Record<string, string>) => string
   translations: TranslationData
   availableLanguages: { code: Language; name: string }[]
@@ -27,6 +30,7 @@ const translations: Record<Language, TranslationData> = {
 
 export function TranslationProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>("fr")
+  const [timeFormat, setTimeFormatState] = useState<TimeFormat>("24h")
   const supabase = createClientComponentClient()
 
   const availableLanguages = [
@@ -34,13 +38,18 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
     { code: "en" as Language, name: "English" }
   ]
 
-  // Load language preference from localStorage on mount
+  // Load language and time format preferences from localStorage on mount
   useEffect(() => {
-    const loadLanguagePreference = async () => {
+    const loadPreferences = async () => {
       // First try to load from localStorage
       const savedLanguage = localStorage.getItem("language-preference")
       if (savedLanguage === "en" || savedLanguage === "fr") {
         setLanguageState(savedLanguage as Language)
+      }
+
+      const savedTimeFormat = localStorage.getItem("time-format-preference")
+      if (savedTimeFormat === "12h" || savedTimeFormat === "24h") {
+        setTimeFormatState(savedTimeFormat as TimeFormat)
       }
 
       // Then try to load from user profile
@@ -48,17 +57,20 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
       if (user) {
         const { data: profile } = await supabase
           .from("profiles")
-          .select("language_preference")
+          .select("language_preference, time_format_preference")
           .eq("id", user.id)
           .single()
 
         if (profile?.language_preference) {
           setLanguageState(profile.language_preference as Language)
         }
+        if (profile?.time_format_preference) {
+          setTimeFormatState(profile.time_format_preference as TimeFormat)
+        }
       }
     }
     
-    loadLanguagePreference()
+    loadPreferences()
   }, [supabase])
 
   // Save language preference
@@ -75,6 +87,25 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
         .from("profiles")
         .update({
           language_preference: newLanguage
+        })
+        .eq("id", user.id)
+    }
+  }, [supabase])
+
+  // Save time format preference
+  const setTimeFormat = useCallback(async (newTimeFormat: TimeFormat) => {
+    setTimeFormatState(newTimeFormat)
+    
+    // Save to localStorage
+    localStorage.setItem("time-format-preference", newTimeFormat)
+
+    // Save to database
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) {
+      await supabase
+        .from("profiles")
+        .update({
+          time_format_preference: newTimeFormat
         })
         .eq("id", user.id)
     }
@@ -119,6 +150,8 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
       value={{
         language,
         setLanguage,
+        timeFormat,
+        setTimeFormat,
         t,
         translations: translations[language],
         availableLanguages

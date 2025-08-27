@@ -84,7 +84,7 @@ export default function SettingsPage() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { user } = useAuth()
   const { profile, updating, updateProfile, uploadAvatar, removeAvatar } = useProfile()
-  const { t, language, setLanguage, availableLanguages } = useTranslation()
+  const { t, language, setLanguage, timeFormat, setTimeFormat, availableLanguages } = useTranslation()
 
   const firstName = profile?.first_name || user?.user_metadata?.first_name || ""
   const lastName = profile?.last_name || user?.user_metadata?.last_name || ""
@@ -449,45 +449,30 @@ export default function SettingsPage() {
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
 
-              <Separator />
-
-              {/* Language Preview */}
-              <div>
-                <h3 className="text-lg font-semibold mb-1">
-                  {language === "fr" ? "Aperçu" : "Preview"}
-                </h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  {language === "fr" 
-                    ? "Voyez comment le contenu apparaît dans votre langue sélectionnée"
-                    : "See how content appears in your selected language"}
-                </p>
-                <div className="p-4 bg-muted/50 rounded-lg space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Navigation:</span>
-                    <div className="flex space-x-2">
-                      {["navigation.dashboard", "navigation.projects", "navigation.settings"].map(key => (
-                        <Badge key={key} variant="outline">{t(key)}</Badge>
-                      ))}
-                    </div>
-                  </div>
-                  <Separator />
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Message:</span>
-                    <span className="text-sm text-muted-foreground">{t("messages.success.saved")}</span>
-                  </div>
-                  <Separator />
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Actions:</span>
-                    <div className="flex space-x-2">
-                      {["common.save", "common.cancel", "common.delete"].map(key => (
-                        <Badge key={key} variant="secondary">{t(key)}</Badge>
-                      ))}
-                    </div>
-                  </div>
+                <div>
+                  <Label className="text-base font-medium">{t("settings.sections.language.timeFormat.title")}</Label>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    {t("settings.sections.language.timeFormat.description")}
+                  </p>
+                  <Select value={timeFormat} onValueChange={(value) => setTimeFormat(value as "12h" | "24h")}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select time format" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="24h">
+                        <span className="font-mono">14:30</span>
+                        <span className="text-muted-foreground ml-2">(24 {language === "fr" ? "heures" : "hours"})</span>
+                      </SelectItem>
+                      <SelectItem value="12h">
+                        <span className="font-mono">2:30 PM</span>
+                        <span className="text-muted-foreground ml-2">(12 {language === "fr" ? "heures" : "hours"})</span>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
+
             </div>
           </div>
         )
