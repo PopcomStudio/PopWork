@@ -7,10 +7,12 @@ import enTranslations from "../translations/en.json"
 import frTranslations from "../translations/fr.json"
 import deTranslations from "../translations/de.json"
 import esTranslations from "../translations/es.json"
+import itTranslations from "../translations/it.json"
+import ptTranslations from "../translations/pt.json"
 
 type TranslationData = typeof enTranslations
 
-export type Language = "en" | "fr" | "de" | "es"
+export type Language = "en" | "fr" | "de" | "es" | "it" | "pt"
 export type TimeFormat = "12h" | "24h"
 export type WeekStartDay = "monday" | "sunday" | "saturday"
 
@@ -34,7 +36,9 @@ const translations: Record<Language, TranslationData> = {
   en: enTranslations,
   fr: frTranslations,
   de: deTranslations,
-  es: esTranslations
+  es: esTranslations,
+  it: itTranslations,
+  pt: ptTranslations
 }
 
 export function TranslationProvider({ children }: { children: ReactNode }) {
@@ -48,7 +52,9 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
     { code: "fr" as Language, name: "Français" },
     { code: "en" as Language, name: "English" },
     { code: "de" as Language, name: "Deutsch" },
-    { code: "es" as Language, name: "Español" }
+    { code: "es" as Language, name: "Español" },
+    { code: "it" as Language, name: "Italiano" },
+    { code: "pt" as Language, name: "Português" }
   ]
 
   // Load language and time format preferences from localStorage on mount
@@ -56,7 +62,7 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
     const loadPreferences = async () => {
       // First try to load from localStorage
       const savedLanguage = localStorage.getItem("language-preference")
-      if (["en", "fr", "de", "es"].includes(savedLanguage)) {
+      if (["en", "fr", "de", "es", "it", "pt"].includes(savedLanguage)) {
         setLanguageState(savedLanguage as Language)
       }
 

@@ -51,12 +51,12 @@
     }
   },
   "navigation": {
-    "dashboard": "Tableau de bord",
-    "projects": "Projets",
+    "dashboard": "Dashboard",
+    "projects": "Projets & Tâches", 
     "clients": "Clients",
     "calendar": "Calendrier",
     "tasks": "Tâches",
-    "documents": "Documents",
+    "documents": "Coffre-fort RH",
     "reports": "Rapports",
     "settings": "Paramètres",
     "admin": "Administration",
@@ -72,6 +72,13 @@
     "history": "Historique",
     "notifications": "Notifications",
     "resources": "Ressources"
+  },
+  "search": {
+    "quickSearch": "Recherche rapide...",
+    "search": "Recherche...",
+    "placeholder": "Rechercher une page ou un projet...",
+    "noResults": "Aucun résultat trouvé.",
+    "navigation": "Navigation"
   },
   "settings": {
     "title": "Paramètres",

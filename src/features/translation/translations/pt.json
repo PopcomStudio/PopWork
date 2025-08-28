@@ -1,0 +1,260 @@
+{
+  "common": {
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "add": "Adicionar",
+    "search": "Pesquisar",
+    "loading": "Carregando...",
+    "error": "Erro",
+    "success": "Sucesso",
+    "confirm": "Confirmar",
+    "back": "Voltar",
+    "next": "Próximo",
+    "previous": "Anterior",
+    "close": "Fechar",
+    "select": "Selecionar",
+    "upload": "Enviar",
+    "download": "Baixar",
+    "export": "Exportar",
+    "import": "Importar",
+    "refresh": "Atualizar",
+    "filter": "Filtrar",
+    "sort": "Ordenar",
+    "view": "Visualizar",
+    "actions": "Ações",
+    "yes": "Sim",
+    "no": "Não",
+    "days": {
+      "monday": "Segunda-feira",
+      "tuesday": "Terça-feira",
+      "wednesday": "Quarta-feira",
+      "thursday": "Quinta-feira",
+      "friday": "Sexta-feira",
+      "saturday": "Sábado",
+      "sunday": "Domingo"
+    },
+    "months": {
+      "january": "Janeiro",
+      "february": "Fevereiro",
+      "march": "Março",
+      "april": "Abril",
+      "may": "Maio",
+      "june": "Junho",
+      "july": "Julho",
+      "august": "Agosto",
+      "september": "Setembro",
+      "october": "Outubro",
+      "november": "Novembro",
+      "december": "Dezembro"
+    }
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "projects": "Projetos e Tarefas",
+    "clients": "Clientes",
+    "calendar": "Calendário",
+    "tasks": "Tarefas",
+    "documents": "Cofre RH",
+    "reports": "Relatórios",
+    "settings": "Configurações",
+    "admin": "Administração",
+    "help": "Ajuda",
+    "logout": "Sair",
+    "timeTracking": "Controle de tempo",
+    "invoicing": "Faturamento",
+    "team": "Equipe",
+    "companies": "Empresas",
+    "services": "Serviços",
+    "contacts": "Contatos",
+    "leaves": "Férias",
+    "history": "Histórico",
+    "notifications": "Notificações",
+    "resources": "Recursos"
+  },
+  "search": {
+    "quickSearch": "Pesquisa rápida...",
+    "search": "Pesquisar...",
+    "placeholder": "Pesquisar uma página ou projeto...",
+    "noResults": "Nenhum resultado encontrado.",
+    "navigation": "Navegação"
+  },
+  "companies": {
+    "title": "Empresas",
+    "newCompany": "Nova empresa",
+    "allCompanies": "Todas as empresas",
+    "editCompany": "Editar empresa",
+    "deleteConfirm": "Tem certeza que deseja excluir a empresa \"{{name}}\"?",
+    "noCompaniesFound": "Nenhuma empresa encontrada",
+    "searchPlaceholder": "Pesquisar por nome, endereço, SIRET ou email...",
+    "columns": "Colunas",
+    "detailedInfo": "Informações detalhadas da empresa",
+    "selected": "{{count}} de {{total}} empresa(s) selecionada(s).",
+    "rowsPerPage": "Linhas por página",
+    "page": "Página {{current}} de {{total}}",
+    "fields": {
+      "name": "Nome da empresa",
+      "company": "Empresa",
+      "address": "Endereço",
+      "addressComplete": "Endereço completo",
+      "addressPlaceholder": "Rua Exemplo 123, 01000-000 São Paulo",
+      "addressNotProvided": "Endereço não fornecido",
+      "siret": "SIRET",
+      "siretPlaceholder": "12345678901234",
+      "siretNotProvided": "Não fornecido",
+      "email": "Email",
+      "emailPlaceholder": "contato@acme.com",
+      "phone": "Telefone",
+      "phonePlaceholder": "+55 11 1234-5678",
+      "contact": "Contato",
+      "noContact": "Nenhum contato",
+      "createdAt": "Criado em",
+      "companyNamePlaceholder": "Ex.: ACME Ltda.",
+      "required": "*"
+    },
+    "actions": {
+      "save": "Salvar",
+      "close": "Fechar",
+      "modify": "Modificar",
+      "create": "Criar",
+      "creating": "Criando...",
+      "modifying": "Modificando..."
+    },
+    "validation": {
+      "nameMinLength": "O nome deve conter pelo menos 2 caracteres",
+      "emailInvalid": "Endereço de email inválido"
+    }
+  },
+  "services": {
+    "title": "Serviços",
+    "newService": "Novo serviço",
+    "editService": "Editar serviço",
+    "deleteConfirm": "Tem certeza que deseja excluir o serviço \"{{name}}\"?",
+    "noServicesFound": "Nenhum serviço encontrado",
+    "searchPlaceholder": "Pesquisar por nome, empresa ou endereço...",
+    "columns": "Colunas",
+    "noContact": "Nenhum contato",
+    "fields": {
+      "name": "Nome do serviço",
+      "namePlaceholder": "Nome do serviço",
+      "company": "Empresa",
+      "companySelect": "Selecionar empresa",
+      "companyRequired": "Por favor selecione uma empresa",
+      "address": "Endereço",
+      "addressPlaceholder": "Endereço do serviço",
+      "addressNotProvided": "Endereço não fornecido",
+      "phone": "Telefone",
+      "phonePlaceholder": "11 1234-5678",
+      "createdAt": "Criado em",
+      "required": "*"
+    },
+    "actions": {
+      "create": "Criar",
+      "modify": "Modificar",
+      "creating": "Criando...",
+      "modifying": "Modificando...",
+      "save": "Salvar",
+      "close": "Fechar"
+    },
+    "validation": {
+      "nameMinLength": "O nome deve conter pelo menos 2 caracteres",
+      "companyRequired": "Por favor selecione uma empresa"
+    }
+  },
+  "contacts": {
+    "title": "Contatos",
+    "newContact": "Novo contato",
+    "editContact": "Editar contato",
+    "deleteConfirm": "Tem certeza que deseja excluir o contato \"{{firstName}} {{lastName}}\"?",
+    "noContactsFound": "Nenhum contato encontrado",
+    "searchPlaceholder": "Pesquisar por nome, sobrenome ou email...",
+    "columns": "Colunas",
+    "company": "Empresa",
+    "detailedInfo": "Informações detalhadas do contato",
+    "selected": "{{count}} de {{total}} contato(s) selecionado(s).",
+    "rowsPerPage": "Linhas por página",
+    "page": "Página {{current}} de {{total}}",
+    "fields": {
+      "firstName": "Nome",
+      "firstNamePlaceholder": "Nome",
+      "lastName": "Sobrenome",
+      "lastNamePlaceholder": "Sobrenome",
+      "fullName": "Nome completo",
+      "service": "Serviço",
+      "serviceSelect": "Selecionar serviço",
+      "serviceRequired": "Por favor selecione um serviço",
+      "email": "Email",
+      "emailPlaceholder": "contato@empresa.com",
+      "phone": "Telefone",
+      "phonePlaceholder": "11 1234-5678",
+      "contact": "Contato",
+      "noContact": "Nenhum contato",
+      "createdAt": "Criado em",
+      "company": "Empresa",
+      "required": "*"
+    },
+    "actions": {
+      "create": "Criar",
+      "modify": "Modificar",
+      "creating": "Criando...",
+      "modifying": "Modificando..."
+    },
+    "validation": {
+      "firstNameMinLength": "O nome deve conter pelo menos 2 caracteres",
+      "lastNameMinLength": "O sobrenome deve conter pelo menos 2 caracteres",
+      "emailInvalid": "Endereço de email inválido",
+      "serviceRequired": "Por favor selecione um serviço"
+    }
+  },
+  "settings": {
+    "title": "Configurações",
+    "sections": {
+      "language": {
+        "title": "Idioma e região",
+        "subtitle": "Personalizar configurações de idioma e região"
+      }
+    },
+    "sidebar": {
+      "languageRegion": "Idioma e região"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Entrar",
+      "email": "Endereço de email",
+      "password": "Senha",
+      "submit": "Entrar"
+    }
+  },
+  "dashboard": {
+    "welcome": "Bem-vindo, {{name}}",
+    "overview": "Visão geral"
+  },
+  "projects": {
+    "title": "Projetos",
+    "fields": {
+      "name": "Nome do projeto"
+    }
+  },
+  "clients": {
+    "title": "Clientes",
+    "fields": {
+      "name": "Nome"
+    }
+  },
+  "calendar": {
+    "title": "Calendário"
+  },
+  "tasks": {
+    "title": "Tarefas"
+  },
+  "messages": {
+    "success": {
+      "saved": "Salvo com sucesso"
+    },
+    "error": {
+      "general": "Ocorreu um erro"
+    }
+  }
+}

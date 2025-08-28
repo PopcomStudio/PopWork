@@ -52,11 +52,11 @@
   },
   "navigation": {
     "dashboard": "Dashboard",
-    "projects": "Projekte",
+    "projects": "Projekte & Aufgaben",
     "clients": "Kunden",
     "calendar": "Kalender",
-    "tasks": "Aufgaben",
-    "documents": "Dokumente",
+    "tasks": "Aufgaben", 
+    "documents": "HR-Tresor",
     "reports": "Berichte",
     "settings": "Einstellungen",
     "admin": "Administration",
@@ -72,6 +72,13 @@
     "history": "Verlauf",
     "notifications": "Benachrichtigungen",
     "resources": "Ressourcen"
+  },
+  "search": {
+    "quickSearch": "Schnellsuche...",
+    "search": "Suche...",
+    "placeholder": "Seite oder Projekt suchen...",
+    "noResults": "Keine Ergebnisse gefunden.",
+    "navigation": "Navigation"
   },
   "settings": {
     "title": "Einstellungen",

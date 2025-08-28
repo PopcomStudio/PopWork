@@ -51,12 +51,12 @@
     }
   },
   "navigation": {
-    "dashboard": "Panel de control",
-    "projects": "Proyectos",
+    "dashboard": "Dashboard",
+    "projects": "Proyectos y Tareas",
     "clients": "Clientes",
     "calendar": "Calendario",
     "tasks": "Tareas",
-    "documents": "Documentos",
+    "documents": "Bóveda RRHH",
     "reports": "Informes",
     "settings": "Configuración",
     "admin": "Administración",
@@ -72,6 +72,13 @@
     "history": "Historial",
     "notifications": "Notificaciones",
     "resources": "Recursos"
+  },
+  "search": {
+    "quickSearch": "Búsqueda rápida...",
+    "search": "Buscar...",
+    "placeholder": "Buscar una página o proyecto...",
+    "noResults": "No se encontraron resultados.",
+    "navigation": "Navegación"
   },
   "companies": {
     "title": "Empresas",

@@ -52,11 +52,11 @@
   },
   "navigation": {
     "dashboard": "Dashboard",
-    "projects": "Projects",
+    "projects": "Projects & Tasks",
     "clients": "Clients",
     "calendar": "Calendar",
     "tasks": "Tasks",
-    "documents": "Documents",
+    "documents": "HR Vault",
     "reports": "Reports",
     "settings": "Settings",
     "admin": "Admin",
@@ -72,6 +72,13 @@
     "history": "History",
     "notifications": "Notifications",
     "resources": "Resources"
+  },
+  "search": {
+    "quickSearch": "Quick search...",
+    "search": "Search...",
+    "placeholder": "Search for a page or project...",
+    "noResults": "No results found.",
+    "navigation": "Navigation"
   },
   "settings": {
     "title": "Settings",
