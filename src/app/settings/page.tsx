@@ -695,7 +695,7 @@ export default function SettingsPage() {
     <PageLayout>
       <div className="flex bg-background -mx-4 lg:-mx-6 -my-4 md:-my-6 h-[calc(100vh-var(--header-height))]">
         {/* Settings Sidebar */}
-        <div className="w-64 bg-card border-r flex flex-col h-full">
+        <div className="w-64 bg-background border-r flex flex-col h-full">
           <div className="flex-1 p-4 overflow-y-auto">
             <div className="space-y-6">
               <div>
