@@ -136,7 +136,7 @@ export function MonthView({
               // Check if this is a working day based on the week start and working days setting
               const dayOfWeek = day.getDay()
               const weekStart = weekStartDay === 'monday' ? 1 : weekStartDay === 'sunday' ? 0 : 6
-              let adjustedDayIndex = (dayOfWeek - weekStart + 7) % 7
+              const adjustedDayIndex = (dayOfWeek - weekStart + 7) % 7
               const isWorkingDay = adjustedDayIndex < workingDays
 
               const isReferenceCell = weekIndex === 0 && dayIndex === 0

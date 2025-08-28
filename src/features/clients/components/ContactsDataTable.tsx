@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslation } from '@/features/translation/hooks/use-translation'
 import {
   closestCenter,
   DndContext,
@@ -136,6 +137,7 @@ export function ContactsDataTable({
   onEditContact,
   onDeleteContact,
 }: ContactsDataTableFullProps) {
+  const { t } = useTranslation()
   
   const columns: ColumnDef<Contact>[] = [
     {
@@ -171,7 +173,7 @@ export function ContactsDataTable({
     },
     {
       accessorKey: "first_name",
-      header: "Contact",
+      header: t('contacts.fields.fullName'),
       cell: ({ row }) => {
         return <ContactCellViewer contact={row.original} />
       },
@@ -179,7 +181,7 @@ export function ContactsDataTable({
     },
     {
       accessorKey: "service_name",
-      header: "Service",
+      header: t('contacts.fields.service'),
       cell: ({ row }) => (
         <div className="w-40">
           <Badge variant="outline" className="text-muted-foreground px-1.5">
@@ -190,7 +192,7 @@ export function ContactsDataTable({
     },
     {
       accessorKey: "company_name",
-      header: "Entreprise",
+      header: t('contacts.fields.company'),
       cell: ({ row }) => (
         <div className="w-40">
           <Badge variant="secondary" className="text-muted-foreground px-1.5">
@@ -201,7 +203,7 @@ export function ContactsDataTable({
     },
     {
       accessorKey: "email",
-      header: "Contact",
+      header: t('contacts.fields.contact'),
       cell: ({ row }) => {
         const contact = row.original
         return (
@@ -228,7 +230,7 @@ export function ContactsDataTable({
             )}
             {!contact.email && !contact.phone && (
               <span className="text-muted-foreground italic text-sm">
-                Aucun contact
+                {t('contacts.fields.noContact')}
               </span>
             )}
           </div>
@@ -237,7 +239,7 @@ export function ContactsDataTable({
     },
     {
       accessorKey: "created_at",
-      header: "Créé le",
+      header: t('contacts.fields.createdAt'),
       cell: ({ row }) => (
         <span className="text-sm text-muted-foreground">
           {new Date(row.original.created_at).toLocaleDateString('fr-FR')}
@@ -261,7 +263,7 @@ export function ContactsDataTable({
           <DropdownMenuContent align="end" className="w-32">
             <DropdownMenuItem onClick={() => onEditContact(row.original)}>
               <Edit className="h-4 w-4 mr-2" />
-              Modifier
+              {t('common.edit')}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem 
@@ -269,7 +271,7 @@ export function ContactsDataTable({
               className="text-destructive"
             >
               <Trash2 className="h-4 w-4 mr-2" />
-              Supprimer
+              {t('common.delete')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -376,7 +378,7 @@ export function ContactsDataTable({
         <div className="flex items-center space-x-2 flex-1 max-w-md">
           <Search className="h-4 w-4 opacity-50" />
           <Input
-            placeholder="Rechercher par nom, email ou service..."
+            placeholder={t('contacts.searchPlaceholder')}
             value={globalFilter}
             onChange={(event) => setGlobalFilter(event.target.value)}
             className="flex-1"
@@ -387,7 +389,7 @@ export function ContactsDataTable({
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
                 <ChevronDown />
-                <span className="hidden lg:inline">Colonnes</span>
+                <span className="hidden lg:inline">{t('contacts.columns')}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
@@ -408,11 +410,11 @@ export function ContactsDataTable({
                         column.toggleVisibility(!!value)
                       }
                     >
-                      {column.id === "first_name" ? "Contact" :
-                       column.id === "service_name" ? "Service" :
-                       column.id === "company_name" ? "Entreprise" :
-                       column.id === "email" ? "Contact" :
-                       column.id === "created_at" ? "Créé le" :
+                      {column.id === "first_name" ? t('contacts.fields.fullName') :
+                       column.id === "service_name" ? t('contacts.fields.service') :
+                       column.id === "company_name" ? t('contacts.fields.company') :
+                       column.id === "email" ? t('contacts.fields.contact') :
+                       column.id === "created_at" ? t('contacts.fields.createdAt') :
                        column.id}
                     </DropdownMenuCheckboxItem>
                   )
@@ -421,7 +423,7 @@ export function ContactsDataTable({
           </DropdownMenu>
           <Button variant="default" size="sm" onClick={onNewContact}>
             <Plus />
-            <span className="hidden lg:inline">Nouveau contact</span>
+            <span className="hidden lg:inline">{t('contacts.newContact')}</span>
           </Button>
         </div>
       </div>
@@ -469,7 +471,7 @@ export function ContactsDataTable({
                       colSpan={columns.length}
                       className="h-24 text-center"
                     >
-                      Aucun contact trouvé
+                      {t('contacts.noContactsFound')}
                     </TableCell>
                   </TableRow>
                 )}
@@ -479,13 +481,15 @@ export function ContactsDataTable({
         </div>
         <div className="flex items-center justify-between px-4">
           <div className="text-muted-foreground hidden flex-1 text-sm lg:flex">
-            {table.getFilteredSelectedRowModel().rows.length} sur{" "}
-            {table.getFilteredRowModel().rows.length} contact(s) sélectionné(s).
+            {t('contacts.selected', {
+              count: table.getFilteredSelectedRowModel().rows.length.toString(),
+              total: table.getFilteredRowModel().rows.length.toString()
+            })}
           </div>
           <div className="flex w-full items-center gap-8 lg:w-fit">
             <div className="hidden items-center gap-2 lg:flex">
               <Label htmlFor="rows-per-page" className="text-sm font-medium">
-                Lignes par page
+                {t('contacts.rowsPerPage')}
               </Label>
               <Select
                 value={`${table.getState().pagination.pageSize}`}
@@ -508,8 +512,10 @@ export function ContactsDataTable({
               </Select>
             </div>
             <div className="flex w-fit items-center justify-center text-sm font-medium">
-              Page {table.getState().pagination.pageIndex + 1} sur{" "}
-              {table.getPageCount()}
+              {t('contacts.page', {
+                current: (table.getState().pagination.pageIndex + 1).toString(),
+                total: table.getPageCount().toString()
+              })}
             </div>
             <div className="ml-auto flex items-center gap-2 lg:ml-0">
               <Button
@@ -561,6 +567,7 @@ export function ContactsDataTable({
 
 function ContactCellViewer({ contact }: { contact: Contact }) {
   const isMobile = useIsMobile()
+  const { t } = useTranslation()
 
   return (
     <Drawer direction={isMobile ? "bottom" : "right"}>
@@ -573,45 +580,45 @@ function ContactCellViewer({ contact }: { contact: Contact }) {
         <DrawerHeader className="gap-1">
           <DrawerTitle>{contact.first_name} {contact.last_name}</DrawerTitle>
           <DrawerDescription>
-            Informations détaillées du contact
+            {t('contacts.detailedInfo')}
           </DrawerDescription>
         </DrawerHeader>
         <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm">
           <form className="flex flex-col gap-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-3">
-                <Label htmlFor="first_name">Prénom</Label>
+                <Label htmlFor="first_name">{t('contacts.fields.firstName')}</Label>
                 <Input id="first_name" defaultValue={contact.first_name} />
               </div>
               <div className="flex flex-col gap-3">
-                <Label htmlFor="last_name">Nom</Label>
+                <Label htmlFor="last_name">{t('contacts.fields.lastName')}</Label>
                 <Input id="last_name" defaultValue={contact.last_name} />
               </div>
             </div>
             <div className="flex flex-col gap-3">
-              <Label htmlFor="service">Service</Label>
+              <Label htmlFor="service">{t('contacts.fields.service')}</Label>
               <Input id="service" defaultValue={contact.service_name} disabled />
             </div>
             <div className="flex flex-col gap-3">
-              <Label htmlFor="company">Entreprise</Label>
+              <Label htmlFor="company">{t('contacts.company')}</Label>
               <Input id="company" defaultValue={contact.company_name} disabled />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-3">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t('contacts.fields.email')}</Label>
                 <Input id="email" defaultValue={contact.email || ""} />
               </div>
               <div className="flex flex-col gap-3">
-                <Label htmlFor="phone">Téléphone</Label>
+                <Label htmlFor="phone">{t('contacts.fields.phone')}</Label>
                 <Input id="phone" defaultValue={contact.phone || ""} />
               </div>
             </div>
           </form>
         </div>
         <DrawerFooter>
-          <Button>Enregistrer</Button>
+          <Button>{t('common.save')}</Button>
           <DrawerClose asChild>
-            <Button variant="outline">Fermer</Button>
+            <Button variant="outline">{t('common.close')}</Button>
           </DrawerClose>
         </DrawerFooter>
       </DrawerContent>

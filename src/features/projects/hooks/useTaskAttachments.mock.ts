@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect } from 'react'
 import { TaskAttachmentExtended } from '../types/kanban'
 
 // Données mockées pour les tests
-let mockAttachments: TaskAttachmentExtended[] = [
+const mockAttachments: TaskAttachmentExtended[] = [
   {
     id: 'attachment-1',
     taskId: 'task-1',

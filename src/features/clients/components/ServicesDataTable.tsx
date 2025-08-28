@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslation } from '@/features/translation/hooks/use-translation'
 import {
   closestCenter,
   DndContext,
@@ -134,6 +135,7 @@ export function ServicesDataTable({
   onEditService,
   onDeleteService,
 }: ServicesDataTableFullProps) {
+  const { t } = useTranslation()
   
   const columns: ColumnDef<Service>[] = [
     {
@@ -169,7 +171,7 @@ export function ServicesDataTable({
     },
     {
       accessorKey: "name",
-      header: "Service",
+      header: t('services.fields.name'),
       cell: ({ row }) => {
         return <ServiceCellViewer service={row.original} />
       },
@@ -177,7 +179,7 @@ export function ServicesDataTable({
     },
     {
       accessorKey: "company_name",
-      header: "Entreprise",
+      header: t('services.fields.company'),
       cell: ({ row }) => (
         <div className="w-40">
           <Badge variant="outline" className="text-muted-foreground px-1.5">
@@ -188,14 +190,14 @@ export function ServicesDataTable({
     },
     {
       accessorKey: "address",
-      header: "Adresse",
+      header: t('services.fields.address'),
       cell: ({ row }) => (
         <div className="max-w-48">
           {row.original.address ? (
             <span className="text-sm">{row.original.address}</span>
           ) : (
             <span className="text-muted-foreground italic text-sm">
-              Adresse non renseignée
+              {t('services.fields.addressNotProvided')}
             </span>
           )}
         </div>
@@ -203,7 +205,7 @@ export function ServicesDataTable({
     },
     {
       accessorKey: "phone",
-      header: "Contact",
+      header: t('services.fields.phone'),
       cell: ({ row }) => {
         const service = row.original
         return (
@@ -220,7 +222,7 @@ export function ServicesDataTable({
             )}
             {!service.phone && (
               <span className="text-muted-foreground italic text-sm">
-                Aucun contact
+                {t('services.noContact')}
               </span>
             )}
           </div>
@@ -229,7 +231,7 @@ export function ServicesDataTable({
     },
     {
       accessorKey: "created_at",
-      header: "Créé le",
+      header: t('services.fields.createdAt'),
       cell: ({ row }) => (
         <span className="text-sm text-muted-foreground">
           {new Date(row.original.created_at).toLocaleDateString('fr-FR')}
@@ -253,7 +255,7 @@ export function ServicesDataTable({
           <DropdownMenuContent align="end" className="w-32">
             <DropdownMenuItem onClick={() => onEditService(row.original)}>
               <Edit className="h-4 w-4 mr-2" />
-              Modifier
+              {t('common.edit')}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem 
@@ -261,7 +263,7 @@ export function ServicesDataTable({
               className="text-destructive"
             >
               <Trash2 className="h-4 w-4 mr-2" />
-              Supprimer
+              {t('common.delete')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -368,7 +370,7 @@ export function ServicesDataTable({
         <div className="flex items-center space-x-2 flex-1 max-w-md">
           <Search className="h-4 w-4 opacity-50" />
           <Input
-            placeholder="Rechercher par nom, adresse ou entreprise..."
+            placeholder={t('services.searchPlaceholder')}
             value={globalFilter}
             onChange={(event) => setGlobalFilter(event.target.value)}
             className="flex-1"
@@ -379,7 +381,7 @@ export function ServicesDataTable({
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
                 <ChevronDown />
-                <span className="hidden lg:inline">Colonnes</span>
+                <span className="hidden lg:inline">{t('services.columns')}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
@@ -402,7 +404,7 @@ export function ServicesDataTable({
                     >
                       {column.id === "name" ? "Service" :
                        column.id === "company_name" ? "Entreprise" :
-                       column.id === "address" ? "Adresse" :
+                       column.id === "address" ? t('services.fields.address') :
                        column.id === "phone" ? "Contact" :
                        column.id === "created_at" ? "Créé le" :
                        column.id}
@@ -413,7 +415,7 @@ export function ServicesDataTable({
           </DropdownMenu>
           <Button variant="default" size="sm" onClick={onNewService}>
             <Plus />
-            <span className="hidden lg:inline">Nouveau service</span>
+            <span className="hidden lg:inline">{t('services.newService')}</span>
           </Button>
         </div>
       </div>
@@ -461,7 +463,7 @@ export function ServicesDataTable({
                       colSpan={columns.length}
                       className="h-24 text-center"
                     >
-                      Aucun service trouvé
+                      {t('services.noServicesFound')}
                     </TableCell>
                   </TableRow>
                 )}
@@ -553,6 +555,7 @@ export function ServicesDataTable({
 
 function ServiceCellViewer({ service }: { service: Service }) {
   const isMobile = useIsMobile()
+  const { t } = useTranslation()
 
   return (
     <Drawer direction={isMobile ? "bottom" : "right"}>
@@ -571,7 +574,7 @@ function ServiceCellViewer({ service }: { service: Service }) {
         <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm">
           <form className="flex flex-col gap-4">
             <div className="flex flex-col gap-3">
-              <Label htmlFor="name">Nom du service</Label>
+              <Label htmlFor="name">{t('services.fields.name')}</Label>
               <Input id="name" defaultValue={service.name} />
             </div>
             <div className="flex flex-col gap-3">
@@ -579,19 +582,19 @@ function ServiceCellViewer({ service }: { service: Service }) {
               <Input id="company" defaultValue={service.company_name} disabled />
             </div>
             <div className="flex flex-col gap-3">
-              <Label htmlFor="address">Adresse</Label>
+              <Label htmlFor="address">{t('services.fields.address')}</Label>
               <Input id="address" defaultValue={service.address || ""} />
             </div>
             <div className="flex flex-col gap-3">
-              <Label htmlFor="phone">Téléphone</Label>
+              <Label htmlFor="phone">{t('services.fields.phone')}</Label>
               <Input id="phone" defaultValue={service.phone || ""} />
             </div>
           </form>
         </div>
         <DrawerFooter>
-          <Button>Enregistrer</Button>
+          <Button>{t('services.actions.save')}</Button>
           <DrawerClose asChild>
-            <Button variant="outline">Fermer</Button>
+            <Button variant="outline">{t('services.actions.close')}</Button>
           </DrawerClose>
         </DrawerFooter>
       </DrawerContent>

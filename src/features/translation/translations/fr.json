@@ -356,6 +356,133 @@
       "notes": "Notes"
     }
   },
+  "companies": {
+    "title": "Entreprises",
+    "newCompany": "Nouvelle entreprise",
+    "allCompanies": "Toutes les entreprises",
+    "editCompany": "Modifier l'entreprise",
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer l'entreprise \"{{name}}\" ?",
+    "noCompaniesFound": "Aucune entreprise trouvée",
+    "searchPlaceholder": "Rechercher par nom, adresse, SIRET ou email...",
+    "columns": "Colonnes",
+    "detailedInfo": "Informations détaillées de l'entreprise",
+    "selected": "{{count}} sur {{total}} entreprise(s) sélectionnée(s).",
+    "rowsPerPage": "Lignes par page",
+    "page": "Page {{current}} sur {{total}}",
+    "fields": {
+      "name": "Nom de l'entreprise",
+      "company": "Entreprise",
+      "address": "Adresse",
+      "addressComplete": "Adresse complète",
+      "addressPlaceholder": "123 Rue Example, 75001 Paris",
+      "addressNotProvided": "Adresse non renseignée",
+      "siret": "SIRET",
+      "siretPlaceholder": "12345678901234",
+      "siretNotProvided": "Non renseigné",
+      "email": "Email",
+      "emailPlaceholder": "contact@acme.com",
+      "phone": "Téléphone",
+      "phonePlaceholder": "+33 1 23 45 67 89",
+      "contact": "Contact",
+      "noContact": "Aucun contact",
+      "createdAt": "Créée le",
+      "companyNamePlaceholder": "Ex: Acme Corporation",
+      "required": "*"
+    },
+    "actions": {
+      "save": "Enregistrer",
+      "close": "Fermer",
+      "modify": "Modifier",
+      "create": "Créer",
+      "creating": "Création...",
+      "modifying": "Modification..."
+    },
+    "validation": {
+      "nameMinLength": "Le nom doit contenir au moins 2 caractères",
+      "emailInvalid": "Adresse email invalide"
+    }
+  },
+  "services": {
+    "title": "Services",
+    "newService": "Nouveau service",
+    "editService": "Modifier le service",
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer le service \"{{name}}\" ?",
+    "noServicesFound": "Aucun service trouvé",
+    "searchPlaceholder": "Rechercher par nom, entreprise ou adresse...",
+    "columns": "Colonnes",
+    "noContact": "Aucun contact",
+    "fields": {
+      "name": "Nom du service",
+      "namePlaceholder": "Nom du service",
+      "company": "Entreprise",
+      "companySelect": "Sélectionner une entreprise",
+      "companyRequired": "Veuillez sélectionner une entreprise",
+      "address": "Adresse",
+      "addressPlaceholder": "Adresse du service",
+      "addressNotProvided": "Adresse non renseignée",
+      "phone": "Téléphone",
+      "phonePlaceholder": "01 23 45 67 89",
+      "createdAt": "Créé le",
+      "required": "*"
+    },
+    "actions": {
+      "create": "Créer",
+      "modify": "Modifier",
+      "creating": "Création...",
+      "modifying": "Modification...",
+      "save": "Enregistrer",
+      "close": "Fermer"
+    },
+    "validation": {
+      "nameMinLength": "Le nom doit contenir au moins 2 caractères",
+      "companyRequired": "Veuillez sélectionner une entreprise"
+    }
+  },
+  "contacts": {
+    "title": "Contacts",
+    "newContact": "Nouveau contact",
+    "editContact": "Modifier le contact",
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer le contact \"{{firstName}} {{lastName}}\" ?",
+    "noContactsFound": "Aucun contact trouvé",
+    "searchPlaceholder": "Rechercher par nom, prénom ou email...",
+    "columns": "Colonnes",
+    "company": "Entreprise",
+    "detailedInfo": "Informations détaillées du contact",
+    "selected": "{{count}} sur {{total}} contact(s) sélectionné(s).",
+    "rowsPerPage": "Lignes par page",
+    "page": "Page {{current}} sur {{total}}",
+    "fields": {
+      "firstName": "Prénom",
+      "firstNamePlaceholder": "Prénom",
+      "lastName": "Nom",
+      "lastNamePlaceholder": "Nom de famille",
+      "fullName": "Nom complet",
+      "service": "Service",
+      "serviceSelect": "Sélectionner un service",
+      "serviceRequired": "Veuillez sélectionner un service",
+      "email": "Email",
+      "emailPlaceholder": "contact@entreprise.com",
+      "phone": "Téléphone",
+      "phonePlaceholder": "01 23 45 67 89",
+      "contact": "Contact",
+      "noContact": "Aucun contact",
+      "createdAt": "Créé le",
+      "company": "Entreprise",
+      "required": "*"
+    },
+    "actions": {
+      "create": "Créer",
+      "modify": "Modifier",
+      "creating": "Création...",
+      "modifying": "Modification..."
+    },
+    "validation": {
+      "firstNameMinLength": "Le prénom doit contenir au moins 2 caractères",
+      "lastNameMinLength": "Le nom doit contenir au moins 2 caractères",
+      "emailInvalid": "Adresse email invalide",
+      "serviceRequired": "Veuillez sélectionner un service"
+    }
+  },
   "calendar": {
     "title": "Calendrier",
     "today": "Aujourd'hui",

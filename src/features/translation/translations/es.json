@@ -1,0 +1,253 @@
+{
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "add": "Agregar",
+    "search": "Buscar",
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "confirm": "Confirmar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "close": "Cerrar",
+    "select": "Seleccionar",
+    "upload": "Subir",
+    "download": "Descargar",
+    "export": "Exportar",
+    "import": "Importar",
+    "refresh": "Actualizar",
+    "filter": "Filtrar",
+    "sort": "Ordenar",
+    "view": "Ver",
+    "actions": "Acciones",
+    "yes": "Sí",
+    "no": "No",
+    "days": {
+      "monday": "Lunes",
+      "tuesday": "Martes",
+      "wednesday": "Miércoles",
+      "thursday": "Jueves",
+      "friday": "Viernes",
+      "saturday": "Sábado",
+      "sunday": "Domingo"
+    },
+    "months": {
+      "january": "Enero",
+      "february": "Febrero",
+      "march": "Marzo",
+      "april": "Abril",
+      "may": "Mayo",
+      "june": "Junio",
+      "july": "Julio",
+      "august": "Agosto",
+      "september": "Septiembre",
+      "october": "Octubre",
+      "november": "Noviembre",
+      "december": "Diciembre"
+    }
+  },
+  "navigation": {
+    "dashboard": "Panel de control",
+    "projects": "Proyectos",
+    "clients": "Clientes",
+    "calendar": "Calendario",
+    "tasks": "Tareas",
+    "documents": "Documentos",
+    "reports": "Informes",
+    "settings": "Configuración",
+    "admin": "Administración",
+    "help": "Ayuda",
+    "logout": "Cerrar sesión",
+    "timeTracking": "Control de tiempo",
+    "invoicing": "Facturación",
+    "team": "Equipo",
+    "companies": "Empresas",
+    "services": "Servicios",
+    "contacts": "Contactos",
+    "leaves": "Vacaciones",
+    "history": "Historial",
+    "notifications": "Notificaciones",
+    "resources": "Recursos"
+  },
+  "companies": {
+    "title": "Empresas",
+    "newCompany": "Nueva empresa",
+    "allCompanies": "Todas las empresas",
+    "editCompany": "Editar empresa",
+    "deleteConfirm": "¿Está seguro de que desea eliminar la empresa \"{{name}}\"?",
+    "noCompaniesFound": "No se encontraron empresas",
+    "searchPlaceholder": "Buscar por nombre, dirección, SIRET o email...",
+    "columns": "Columnas",
+    "detailedInfo": "Información detallada de la empresa",
+    "selected": "{{count}} de {{total}} empresa(s) seleccionada(s).",
+    "rowsPerPage": "Filas por página",
+    "page": "Página {{current}} de {{total}}",
+    "fields": {
+      "name": "Nombre de la empresa",
+      "company": "Empresa",
+      "address": "Dirección",
+      "addressComplete": "Dirección completa",
+      "addressPlaceholder": "Calle Ejemplo 123, 28001 Madrid",
+      "addressNotProvided": "Dirección no proporcionada",
+      "siret": "SIRET",
+      "siretPlaceholder": "12345678901234",
+      "siretNotProvided": "No proporcionado",
+      "email": "Email",
+      "emailPlaceholder": "contacto@acme.com",
+      "phone": "Teléfono",
+      "phonePlaceholder": "+34 91 123 45 67",
+      "contact": "Contacto",
+      "noContact": "Sin contacto",
+      "createdAt": "Creado el",
+      "companyNamePlaceholder": "Ej.: ACME Corporation",
+      "required": "*"
+    },
+    "actions": {
+      "save": "Guardar",
+      "close": "Cerrar",
+      "modify": "Modificar",
+      "create": "Crear",
+      "creating": "Creando...",
+      "modifying": "Modificando..."
+    },
+    "validation": {
+      "nameMinLength": "El nombre debe contener al menos 2 caracteres",
+      "emailInvalid": "Dirección de email inválida"
+    }
+  },
+  "services": {
+    "title": "Servicios",
+    "newService": "Nuevo servicio",
+    "editService": "Editar servicio",
+    "deleteConfirm": "¿Está seguro de que desea eliminar el servicio \"{{name}}\"?",
+    "noServicesFound": "No se encontraron servicios",
+    "searchPlaceholder": "Buscar por nombre, empresa o dirección...",
+    "columns": "Columnas",
+    "noContact": "Sin contacto",
+    "fields": {
+      "name": "Nombre del servicio",
+      "namePlaceholder": "Nombre del servicio",
+      "company": "Empresa",
+      "companySelect": "Seleccionar empresa",
+      "companyRequired": "Por favor seleccione una empresa",
+      "address": "Dirección",
+      "addressPlaceholder": "Dirección del servicio",
+      "addressNotProvided": "Dirección no proporcionada",
+      "phone": "Teléfono",
+      "phonePlaceholder": "91 123 45 67",
+      "createdAt": "Creado el",
+      "required": "*"
+    },
+    "actions": {
+      "create": "Crear",
+      "modify": "Modificar",
+      "creating": "Creando...",
+      "modifying": "Modificando...",
+      "save": "Guardar",
+      "close": "Cerrar"
+    },
+    "validation": {
+      "nameMinLength": "El nombre debe contener al menos 2 caracteres",
+      "companyRequired": "Por favor seleccione una empresa"
+    }
+  },
+  "contacts": {
+    "title": "Contactos",
+    "newContact": "Nuevo contacto",
+    "editContact": "Editar contacto",
+    "deleteConfirm": "¿Está seguro de que desea eliminar el contacto \"{{firstName}} {{lastName}}\"?",
+    "noContactsFound": "No se encontraron contactos",
+    "searchPlaceholder": "Buscar por nombre, apellido o email...",
+    "columns": "Columnas",
+    "company": "Empresa",
+    "detailedInfo": "Información detallada del contacto",
+    "selected": "{{count}} de {{total}} contacto(s) seleccionado(s).",
+    "rowsPerPage": "Filas por página",
+    "page": "Página {{current}} de {{total}}",
+    "fields": {
+      "firstName": "Nombre",
+      "firstNamePlaceholder": "Nombre",
+      "lastName": "Apellido",
+      "lastNamePlaceholder": "Apellido",
+      "fullName": "Nombre completo",
+      "service": "Servicio",
+      "serviceSelect": "Seleccionar servicio",
+      "serviceRequired": "Por favor seleccione un servicio",
+      "email": "Email",
+      "emailPlaceholder": "contacto@empresa.com",
+      "phone": "Teléfono",
+      "phonePlaceholder": "91 123 45 67",
+      "contact": "Contacto",
+      "noContact": "Sin contacto",
+      "createdAt": "Creado el",
+      "company": "Empresa",
+      "required": "*"
+    },
+    "actions": {
+      "create": "Crear",
+      "modify": "Modificar",
+      "creating": "Creando...",
+      "modifying": "Modificando..."
+    },
+    "validation": {
+      "firstNameMinLength": "El nombre debe contener al menos 2 caracteres",
+      "lastNameMinLength": "El apellido debe contener al menos 2 caracteres",
+      "emailInvalid": "Dirección de email inválida",
+      "serviceRequired": "Por favor seleccione un servicio"
+    }
+  },
+  "settings": {
+    "title": "Configuración",
+    "sections": {
+      "language": {
+        "title": "Idioma y región",
+        "subtitle": "Personalizar configuración de idioma y región"
+      }
+    },
+    "sidebar": {
+      "languageRegion": "Idioma y región"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Iniciar sesión",
+      "email": "Dirección de email",
+      "password": "Contraseña",
+      "submit": "Iniciar sesión"
+    }
+  },
+  "dashboard": {
+    "welcome": "Bienvenido, {{name}}",
+    "overview": "Resumen"
+  },
+  "projects": {
+    "title": "Proyectos",
+    "fields": {
+      "name": "Nombre del proyecto"
+    }
+  },
+  "clients": {
+    "title": "Clientes",
+    "fields": {
+      "name": "Nombre"
+    }
+  },
+  "calendar": {
+    "title": "Calendario"
+  },
+  "tasks": {
+    "title": "Tareas"
+  },
+  "messages": {
+    "success": {
+      "saved": "Guardado con éxito"
+    },
+    "error": {
+      "general": "Se produjo un error"
+    }
+  }
+}

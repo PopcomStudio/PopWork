@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from 'react'
+import { useTranslation } from '@/features/translation/hooks/use-translation'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { CompaniesDataTable } from './CompaniesDataTable'
@@ -21,17 +22,20 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useCompanies, type Company, type CreateCompanyData } from '../hooks/use-companies'
 import { Building } from 'lucide-react'
 
-const companyFormSchema = z.object({
-  name: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
+const createCompanyFormSchema = (t: (key: string) => string) => z.object({
+  name: z.string().min(2, t('companies.validation.nameMinLength')),
   address: z.string().optional(),
   siret: z.string().optional(),
-  email: z.string().email('Adresse email invalide').optional().or(z.literal('')),
+  email: z.string().email(t('companies.validation.emailInvalid')).optional().or(z.literal('')),
   phone: z.string().optional(),
 })
 
-type CompanyFormData = z.infer<typeof companyFormSchema>
+type CompanyFormData = z.infer<ReturnType<typeof createCompanyFormSchema>>
 
 export function CompanyManagement() {
+  const { t } = useTranslation()
+  const companyFormSchema = createCompanyFormSchema(t)
+  
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingCompany, setEditingCompany] = useState<Company | null>(null)
   const [actionLoading, setActionLoading] = useState(false)
@@ -58,13 +62,13 @@ export function CompanyManagement() {
 
   // Gérer la suppression d'une entreprise
   const handleDeleteCompany = async (company: Company) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer l'entreprise "${company.name}" ?`)) {
+    if (window.confirm(t('companies.deleteConfirm', { name: company.name }))) {
       try {
         setError(null)
         await deleteCompany(company.id)
       } catch (err) {
         console.error('Erreur lors de la suppression:', err)
-        setError(err instanceof Error ? err.message : 'Erreur inconnue')
+        setError(err instanceof Error ? err.message : t('messages.error.general'))
       }
     }
   }
@@ -122,7 +126,7 @@ export function CompanyManagement() {
       handleCloseDialog()
     } catch (err) {
       console.error('Erreur lors de l\'enregistrement:', err)
-      setError(err instanceof Error ? err.message : 'Erreur inconnue')
+      setError(err instanceof Error ? err.message : t('messages.error.general'))
     } finally {
       setActionLoading(false)
     }
@@ -135,7 +139,7 @@ export function CompanyManagement() {
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
                   <Building className="h-5 w-5" />
-                  {editingCompany ? 'Modifier l\'entreprise' : 'Nouvelle entreprise'}
+                  {editingCompany ? t('companies.editCompany') : t('companies.newCompany')}
                 </DialogTitle>
               </DialogHeader>
               
@@ -143,10 +147,10 @@ export function CompanyManagement() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Nom de l'entreprise */}
                   <div className="md:col-span-2">
-                    <Label htmlFor="name">Nom de l'entreprise *</Label>
+                    <Label htmlFor="name">{t('companies.fields.name')} {t('companies.fields.required')}</Label>
                     <Input
                       id="name"
-                      placeholder="Ex: Acme Corporation"
+                      placeholder={t('companies.fields.companyNamePlaceholder')}
                       {...register('name')}
                     />
                     {errors.name && (
@@ -156,41 +160,41 @@ export function CompanyManagement() {
 
                   {/* Adresse */}
                   <div className="md:col-span-2">
-                    <Label htmlFor="address">Adresse complète</Label>
+                    <Label htmlFor="address">{t('companies.fields.addressComplete')}</Label>
                     <Input
                       id="address"
-                      placeholder="123 Rue Example, 75001 Paris"
+                      placeholder={t('companies.fields.addressPlaceholder')}
                       {...register('address')}
                     />
                   </div>
 
                   {/* SIRET */}
                   <div>
-                    <Label htmlFor="siret">SIRET</Label>
+                    <Label htmlFor="siret">{t('companies.fields.siret')}</Label>
                     <Input
                       id="siret"
-                      placeholder="12345678901234"
+                      placeholder={t('companies.fields.siretPlaceholder')}
                       {...register('siret')}
                     />
                   </div>
 
                   {/* Téléphone */}
                   <div>
-                    <Label htmlFor="phone">Téléphone</Label>
+                    <Label htmlFor="phone">{t('companies.fields.phone')}</Label>
                     <Input
                       id="phone"
-                      placeholder="+33 1 23 45 67 89"
+                      placeholder={t('companies.fields.phonePlaceholder')}
                       {...register('phone')}
                     />
                   </div>
 
                   {/* Email */}
                   <div className="md:col-span-2">
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email">{t('companies.fields.email')}</Label>
                     <Input
                       id="email"
                       type="email"
-                      placeholder="contact@acme.com"
+                      placeholder={t('companies.fields.emailPlaceholder')}
                       {...register('email')}
                     />
                     {errors.email && (
@@ -212,11 +216,11 @@ export function CompanyManagement() {
                     onClick={handleCloseDialog}
                     disabled={actionLoading}
                   >
-                    Annuler
+                    {t('common.cancel')}
                   </Button>
                   <Button type="submit" disabled={actionLoading}>
                     {actionLoading && <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />}
-                    {editingCompany ? 'Modifier' : 'Créer'}
+                    {editingCompany ? t('companies.actions.modify') : t('companies.actions.create')}
                   </Button>
                 </div>
               </form>
