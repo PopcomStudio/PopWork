@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { ProfileProvider } from "@/features/settings/contexts/profile-context";
-import { TranslationProvider } from "@/features/translation/contexts/translation-context";
+import { TranslationWrapper } from "@/features/translation/contexts/translation-wrapper";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import "./globals.css";
 
@@ -46,11 +46,11 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <TranslationProvider>
+            <TranslationWrapper>
               <ProfileProvider>
                 {children}
               </ProfileProvider>
-            </TranslationProvider>
+            </TranslationWrapper>
           </ThemeProvider>
         </ErrorBoundary>
       </body>

@@ -41,52 +41,37 @@ const translations: Record<Language, TranslationData> = {
   pt: ptTranslations
 }
 
-// Helper function to get initial language from localStorage
-function getInitialLanguage(): Language {
-  if (typeof window === 'undefined') return "fr"
-  const saved = localStorage.getItem("language-preference")
-  if (saved && ["en", "fr", "de", "es", "it", "pt"].includes(saved)) {
-    return saved as Language
-  }
-  return "fr"
-}
-
-// Helper function to get initial time format from localStorage
-function getInitialTimeFormat(): TimeFormat {
-  if (typeof window === 'undefined') return "24h"
-  const saved = localStorage.getItem("time-format-preference")
-  if (saved === "12h" || saved === "24h") {
-    return saved as TimeFormat
-  }
-  return "24h"
-}
-
-// Helper function to get initial week start day from localStorage
-function getInitialWeekStartDay(): WeekStartDay {
-  if (typeof window === 'undefined') return "monday"
-  const saved = localStorage.getItem("week-start-preference")
-  if (saved === "monday" || saved === "sunday" || saved === "saturday") {
-    return saved as WeekStartDay
-  }
-  return "monday"
-}
-
-// Helper function to get initial working days from localStorage
-function getInitialWorkingDays(): number {
-  if (typeof window === 'undefined') return 5
-  const saved = localStorage.getItem("working-days-preference")
-  if (saved && ["5", "6", "7"].includes(saved)) {
-    return parseInt(saved)
-  }
-  return 5
-}
 
 export function TranslationProvider({ children }: { children: ReactNode }) {
-  // Initialize states directly from localStorage to avoid delay
-  const [language, setLanguageState] = useState<Language>(getInitialLanguage)
-  const [timeFormat, setTimeFormatState] = useState<TimeFormat>(getInitialTimeFormat)
-  const [weekStartDay, setWeekStartDayState] = useState<WeekStartDay>(getInitialWeekStartDay)
-  const [workingDays, setWorkingDaysState] = useState<number>(getInitialWorkingDays)
+  // Use lazy initialization to read from localStorage only once on mount
+  const [language, setLanguageState] = useState<Language>(() => {
+    if (typeof window === 'undefined') return "fr"
+    const saved = localStorage.getItem("language-preference")
+    return (saved && ["en", "fr", "de", "es", "it", "pt"].includes(saved)) 
+      ? saved as Language 
+      : "fr"
+  })
+  
+  const [timeFormat, setTimeFormatState] = useState<TimeFormat>(() => {
+    if (typeof window === 'undefined') return "24h"
+    const saved = localStorage.getItem("time-format-preference")
+    return (saved === "12h" || saved === "24h") ? saved as TimeFormat : "24h"
+  })
+  
+  const [weekStartDay, setWeekStartDayState] = useState<WeekStartDay>(() => {
+    if (typeof window === 'undefined') return "monday"
+    const saved = localStorage.getItem("week-start-preference")
+    return (saved === "monday" || saved === "sunday" || saved === "saturday")
+      ? saved as WeekStartDay
+      : "monday"
+  })
+  
+  const [workingDays, setWorkingDaysState] = useState<number>(() => {
+    if (typeof window === 'undefined') return 5
+    const saved = localStorage.getItem("working-days-preference")
+    return (saved && ["5", "6", "7"].includes(saved)) ? parseInt(saved) : 5
+  })
+  
   const supabase = createClientComponentClient()
 
   const availableLanguages = [
