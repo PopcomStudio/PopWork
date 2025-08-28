@@ -1,0 +1,421 @@
+{
+  "common": {
+    "save": "Salva",
+    "cancel": "Annulla",
+    "delete": "Elimina",
+    "edit": "Modifica",
+    "add": "Aggiungi",
+    "search": "Cerca",
+    "loading": "Caricamento...",
+    "error": "Errore",
+    "success": "Successo",
+    "confirm": "Conferma",
+    "back": "Indietro",
+    "next": "Successivo",
+    "previous": "Precedente",
+    "close": "Chiudi",
+    "select": "Seleziona",
+    "upload": "Carica",
+    "download": "Scarica",
+    "export": "Esporta",
+    "import": "Importa",
+    "refresh": "Aggiorna",
+    "filter": "Filtra",
+    "sort": "Ordina",
+    "view": "Visualizza",
+    "actions": "Azioni",
+    "yes": "Sì",
+    "no": "No",
+    "days": {
+      "monday": "Lunedì",
+      "tuesday": "Martedì",
+      "wednesday": "Mercoledì",
+      "thursday": "Giovedì",
+      "friday": "Venerdì",
+      "saturday": "Sabato",
+      "sunday": "Domenica"
+    },
+    "months": {
+      "january": "Gennaio",
+      "february": "Febbraio",
+      "march": "Marzo",
+      "april": "Aprile",
+      "may": "Maggio",
+      "june": "Giugno",
+      "july": "Luglio",
+      "august": "Agosto",
+      "september": "Settembre",
+      "october": "Ottobre",
+      "november": "Novembre",
+      "december": "Dicembre"
+    }
+  },
+  "navigation": {
+    "dashboard": "Pannello di Controllo",
+    "projects": "Progetti e Attività",
+    "clients": "Clienti",
+    "calendar": "Calendario",
+    "tasks": "Attività",
+    "documents": "Cassaforte HR",
+    "reports": "Report",
+    "settings": "Impostazioni",
+    "admin": "Amministrazione",
+    "help": "Aiuto",
+    "logout": "Disconnetti",
+    "timeTracking": "Tracciamento tempo",
+    "invoicing": "Fatturazione",
+    "team": "Team",
+    "companies": "Aziende",
+    "services": "Servizi",
+    "contacts": "Contatti",
+    "leaves": "Ferie",
+    "history": "Cronologia",
+    "notifications": "Notifiche",
+    "resources": "Risorse"
+  },
+  "search": {
+    "quickSearch": "Ricerca rapida...",
+    "search": "Cerca...",
+    "placeholder": "Cerca una pagina o progetto...",
+    "noResults": "Nessun risultato trovato.",
+    "navigation": "Navigazione"
+  },
+  "companies": {
+    "title": "Aziende",
+    "newCompany": "Nuova azienda",
+    "allCompanies": "Tutte le aziende",
+    "editCompany": "Modifica azienda",
+    "deleteConfirm": "Sei sicuro di voler eliminare l'azienda \"{{name}}\"?",
+    "noCompaniesFound": "Nessuna azienda trovata",
+    "searchPlaceholder": "Cerca per nome, indirizzo, SIRET o email...",
+    "columns": "Colonne",
+    "detailedInfo": "Informazioni dettagliate dell'azienda",
+    "selected": "{{count}} di {{total}} azienda/e selezionata/e.",
+    "rowsPerPage": "Righe per pagina",
+    "page": "Pagina {{current}} di {{total}}",
+    "fields": {
+      "name": "Nome azienda",
+      "company": "Azienda",
+      "address": "Indirizzo",
+      "addressComplete": "Indirizzo completo",
+      "addressPlaceholder": "Via Esempio 123, 00100 Roma",
+      "addressNotProvided": "Indirizzo non fornito",
+      "siret": "SIRET",
+      "siretPlaceholder": "12345678901234",
+      "siretNotProvided": "Non fornito",
+      "email": "Email",
+      "emailPlaceholder": "contatto@acme.com",
+      "phone": "Telefono",
+      "phonePlaceholder": "+39 06 123 45 67",
+      "contact": "Contatto",
+      "noContact": "Nessun contatto",
+      "createdAt": "Creato il",
+      "companyNamePlaceholder": "Es.: ACME S.r.l.",
+      "required": "*"
+    },
+    "actions": {
+      "save": "Salva",
+      "close": "Chiudi",
+      "modify": "Modifica",
+      "create": "Crea",
+      "creating": "Creazione...",
+      "modifying": "Modifica..."
+    },
+    "validation": {
+      "nameMinLength": "Il nome deve contenere almeno 2 caratteri",
+      "emailInvalid": "Indirizzo email non valido"
+    }
+  },
+  "services": {
+    "title": "Servizi",
+    "newService": "Nuovo servizio",
+    "editService": "Modifica servizio",
+    "deleteConfirm": "Sei sicuro di voler eliminare il servizio \"{{name}}\"?",
+    "noServicesFound": "Nessun servizio trovato",
+    "searchPlaceholder": "Cerca per nome, azienda o indirizzo...",
+    "columns": "Colonne",
+    "noContact": "Nessun contatto",
+    "fields": {
+      "name": "Nome servizio",
+      "namePlaceholder": "Nome servizio",
+      "company": "Azienda",
+      "companySelect": "Seleziona azienda",
+      "companyRequired": "Per favore seleziona un'azienda",
+      "address": "Indirizzo",
+      "addressPlaceholder": "Indirizzo del servizio",
+      "addressNotProvided": "Indirizzo non fornito",
+      "phone": "Telefono",
+      "phonePlaceholder": "06 123 45 67",
+      "createdAt": "Creato il",
+      "required": "*"
+    },
+    "actions": {
+      "create": "Crea",
+      "modify": "Modifica",
+      "creating": "Creazione...",
+      "modifying": "Modifica...",
+      "save": "Salva",
+      "close": "Chiudi"
+    },
+    "validation": {
+      "nameMinLength": "Il nome deve contenere almeno 2 caratteri",
+      "companyRequired": "Per favore seleziona un'azienda"
+    }
+  },
+  "contacts": {
+    "title": "Contatti",
+    "newContact": "Nuovo contatto",
+    "editContact": "Modifica contatto",
+    "deleteConfirm": "Sei sicuro di voler eliminare il contatto \"{{firstName}} {{lastName}}\"?",
+    "noContactsFound": "Nessun contatto trovato",
+    "searchPlaceholder": "Cerca per nome, cognome o email...",
+    "columns": "Colonne",
+    "company": "Azienda",
+    "detailedInfo": "Informazioni dettagliate del contatto",
+    "selected": "{{count}} di {{total}} contatto/i selezionato/i.",
+    "rowsPerPage": "Righe per pagina",
+    "page": "Pagina {{current}} di {{total}}",
+    "fields": {
+      "firstName": "Nome",
+      "firstNamePlaceholder": "Nome",
+      "lastName": "Cognome",
+      "lastNamePlaceholder": "Cognome",
+      "fullName": "Nome completo",
+      "service": "Servizio",
+      "serviceSelect": "Seleziona servizio",
+      "serviceRequired": "Per favore seleziona un servizio",
+      "email": "Email",
+      "emailPlaceholder": "contatto@azienda.com",
+      "phone": "Telefono",
+      "phonePlaceholder": "06 123 45 67",
+      "contact": "Contatto",
+      "noContact": "Nessun contatto",
+      "createdAt": "Creato il",
+      "company": "Azienda",
+      "required": "*"
+    },
+    "actions": {
+      "create": "Crea",
+      "modify": "Modifica",
+      "creating": "Creazione...",
+      "modifying": "Modifica..."
+    },
+    "validation": {
+      "firstNameMinLength": "Il nome deve contenere almeno 2 caratteri",
+      "lastNameMinLength": "Il cognome deve contenere almeno 2 caratteri",
+      "emailInvalid": "Indirizzo email non valido",
+      "serviceRequired": "Per favore seleziona un servizio"
+    }
+  },
+  "settings": {
+    "title": "Impostazioni",
+    "sections": {
+      "account": {
+        "title": "Account",
+        "subtitle": "Gestisci impostazioni e preferenze dell'account",
+        "profile": {
+          "title": "Il mio profilo",
+          "firstName": "Nome",
+          "lastName": "Cognome",
+          "email": "Email",
+          "changeImage": "Cambia immagine",
+          "removeImage": "Rimuovi immagine",
+          "imageRequirements": "Supportiamo PNG, JPEG e WebP di dimensioni inferiori a 10MB.",
+          "uploading": "Caricamento...",
+          "enterFirstName": "Inserisci il tuo nome",
+          "enterLastName": "Inserisci il tuo cognome"
+        },
+        "security": {
+          "title": "Sicurezza dell'account",
+          "password": "Password",
+          "changeEmail": "Cambia email",
+          "changePassword": "Cambia password",
+          "twoFactor": "Verifica in 2 passaggi",
+          "twoFactorDescription": "Aggiungi un livello di sicurezza aggiuntivo al tuo account durante l'accesso."
+        },
+        "management": {
+          "title": "Gestione account",
+          "logoutAllDevices": "Disconnetti da tutti i dispositivi",
+          "logoutAllDevicesDescription": "Disconnetti da tutte le altre sessioni attive su altri dispositivi tranne questo.",
+          "deleteAccount": "Elimina il mio account",
+          "deleteAccountDescription": "Elimina permanentemente l'account e rimuovi l'accesso a tutti gli spazi di lavoro.",
+          "logout": "Disconnetti",
+          "delete": "Elimina account"
+        }
+      },
+      "notifications": {
+        "title": "Notifiche",
+        "subtitle": "Configura come ricevere le notifiche",
+        "email": {
+          "title": "Notifiche email",
+          "description": "Ricevi aggiornamenti via email sui progetti e attività"
+        },
+        "push": {
+          "title": "Notifiche push",
+          "description": "Ricevi notifiche push sul tuo dispositivo"
+        },
+        "taskReminders": {
+          "title": "Promemoria attività",
+          "description": "Ricevi promemoria per scadenze imminenti"
+        },
+        "weeklyReports": {
+          "title": "Report settimanali",
+          "description": "Ricevi report di produttività settimanali"
+        }
+      },
+      "language": {
+        "title": "Lingua e regione",
+        "subtitle": "Personalizza impostazioni lingua e regione",
+        "language": {
+          "title": "Lingua",
+          "description": "Seleziona la lingua preferita per l'interfaccia"
+        },
+        "timezone": {
+          "title": "Fuso orario",
+          "description": "Imposta il tuo fuso orario locale"
+        },
+        "dateFormat": {
+          "title": "Formato data",
+          "description": "Scegli il formato di visualizzazione delle date"
+        },
+        "timeFormat": {
+          "title": "Formato orario",
+          "description": "Scegli tra formato 12 o 24 ore"
+        },
+        "calendar": {
+          "title": "Impostazioni calendario",
+          "weekStart": "Primo giorno della settimana",
+          "weekStartDescription": "Definisci quale giorno inizia la settimana",
+          "workingDays": "Giorni lavorativi",
+          "workingDaysDescription": "Numero di giorni lavorativi nella settimana",
+          "fiveDays": "5 giorni (Lun - Ven)",
+          "sixDays": "6 giorni (Lun - Sab)",
+          "sevenDays": "7 giorni (tutti i giorni)"
+        },
+        "translation": {
+          "title": "Traduzione automatica",
+          "subtitle": "Impostazioni traduzione contenuti",
+          "autoTranslate": {
+            "title": "Traduzione automatica",
+            "description": "Traduci automaticamente i contenuti nella tua lingua"
+          },
+          "showOriginal": {
+            "title": "Mostra testo originale",
+            "description": "Mostra testo originale in parallelo alla traduzione"
+          },
+          "translationService": {
+            "title": "Servizio di traduzione",
+            "description": "Scegli il servizio di traduzione da utilizzare"
+          },
+          "excludedDomains": {
+            "title": "Domini esclusi",
+            "description": "Non tradurre contenuti da questi domini",
+            "placeholder": "Esempio: Codice, nomi propri, sigle"
+          }
+        }
+      },
+      "general": {
+        "title": "Generale",
+        "subtitle": "Impostazioni generali dello spazio di lavoro",
+        "workspaceName": {
+          "title": "Nome spazio di lavoro"
+        },
+        "theme": {
+          "title": "Tema applicazione",
+          "description": "Scegli l'aspetto dell'applicazione",
+          "light": "Chiaro",
+          "dark": "Scuro",
+          "system": "Sistema"
+        },
+        "darkMode": {
+          "title": "Modalità scura",
+          "description": "Usa il tema scuro in tutta l'applicazione"
+        },
+        "compactMode": {
+          "title": "Modalità compatta",
+          "description": "Usa un layout più compatto per visualizzare più contenuti"
+        }
+      },
+      "members": {
+        "title": "Membri",
+        "subtitle": "Gestisci membri del team e permessi",
+        "teamMembers": {
+          "title": "Membri del team",
+          "description": "Invita e gestisci i membri del tuo team"
+        },
+        "inviteMember": "Invita membro",
+        "owner": "Proprietario",
+        "admin": "Amministratore",
+        "member": "Membro"
+      },
+      "billing": {
+        "title": "Fatturazione",
+        "subtitle": "Gestisci abbonamento e informazioni di fatturazione",
+        "currentPlan": {
+          "title": "Piano attuale",
+          "professional": "Professionale",
+          "price": "€29/mese"
+        },
+        "changePlan": "Cambia piano",
+        "paymentMethod": {
+          "title": "Metodo di pagamento"
+        },
+        "update": "Aggiorna"
+      }
+    },
+    "categories": {
+      "general": "Impostazioni generali",
+      "workspace": "Impostazioni spazio di lavoro"
+    },
+    "sidebar": {
+      "account": "Account",
+      "notifications": "Notifiche",
+      "languageRegion": "Lingua e regione",
+      "general": "Generale",
+      "members": "Membri",
+      "billing": "Fatturazione"
+    },
+    "messages": {
+      "avatarUpdated": "Avatar aggiornato con successo!",
+      "avatarRemoved": "Avatar rimosso con successo!"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Accedi",
+      "email": "Indirizzo email",
+      "password": "Password",
+      "submit": "Accedi"
+    }
+  },
+  "dashboard": {
+    "welcome": "Benvenuto, {{name}}",
+    "overview": "Panoramica"
+  },
+  "projects": {
+    "title": "Progetti",
+    "fields": {
+      "name": "Nome progetto"
+    }
+  },
+  "clients": {
+    "title": "Clienti",
+    "fields": {
+      "name": "Nome"
+    }
+  },
+  "calendar": {
+    "title": "Calendario"
+  },
+  "tasks": {
+    "title": "Attività"
+  },
+  "messages": {
+    "success": {
+      "saved": "Salvato con successo"
+    },
+    "error": {
+      "general": "Si è verificato un errore"
+    }
+  }
+}

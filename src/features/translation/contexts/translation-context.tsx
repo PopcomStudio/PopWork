@@ -7,10 +7,12 @@ import enTranslations from "../translations/en.json"
 import frTranslations from "../translations/fr.json"
 import deTranslations from "../translations/de.json"
 import esTranslations from "../translations/es.json"
+import itTranslations from "../translations/it.json"
+import ptTranslations from "../translations/pt.json"
 
 type TranslationData = typeof enTranslations
 
-export type Language = "en" | "fr" | "de" | "es"
+export type Language = "en" | "fr" | "de" | "es" | "it" | "pt"
 export type TimeFormat = "12h" | "24h"
 export type WeekStartDay = "monday" | "sunday" | "saturday"
 
@@ -34,48 +36,62 @@ const translations: Record<Language, TranslationData> = {
   en: enTranslations,
   fr: frTranslations,
   de: deTranslations,
-  es: esTranslations
+  es: esTranslations,
+  it: itTranslations,
+  pt: ptTranslations
 }
 
+
 export function TranslationProvider({ children }: { children: ReactNode }) {
+  // Initialize with default values for both server and client to avoid hydration mismatch
   const [language, setLanguageState] = useState<Language>("fr")
   const [timeFormat, setTimeFormatState] = useState<TimeFormat>("24h")
   const [weekStartDay, setWeekStartDayState] = useState<WeekStartDay>("monday")
   const [workingDays, setWorkingDaysState] = useState<number>(5)
+  const [isHydrated, setIsHydrated] = useState(false)
+  
   const supabase = createClientComponentClient()
 
   const availableLanguages = [
     { code: "fr" as Language, name: "Français" },
     { code: "en" as Language, name: "English" },
     { code: "de" as Language, name: "Deutsch" },
-    { code: "es" as Language, name: "Español" }
+    { code: "es" as Language, name: "Español" },
+    { code: "it" as Language, name: "Italiano" },
+    { code: "pt" as Language, name: "Português" }
   ]
 
-  // Load language and time format preferences from localStorage on mount
+  // Load preferences from localStorage after hydration
   useEffect(() => {
-    const loadPreferences = async () => {
-      // First try to load from localStorage
-      const savedLanguage = localStorage.getItem("language-preference")
-      if (["en", "fr", "de", "es"].includes(savedLanguage)) {
-        setLanguageState(savedLanguage as Language)
+    if (typeof window !== 'undefined') {
+      const savedLang = localStorage.getItem("language-preference")
+      if (savedLang && ["en", "fr", "de", "es", "it", "pt"].includes(savedLang)) {
+        setLanguageState(savedLang as Language)
       }
-
+      
       const savedTimeFormat = localStorage.getItem("time-format-preference")
       if (savedTimeFormat === "12h" || savedTimeFormat === "24h") {
         setTimeFormatState(savedTimeFormat as TimeFormat)
       }
-
+      
       const savedWeekStart = localStorage.getItem("week-start-preference")
       if (savedWeekStart === "monday" || savedWeekStart === "sunday" || savedWeekStart === "saturday") {
         setWeekStartDayState(savedWeekStart as WeekStartDay)
       }
-
+      
       const savedWorkingDays = localStorage.getItem("working-days-preference")
       if (savedWorkingDays && ["5", "6", "7"].includes(savedWorkingDays)) {
         setWorkingDaysState(parseInt(savedWorkingDays))
       }
+      
+      setIsHydrated(true)
+    }
+  }, [])
 
-      // Then try to load from user profile
+  // Sync with database preferences (but don't override localStorage if no DB value)
+  useEffect(() => {
+    const syncWithDatabase = async () => {
+      // Only sync with database if user is logged in
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
         const { data: profile } = await supabase
@@ -84,98 +100,128 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
           .eq("id", user.id)
           .single()
 
-        if (profile?.language_preference) {
+        // Only update from DB if localStorage doesn't have a value
+        // This ensures localStorage takes priority for immediate loading
+        if (profile?.language_preference && !localStorage.getItem("language-preference")) {
           setLanguageState(profile.language_preference as Language)
+          localStorage.setItem("language-preference", profile.language_preference)
         }
-        if (profile?.time_format_preference) {
+        if (profile?.time_format_preference && !localStorage.getItem("time-format-preference")) {
           setTimeFormatState(profile.time_format_preference as TimeFormat)
+          localStorage.setItem("time-format-preference", profile.time_format_preference)
         }
-        if (profile?.week_start_day) {
+        if (profile?.week_start_day && !localStorage.getItem("week-start-preference")) {
           setWeekStartDayState(profile.week_start_day as WeekStartDay)
+          localStorage.setItem("week-start-preference", profile.week_start_day)
         }
-        if (profile?.working_days) {
+        if (profile?.working_days && !localStorage.getItem("working-days-preference")) {
           setWorkingDaysState(profile.working_days)
+          localStorage.setItem("working-days-preference", profile.working_days.toString())
         }
       }
     }
     
-    loadPreferences()
+    syncWithDatabase()
   }, [supabase])
 
   // Save language preference
-  const setLanguage = useCallback(async (newLanguage: Language) => {
+  const setLanguage = useCallback((newLanguage: Language) => {
+    // Update state immediately
     setLanguageState(newLanguage)
     
-    // Save to localStorage
+    // Save to localStorage immediately
     localStorage.setItem("language-preference", newLanguage)
 
-    // Save to database
-    const { data: { user } } = await supabase.auth.getUser()
-    if (user) {
-      await supabase
-        .from("users")
-        .update({
-          language_preference: newLanguage
-        })
-        .eq("id", user.id)
-    }
+    // Save to database asynchronously (non-blocking)
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        supabase
+          .from("users")
+          .update({
+            language_preference: newLanguage
+          })
+          .eq("id", user.id)
+          .then(() => {
+            // Silently succeed
+          })
+          .catch(error => {
+            console.error("Failed to update language preference in database:", error)
+            // Still works locally even if DB update fails
+          })
+      }
+    })
   }, [supabase])
 
   // Save time format preference
-  const setTimeFormat = useCallback(async (newTimeFormat: TimeFormat) => {
+  const setTimeFormat = useCallback((newTimeFormat: TimeFormat) => {
+    // Update state immediately
     setTimeFormatState(newTimeFormat)
     
-    // Save to localStorage
+    // Save to localStorage immediately
     localStorage.setItem("time-format-preference", newTimeFormat)
 
-    // Save to database
-    const { data: { user } } = await supabase.auth.getUser()
-    if (user) {
-      await supabase
-        .from("users")
-        .update({
-          time_format_preference: newTimeFormat
-        })
-        .eq("id", user.id)
-    }
+    // Save to database asynchronously (non-blocking)
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        supabase
+          .from("users")
+          .update({
+            time_format_preference: newTimeFormat
+          })
+          .eq("id", user.id)
+          .catch(error => {
+            console.error("Failed to update time format preference in database:", error)
+          })
+      }
+    })
   }, [supabase])
 
   // Save week start day preference
-  const setWeekStartDay = useCallback(async (newWeekStartDay: WeekStartDay) => {
+  const setWeekStartDay = useCallback((newWeekStartDay: WeekStartDay) => {
+    // Update state immediately
     setWeekStartDayState(newWeekStartDay)
     
-    // Save to localStorage
+    // Save to localStorage immediately
     localStorage.setItem("week-start-preference", newWeekStartDay)
 
-    // Save to database
-    const { data: { user } } = await supabase.auth.getUser()
-    if (user) {
-      await supabase
-        .from("users")
-        .update({
-          week_start_day: newWeekStartDay
-        })
-        .eq("id", user.id)
-    }
+    // Save to database asynchronously (non-blocking)
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        supabase
+          .from("users")
+          .update({
+            week_start_day: newWeekStartDay
+          })
+          .eq("id", user.id)
+          .catch(error => {
+            console.error("Failed to update week start preference in database:", error)
+          })
+      }
+    })
   }, [supabase])
 
   // Save working days preference
-  const setWorkingDays = useCallback(async (newWorkingDays: number) => {
+  const setWorkingDays = useCallback((newWorkingDays: number) => {
+    // Update state immediately
     setWorkingDaysState(newWorkingDays)
     
-    // Save to localStorage
+    // Save to localStorage immediately
     localStorage.setItem("working-days-preference", newWorkingDays.toString())
 
-    // Save to database
-    const { data: { user } } = await supabase.auth.getUser()
-    if (user) {
-      await supabase
-        .from("users")
-        .update({
-          working_days: newWorkingDays
-        })
-        .eq("id", user.id)
-    }
+    // Save to database asynchronously (non-blocking)
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        supabase
+          .from("users")
+          .update({
+            working_days: newWorkingDays
+          })
+          .eq("id", user.id)
+          .catch(error => {
+            console.error("Failed to update working days preference in database:", error)
+          })
+      }
+    })
   }, [supabase])
 
   // Helper function to get nested translation value
