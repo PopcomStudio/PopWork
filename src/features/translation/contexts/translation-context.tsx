@@ -5,10 +5,12 @@ import { createClientComponentClient } from "@/lib/supabase"
 
 import enTranslations from "../translations/en.json"
 import frTranslations from "../translations/fr.json"
+import deTranslations from "../translations/de.json"
+import esTranslations from "../translations/es.json"
 
 type TranslationData = typeof enTranslations
 
-export type Language = "en" | "fr"
+export type Language = "en" | "fr" | "de" | "es"
 export type TimeFormat = "12h" | "24h"
 export type WeekStartDay = "monday" | "sunday" | "saturday"
 
@@ -30,7 +32,9 @@ const TranslationContext = createContext<TranslationContextType | undefined>(und
 
 const translations: Record<Language, TranslationData> = {
   en: enTranslations,
-  fr: frTranslations
+  fr: frTranslations,
+  de: deTranslations,
+  es: esTranslations
 }
 
 export function TranslationProvider({ children }: { children: ReactNode }) {
@@ -42,7 +46,9 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
 
   const availableLanguages = [
     { code: "fr" as Language, name: "Français" },
-    { code: "en" as Language, name: "English" }
+    { code: "en" as Language, name: "English" },
+    { code: "de" as Language, name: "Deutsch" },
+    { code: "es" as Language, name: "Español" }
   ]
 
   // Load language and time format preferences from localStorage on mount
@@ -50,7 +56,7 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
     const loadPreferences = async () => {
       // First try to load from localStorage
       const savedLanguage = localStorage.getItem("language-preference")
-      if (savedLanguage === "en" || savedLanguage === "fr") {
+      if (["en", "fr", "de", "es"].includes(savedLanguage)) {
         setLanguageState(savedLanguage as Language)
       }
 

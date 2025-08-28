@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect } from 'react'
 import { TaskCommentExtended, CommentEditorData, EmojiReaction } from '../types/kanban'
 
 // Données mockées pour les tests
-let mockComments: TaskCommentExtended[] = [
+const mockComments: TaskCommentExtended[] = [
   {
     id: '1',
     taskId: 'task-1',

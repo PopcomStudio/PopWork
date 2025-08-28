@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from 'react'
+import { useTranslation } from '@/features/translation/hooks/use-translation'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ServicesDataTable } from './ServicesDataTable'
@@ -28,16 +29,18 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
-const serviceFormSchema = z.object({
-  name: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
+const createServiceFormSchema = (t: (key: string) => string) => z.object({
+  name: z.string().min(2, t('services.validation.nameMinLength')),
   address: z.string().optional(),
   phone: z.string().optional(),
-  company_id: z.string().min(1, 'Veuillez sélectionner une entreprise'),
+  company_id: z.string().min(1, t('services.validation.companyRequired')),
 })
 
-type ServiceFormData = z.infer<typeof serviceFormSchema>
+type ServiceFormData = z.infer<ReturnType<typeof createServiceFormSchema>>
 
 export function ServiceManagement() {
+  const { t } = useTranslation()
+  const serviceFormSchema = createServiceFormSchema(t)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingService, setEditingService] = useState<Service | null>(null)
   const [actionLoading, setActionLoading] = useState(false)
@@ -66,13 +69,13 @@ export function ServiceManagement() {
 
   // Gérer la suppression d'un service
   const handleDeleteService = async (service: Service) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer le service "${service.name}" ?`)) {
+    if (window.confirm(t('services.deleteConfirm', { name: service.name }))) {
       try {
         setError(null)
         await deleteService(service.id)
       } catch (err) {
         console.error('Erreur lors de la suppression:', err)
-        setError(err instanceof Error ? err.message : 'Erreur inconnue')
+        setError(err instanceof Error ? err.message : t('messages.error.general'))
       }
     }
   }
@@ -129,7 +132,7 @@ export function ServiceManagement() {
       handleCloseDialog()
     } catch (err) {
       console.error('Erreur lors de l\'enregistrement:', err)
-      setError(err instanceof Error ? err.message : 'Erreur inconnue')
+      setError(err instanceof Error ? err.message : t('messages.error.general'))
     } finally {
       setActionLoading(false)
     }
@@ -142,17 +145,17 @@ export function ServiceManagement() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Phone className="h-5 w-5" />
-              {editingService ? 'Modifier le service' : 'Nouveau service'}
+              {editingService ? t('services.editService') : t('services.newService')}
             </DialogTitle>
           </DialogHeader>
           
           <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Nom du service *</Label>
+                <Label htmlFor="name">{t('services.fields.name')} {t('services.fields.required')}</Label>
                 <Input
                   id="name"
-                  placeholder="Nom du service"
+                  placeholder={t('services.fields.namePlaceholder')}
                   {...register('name')}
                 />
                 {errors.name && (
@@ -161,18 +164,18 @@ export function ServiceManagement() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="company_id">Entreprise *</Label>
+                <Label htmlFor="company_id">{t('services.fields.company')} {t('services.fields.required')}</Label>
                 <Select 
                   onValueChange={(value) => setValue('company_id', value)}
                   defaultValue={editingService?.company_id}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner une entreprise" />
+                    <SelectValue placeholder={t('services.fields.companySelect')} />
                   </SelectTrigger>
                   <SelectContent>
                     {companiesLoading ? (
                       <SelectItem value="" disabled>
-                        Chargement...
+                        {t('common.loading')}
                       </SelectItem>
                     ) : (
                       companies.map((company) => (
@@ -190,10 +193,10 @@ export function ServiceManagement() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="address">Adresse</Label>
+              <Label htmlFor="address">{t('services.fields.address')}</Label>
               <Input
                 id="address"
-                placeholder="Adresse du service"
+                placeholder={t('services.fields.addressPlaceholder')}
                 {...register('address')}
               />
               {errors.address && (
@@ -202,11 +205,11 @@ export function ServiceManagement() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phone">Téléphone</Label>
+              <Label htmlFor="phone">{t('services.fields.phone')}</Label>
               <Input
                 id="phone"
                 type="tel"
-                placeholder="01 23 45 67 89"
+                placeholder={t('services.fields.phonePlaceholder')}
                 {...register('phone')}
               />
               {errors.phone && (
@@ -221,16 +224,16 @@ export function ServiceManagement() {
                 onClick={handleCloseDialog}
                 disabled={actionLoading}
               >
-                Annuler
+                {t('common.cancel')}
               </Button>
               <Button type="submit" disabled={actionLoading}>
                 {actionLoading ? (
                   <>
                     <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-                    {editingService ? 'Modification...' : 'Création...'}
+                    {editingService ? t('services.actions.modifying') : t('services.actions.creating')}
                   </>
                 ) : (
-                  editingService ? 'Modifier' : 'Créer'
+                  editingService ? t('services.actions.modify') : t('services.actions.create')
                 )}
               </Button>
             </div>

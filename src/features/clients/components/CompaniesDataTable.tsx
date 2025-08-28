@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslation } from '@/features/translation/hooks/use-translation'
 import {
   closestCenter,
   DndContext,
@@ -134,6 +135,7 @@ export function CompaniesDataTable({
   onEditCompany,
   onDeleteCompany,
 }: CompaniesDataTableFullProps) {
+  const { t } = useTranslation()
   
   const columns: ColumnDef<Company>[] = [
     {
@@ -169,7 +171,7 @@ export function CompaniesDataTable({
     },
     {
       accessorKey: "name",
-      header: "Entreprise",
+      header: t('companies.fields.company'),
       cell: ({ row }) => {
         return <CompanyCellViewer company={row.original} />
       },
@@ -177,7 +179,7 @@ export function CompaniesDataTable({
     },
     {
       accessorKey: "siret",
-      header: "SIRET",
+      header: t('companies.fields.siret'),
       cell: ({ row }) => (
         <div className="w-32">
           {row.original.siret ? (
@@ -186,7 +188,7 @@ export function CompaniesDataTable({
             </Badge>
           ) : (
             <span className="text-muted-foreground italic text-sm">
-              Non renseigné
+              {t('companies.fields.siretNotProvided')}
             </span>
           )}
         </div>
@@ -194,14 +196,14 @@ export function CompaniesDataTable({
     },
     {
       accessorKey: "address",
-      header: "Adresse",
+      header: t('companies.fields.address'),
       cell: ({ row }) => (
         <div className="max-w-48">
           {row.original.address ? (
             <span className="text-sm">{row.original.address}</span>
           ) : (
             <span className="text-muted-foreground italic text-sm">
-              Adresse non renseignée
+              {t('companies.fields.addressNotProvided')}
             </span>
           )}
         </div>
@@ -209,7 +211,7 @@ export function CompaniesDataTable({
     },
     {
       accessorKey: "email",
-      header: "Contact",
+      header: t('companies.fields.contact'),
       cell: ({ row }) => {
         const company = row.original
         return (
@@ -236,7 +238,7 @@ export function CompaniesDataTable({
             )}
             {!company.email && !company.phone && (
               <span className="text-muted-foreground italic text-sm">
-                Aucun contact
+                {t('companies.fields.noContact')}
               </span>
             )}
           </div>
@@ -245,7 +247,7 @@ export function CompaniesDataTable({
     },
     {
       accessorKey: "created_at",
-      header: "Créée le",
+      header: t('companies.fields.createdAt'),
       cell: ({ row }) => (
         <span className="text-sm text-muted-foreground">
           {new Date(row.original.created_at).toLocaleDateString('fr-FR')}
@@ -269,7 +271,7 @@ export function CompaniesDataTable({
           <DropdownMenuContent align="end" className="w-32">
             <DropdownMenuItem onClick={() => onEditCompany(row.original)}>
               <Edit className="h-4 w-4 mr-2" />
-              Modifier
+              {t('common.edit')}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem 
@@ -277,7 +279,7 @@ export function CompaniesDataTable({
               className="text-destructive"
             >
               <Trash2 className="h-4 w-4 mr-2" />
-              Supprimer
+              {t('common.delete')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -381,7 +383,7 @@ export function CompaniesDataTable({
         <div className="flex items-center space-x-2 flex-1 max-w-md">
           <Search className="h-4 w-4 opacity-50" />
           <Input
-            placeholder="Rechercher par nom, adresse, SIRET ou email..."
+            placeholder={t('companies.searchPlaceholder')}
             value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
             onChange={(event) =>
               table.getColumn("name")?.setFilterValue(event.target.value)
@@ -394,7 +396,7 @@ export function CompaniesDataTable({
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
                 <ChevronDown />
-                <span className="hidden lg:inline">Colonnes</span>
+                <span className="hidden lg:inline">{t('companies.columns')}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
@@ -415,11 +417,11 @@ export function CompaniesDataTable({
                         column.toggleVisibility(!!value)
                       }
                     >
-                      {column.id === "name" ? "Entreprise" :
-                       column.id === "siret" ? "SIRET" :
-                       column.id === "address" ? "Adresse" :
-                       column.id === "email" ? "Contact" :
-                       column.id === "created_at" ? "Créée le" :
+                      {column.id === "name" ? t('companies.fields.company') :
+                       column.id === "siret" ? t('companies.fields.siret') :
+                       column.id === "address" ? t('companies.fields.address') :
+                       column.id === "email" ? t('companies.fields.contact') :
+                       column.id === "created_at" ? t('companies.fields.createdAt') :
                        column.id}
                     </DropdownMenuCheckboxItem>
                   )
@@ -428,7 +430,7 @@ export function CompaniesDataTable({
           </DropdownMenu>
           <Button variant="default" size="sm" onClick={onNewCompany}>
             <Plus />
-            <span className="hidden lg:inline">Nouvelle entreprise</span>
+            <span className="hidden lg:inline">{t('companies.newCompany')}</span>
           </Button>
         </div>
       </div>
@@ -476,7 +478,7 @@ export function CompaniesDataTable({
                       colSpan={columns.length}
                       className="h-24 text-center"
                     >
-                      Aucune entreprise trouvée
+                      {t('companies.noCompaniesFound')}
                     </TableCell>
                   </TableRow>
                 )}
@@ -486,13 +488,15 @@ export function CompaniesDataTable({
         </div>
         <div className="flex items-center justify-between px-4">
           <div className="text-muted-foreground hidden flex-1 text-sm lg:flex">
-            {table.getFilteredSelectedRowModel().rows.length} sur{" "}
-            {table.getFilteredRowModel().rows.length} entreprise(s) sélectionnée(s).
+            {t('companies.selected', {
+              count: table.getFilteredSelectedRowModel().rows.length,
+              total: table.getFilteredRowModel().rows.length
+            })}
           </div>
           <div className="flex w-full items-center gap-8 lg:w-fit">
             <div className="hidden items-center gap-2 lg:flex">
               <Label htmlFor="rows-per-page" className="text-sm font-medium">
-                Lignes par page
+                {t('companies.rowsPerPage')}
               </Label>
               <Select
                 value={`${table.getState().pagination.pageSize}`}
@@ -515,8 +519,10 @@ export function CompaniesDataTable({
               </Select>
             </div>
             <div className="flex w-fit items-center justify-center text-sm font-medium">
-              Page {table.getState().pagination.pageIndex + 1} sur{" "}
-              {table.getPageCount()}
+              {t('companies.page', {
+                current: table.getState().pagination.pageIndex + 1,
+                total: table.getPageCount()
+              })}
             </div>
             <div className="ml-auto flex items-center gap-2 lg:ml-0">
               <Button
@@ -568,6 +574,7 @@ export function CompaniesDataTable({
 
 function CompanyCellViewer({ company }: { company: Company }) {
   const isMobile = useIsMobile()
+  const { t } = useTranslation()
 
   return (
     <Drawer direction={isMobile ? "bottom" : "right"}>
@@ -580,39 +587,39 @@ function CompanyCellViewer({ company }: { company: Company }) {
         <DrawerHeader className="gap-1">
           <DrawerTitle>{company.name}</DrawerTitle>
           <DrawerDescription>
-            Informations détaillées de l'entreprise
+            {t('companies.detailedInfo')}
           </DrawerDescription>
         </DrawerHeader>
         <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm">
           <form className="flex flex-col gap-4">
             <div className="flex flex-col gap-3">
-              <Label htmlFor="name">Nom de l'entreprise</Label>
+              <Label htmlFor="name">{t('companies.fields.name')}</Label>
               <Input id="name" defaultValue={company.name} />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-3">
-                <Label htmlFor="siret">SIRET</Label>
+                <Label htmlFor="siret">{t('companies.fields.siret')}</Label>
                 <Input id="siret" defaultValue={company.siret || ""} />
               </div>
               <div className="flex flex-col gap-3">
-                <Label htmlFor="phone">Téléphone</Label>
+                <Label htmlFor="phone">{t('companies.fields.phone')}</Label>
                 <Input id="phone" defaultValue={company.phone || ""} />
               </div>
             </div>
             <div className="flex flex-col gap-3">
-              <Label htmlFor="address">Adresse</Label>
+              <Label htmlFor="address">{t('companies.fields.address')}</Label>
               <Input id="address" defaultValue={company.address || ""} />
             </div>
             <div className="flex flex-col gap-3">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('companies.fields.email')}</Label>
               <Input id="email" defaultValue={company.email || ""} />
             </div>
           </form>
         </div>
         <DrawerFooter>
-          <Button>Enregistrer</Button>
+          <Button>{t('companies.actions.save')}</Button>
           <DrawerClose asChild>
-            <Button variant="outline">Fermer</Button>
+            <Button variant="outline">{t('companies.actions.close')}</Button>
           </DrawerClose>
         </DrawerFooter>
       </DrawerContent>

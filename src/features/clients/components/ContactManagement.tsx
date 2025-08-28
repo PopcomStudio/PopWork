@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from 'react'
+import { useTranslation } from '@/features/translation/hooks/use-translation'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ContactsDataTable } from './ContactsDataTable'
@@ -28,17 +29,19 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
-const contactFormSchema = z.object({
-  first_name: z.string().min(2, 'Le prénom doit contenir au moins 2 caractères'),
-  last_name: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
-  email: z.string().email('Adresse email invalide').optional().or(z.literal('')),
+const createContactFormSchema = (t: (key: string) => string) => z.object({
+  first_name: z.string().min(2, t('contacts.validation.firstNameMinLength')),
+  last_name: z.string().min(2, t('contacts.validation.lastNameMinLength')),
+  email: z.string().email(t('contacts.validation.emailInvalid')).optional().or(z.literal('')),
   phone: z.string().optional(),
-  service_id: z.string().min(1, 'Veuillez sélectionner un service'),
+  service_id: z.string().min(1, t('contacts.validation.serviceRequired')),
 })
 
-type ContactFormData = z.infer<typeof contactFormSchema>
+type ContactFormData = z.infer<ReturnType<typeof createContactFormSchema>>
 
 export function ContactManagement() {
+  const { t } = useTranslation()
+  const contactFormSchema = createContactFormSchema(t)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingContact, setEditingContact] = useState<Contact | null>(null)
   const [actionLoading, setActionLoading] = useState(false)
@@ -67,13 +70,13 @@ export function ContactManagement() {
 
   // Gérer la suppression d'un contact
   const handleDeleteContact = async (contact: Contact) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer le contact "${contact.first_name} ${contact.last_name}" ?`)) {
+    if (window.confirm(t('contacts.deleteConfirm', { firstName: contact.first_name, lastName: contact.last_name }))) {
       try {
         setError(null)
         await deleteContact(contact.id)
       } catch (err) {
         console.error('Erreur lors de la suppression:', err)
-        setError(err instanceof Error ? err.message : 'Erreur inconnue')
+        setError(err instanceof Error ? err.message : t('messages.error.general'))
       }
     }
   }
@@ -132,7 +135,7 @@ export function ContactManagement() {
       handleCloseDialog()
     } catch (err) {
       console.error('Erreur lors de l\'enregistrement:', err)
-      setError(err instanceof Error ? err.message : 'Erreur inconnue')
+      setError(err instanceof Error ? err.message : t('messages.error.general'))
     } finally {
       setActionLoading(false)
     }
@@ -145,17 +148,17 @@ export function ContactManagement() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <UserCheck className="h-5 w-5" />
-              {editingContact ? 'Modifier le contact' : 'Nouveau contact'}
+              {editingContact ? t('contacts.editContact') : t('contacts.newContact')}
             </DialogTitle>
           </DialogHeader>
           
           <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="first_name">Prénom *</Label>
+                <Label htmlFor="first_name">{t('contacts.fields.firstName')} {t('contacts.fields.required')}</Label>
                 <Input
                   id="first_name"
-                  placeholder="Prénom"
+                  placeholder={t('contacts.fields.firstNamePlaceholder')}
                   {...register('first_name')}
                 />
                 {errors.first_name && (
@@ -164,10 +167,10 @@ export function ContactManagement() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="last_name">Nom *</Label>
+                <Label htmlFor="last_name">{t('contacts.fields.lastName')} {t('contacts.fields.required')}</Label>
                 <Input
                   id="last_name"
-                  placeholder="Nom de famille"
+                  placeholder={t('contacts.fields.lastNamePlaceholder')}
                   {...register('last_name')}
                 />
                 {errors.last_name && (
@@ -177,18 +180,18 @@ export function ContactManagement() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="service_id">Service *</Label>
+              <Label htmlFor="service_id">{t('contacts.fields.service')} {t('contacts.fields.required')}</Label>
               <Select 
                 onValueChange={(value) => setValue('service_id', value)}
                 defaultValue={editingContact?.service_id}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner un service" />
+                  <SelectValue placeholder={t('contacts.fields.serviceSelect')} />
                 </SelectTrigger>
                 <SelectContent>
                   {servicesLoading ? (
                     <SelectItem value="" disabled>
-                      Chargement...
+                      {t('common.loading')}
                     </SelectItem>
                   ) : (
                     services.map((service) => (
@@ -206,11 +209,11 @@ export function ContactManagement() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t('contacts.fields.email')}</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="contact@entreprise.com"
+                  placeholder={t('contacts.fields.emailPlaceholder')}
                   {...register('email')}
                 />
                 {errors.email && (
@@ -219,11 +222,11 @@ export function ContactManagement() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="phone">Téléphone</Label>
+                <Label htmlFor="phone">{t('contacts.fields.phone')}</Label>
                 <Input
                   id="phone"
                   type="tel"
-                  placeholder="01 23 45 67 89"
+                  placeholder={t('contacts.fields.phonePlaceholder')}
                   {...register('phone')}
                 />
                 {errors.phone && (
@@ -239,16 +242,16 @@ export function ContactManagement() {
                 onClick={handleCloseDialog}
                 disabled={actionLoading}
               >
-                Annuler
+                {t('common.cancel')}
               </Button>
               <Button type="submit" disabled={actionLoading}>
                 {actionLoading ? (
                   <>
                     <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-                    {editingContact ? 'Modification...' : 'Création...'}
+                    {editingContact ? t('contacts.actions.modifying') : t('contacts.actions.creating')}
                   </>
                 ) : (
-                  editingContact ? 'Modifier' : 'Créer'
+                  editingContact ? t('contacts.actions.modify') : t('contacts.actions.create')
                 )}
               </Button>
             </div>

@@ -1,0 +1,544 @@
+{
+  "common": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "add": "Hinzufügen",
+    "search": "Suchen",
+    "loading": "Lädt...",
+    "error": "Fehler",
+    "success": "Erfolg",
+    "confirm": "Bestätigen",
+    "back": "Zurück",
+    "next": "Weiter",
+    "previous": "Zurück",
+    "close": "Schließen",
+    "select": "Auswählen",
+    "upload": "Hochladen",
+    "download": "Herunterladen",
+    "export": "Exportieren",
+    "import": "Importieren",
+    "refresh": "Aktualisieren",
+    "filter": "Filtern",
+    "sort": "Sortieren",
+    "view": "Anzeigen",
+    "actions": "Aktionen",
+    "yes": "Ja",
+    "no": "Nein",
+    "days": {
+      "monday": "Montag",
+      "tuesday": "Dienstag",
+      "wednesday": "Mittwoch",
+      "thursday": "Donnerstag",
+      "friday": "Freitag",
+      "saturday": "Samstag",
+      "sunday": "Sonntag"
+    },
+    "months": {
+      "january": "Januar",
+      "february": "Februar",
+      "march": "März",
+      "april": "April",
+      "may": "Mai",
+      "june": "Juni",
+      "july": "Juli",
+      "august": "August",
+      "september": "September",
+      "october": "Oktober",
+      "november": "November",
+      "december": "Dezember"
+    }
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "projects": "Projekte",
+    "clients": "Kunden",
+    "calendar": "Kalender",
+    "tasks": "Aufgaben",
+    "documents": "Dokumente",
+    "reports": "Berichte",
+    "settings": "Einstellungen",
+    "admin": "Administration",
+    "help": "Hilfe",
+    "logout": "Abmelden",
+    "timeTracking": "Zeiterfassung",
+    "invoicing": "Rechnungsstellung",
+    "team": "Team",
+    "companies": "Unternehmen",
+    "services": "Dienstleistungen",
+    "contacts": "Kontakte",
+    "leaves": "Urlaub",
+    "history": "Verlauf",
+    "notifications": "Benachrichtigungen",
+    "resources": "Ressourcen"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "sections": {
+      "account": {
+        "title": "Konto",
+        "subtitle": "Konto-Einstellungen und Präferenzen verwalten",
+        "profile": {
+          "title": "Mein Profil",
+          "firstName": "Vorname",
+          "lastName": "Nachname",
+          "email": "E-Mail",
+          "changeImage": "Bild ändern",
+          "removeImage": "Bild entfernen",
+          "imageRequirements": "Wir unterstützen PNG, JPEG und WebP unter 10MB.",
+          "uploading": "Hochladen...",
+          "enterFirstName": "Vorname eingeben",
+          "enterLastName": "Nachname eingeben"
+        },
+        "security": {
+          "title": "Kontosicherheit",
+          "password": "Passwort",
+          "changeEmail": "E-Mail ändern",
+          "changePassword": "Passwort ändern",
+          "twoFactor": "Zwei-Faktor-Verifizierung",
+          "twoFactorDescription": "Fügen Sie eine zusätzliche Sicherheitsebene bei der Anmeldung hinzu."
+        },
+        "management": {
+          "title": "Kontoverwaltung",
+          "logoutAllDevices": "Von allen Geräten abmelden",
+          "logoutAllDevicesDescription": "Von allen anderen aktiven Sitzungen auf anderen Geräten abmelden außer diesem.",
+          "deleteAccount": "Mein Konto löschen",
+          "deleteAccountDescription": "Konto dauerhaft löschen und Zugriff auf alle Arbeitsbereiche entfernen.",
+          "logout": "Abmelden",
+          "delete": "Konto löschen"
+        }
+      },
+      "notifications": {
+        "title": "Benachrichtigungen",
+        "subtitle": "Konfigurieren Sie, wie Sie Benachrichtigungen erhalten",
+        "email": {
+          "title": "E-Mail-Benachrichtigungen",
+          "description": "Updates zu Projekten und Aufgaben per E-Mail erhalten"
+        },
+        "push": {
+          "title": "Push-Benachrichtigungen",
+          "description": "Push-Benachrichtigungen auf Ihrem Gerät erhalten"
+        },
+        "taskReminders": {
+          "title": "Aufgabenerinnerungen",
+          "description": "An bevorstehende Aufgabenfristen erinnert werden"
+        },
+        "weeklyReports": {
+          "title": "Wöchentliche Berichte",
+          "description": "Wöchentliche Produktivitätsberichte erhalten"
+        }
+      },
+      "language": {
+        "title": "Sprache und Region",
+        "subtitle": "Sprach- und Regionseinstellungen anpassen",
+        "language": {
+          "title": "Sprache",
+          "description": "Bevorzugte Sprache für die Benutzeroberfläche auswählen"
+        },
+        "timezone": {
+          "title": "Zeitzone",
+          "description": "Lokale Zeitzone festlegen"
+        },
+        "dateFormat": {
+          "title": "Datumsformat",
+          "description": "Datumsanzeige-Format wählen"
+        },
+        "timeFormat": {
+          "title": "Zeitformat",
+          "description": "Zwischen 12-Stunden- oder 24-Stunden-Format wählen"
+        },
+        "calendar": {
+          "title": "Kalendereinstellungen",
+          "weekStart": "Erster Wochentag",
+          "weekStartDescription": "Festlegen, an welchem Tag die Woche beginnt",
+          "workingDays": "Arbeitстage",
+          "workingDaysDescription": "Anzahl der Arbeitstage in der Woche",
+          "fiveDays": "5 Tage (Mo - Fr)",
+          "sixDays": "6 Tage (Mo - Sa)",
+          "sevenDays": "7 Tage (alle Tage)"
+        },
+        "translation": {
+          "title": "Automatische Übersetzung",
+          "subtitle": "Inhaltsübersetzungseinstellungen",
+          "autoTranslate": {
+            "title": "Automatische Übersetzung",
+            "description": "Inhalte automatisch in Ihre Sprache übersetzen"
+          },
+          "showOriginal": {
+            "title": "Originaltext anzeigen",
+            "description": "Originaltext parallel zur Übersetzung anzeigen"
+          },
+          "translationService": {
+            "title": "Übersetzungsdienst",
+            "description": "Zu verwendenden Übersetzungsdienst auswählen"
+          },
+          "excludedDomains": {
+            "title": "Ausgeschlossene Bereiche",
+            "description": "Inhalte aus diesen Bereichen nicht übersetzen",
+            "placeholder": "Beispiel: Code, Eigennamen, Akronyme"
+          }
+        }
+      },
+      "general": {
+        "title": "Allgemein",
+        "subtitle": "Allgemeine Arbeitsbereich-Einstellungen",
+        "workspaceName": {
+          "title": "Arbeitsbereich-Name"
+        },
+        "theme": {
+          "title": "Anwendungsthema",
+          "description": "Aussehen der Anwendung wählen",
+          "light": "Hell",
+          "dark": "Dunkel",
+          "system": "System"
+        },
+        "darkMode": {
+          "title": "Dunkler Modus",
+          "description": "Dunkles Theme in der gesamten Anwendung verwenden"
+        },
+        "compactMode": {
+          "title": "Kompakter Modus",
+          "description": "Kompakteres Layout verwenden, um mehr Inhalt anzuzeigen"
+        }
+      },
+      "members": {
+        "title": "Mitglieder",
+        "subtitle": "Team-Mitglieder und Berechtigungen verwalten",
+        "teamMembers": {
+          "title": "Team-Mitglieder",
+          "description": "Mitglieder Ihres Teams einladen und verwalten"
+        },
+        "inviteMember": "Mitglied einladen",
+        "owner": "Eigentümer",
+        "admin": "Administrator",
+        "member": "Mitglied"
+      },
+      "billing": {
+        "title": "Abrechnung",
+        "subtitle": "Abonnement und Rechnungsinformationen verwalten",
+        "currentPlan": {
+          "title": "Aktueller Plan",
+          "professional": "Professionell",
+          "price": "29€/Monat"
+        },
+        "changePlan": "Plan ändern",
+        "paymentMethod": {
+          "title": "Zahlungsmethode"
+        },
+        "update": "Aktualisieren"
+      }
+    },
+    "categories": {
+      "general": "Allgemeine Einstellungen",
+      "workspace": "Arbeitsbereich-Einstellungen"
+    },
+    "sidebar": {
+      "account": "Konto",
+      "notifications": "Benachrichtigungen",
+      "languageRegion": "Sprache und Region",
+      "general": "Allgemein",
+      "members": "Mitglieder",
+      "billing": "Abrechnung"
+    },
+    "messages": {
+      "avatarUpdated": "Avatar erfolgreich aktualisiert!",
+      "avatarRemoved": "Avatar erfolgreich entfernt!"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Anmeldung",
+      "email": "E-Mail-Adresse",
+      "password": "Passwort",
+      "rememberMe": "Angemeldet bleiben",
+      "forgotPassword": "Passwort vergessen?",
+      "submit": "Anmelden",
+      "noAccount": "Noch kein Konto?",
+      "signUp": "Registrieren"
+    },
+    "signup": {
+      "title": "Konto erstellen",
+      "firstName": "Vorname",
+      "lastName": "Nachname",
+      "email": "E-Mail-Adresse",
+      "password": "Passwort",
+      "confirmPassword": "Passwort bestätigen",
+      "terms": "Ich akzeptiere die Nutzungsbedingungen",
+      "submit": "Mein Konto erstellen",
+      "hasAccount": "Bereits ein Konto?",
+      "login": "Anmelden"
+    },
+    "forgotPassword": {
+      "title": "Passwort vergessen",
+      "description": "Geben Sie Ihre E-Mail-Adresse ein und wir senden Ihnen einen Link zum Zurücksetzen Ihres Passworts.",
+      "email": "E-Mail-Adresse",
+      "submit": "Link senden",
+      "backToLogin": "Zurück zur Anmeldung"
+    },
+    "resetPassword": {
+      "title": "Passwort zurücksetzen",
+      "newPassword": "Neues Passwort",
+      "confirmPassword": "Passwort bestätigen",
+      "submit": "Zurücksetzen"
+    }
+  },
+  "dashboard": {
+    "welcome": "Willkommen, {{name}}",
+    "overview": "Übersicht",
+    "recentProjects": "Aktuelle Projekte",
+    "upcomingTasks": "Bevorstehende Aufgaben",
+    "statistics": {
+      "activeProjects": "Aktive Projekte",
+      "completedTasks": "Abgeschlossene Aufgaben",
+      "totalClients": "Kunden gesamt",
+      "revenue": "Umsatz"
+    },
+    "cards": {
+      "revenue": {
+        "title": "Umsatz",
+        "trending": "Steigend in diesem Monat",
+        "description": "Bezahlte Rechnungen in diesem Quartal"
+      },
+      "activeProjects": {
+        "title": "Aktive Projekte",
+        "trendingUp": "Steigend",
+        "trendingDown": "Fallend",
+        "description": "Projekte in Entwicklung"
+      },
+      "completedTasks": {
+        "title": "Abgeschlossene Aufgaben",
+        "trending": "Hohe Produktivität",
+        "description": "Team-Ziele erreicht"
+      },
+      "pendingInvoices": {
+        "title": "Ausstehende Rechnungen",
+        "trending": "Zahlungsverfolgung",
+        "description": "Laufende Abrechnung"
+      }
+    },
+    "error": "Fehler beim Laden"
+  },
+  "projects": {
+    "title": "Projekte",
+    "newProject": "Neues Projekt",
+    "allProjects": "Alle Projekte",
+    "activeProjects": "Aktive Projekte",
+    "completedProjects": "Abgeschlossene Projekte",
+    "status": {
+      "active": "Aktiv",
+      "completed": "Abgeschlossen",
+      "onHold": "Pausiert",
+      "cancelled": "Abgebrochen"
+    },
+    "fields": {
+      "name": "Projektname",
+      "client": "Kunde",
+      "startDate": "Startdatum",
+      "endDate": "Enddatum",
+      "budget": "Budget",
+      "status": "Status",
+      "description": "Beschreibung",
+      "team": "Team"
+    }
+  },
+  "clients": {
+    "title": "Kunden",
+    "newClient": "Neuer Kunde",
+    "allClients": "Alle Kunden",
+    "fields": {
+      "name": "Name",
+      "company": "Unternehmen",
+      "email": "E-Mail",
+      "phone": "Telefon",
+      "address": "Adresse",
+      "website": "Website",
+      "notes": "Notizen"
+    }
+  },
+  "companies": {
+    "title": "Unternehmen",
+    "newCompany": "Neues Unternehmen",
+    "allCompanies": "Alle Unternehmen",
+    "editCompany": "Unternehmen bearbeiten",
+    "deleteConfirm": "Sind Sie sicher, dass Sie das Unternehmen \"{{name}}\" löschen möchten?",
+    "noCompaniesFound": "Keine Unternehmen gefunden",
+    "searchPlaceholder": "Suche nach Name, Adresse, SIRET oder E-Mail...",
+    "columns": "Spalten",
+    "detailedInfo": "Detaillierte Unternehmensinformationen",
+    "selected": "{{count}} von {{total}} Unternehmen ausgewählt.",
+    "rowsPerPage": "Zeilen pro Seite",
+    "page": "Seite {{current}} von {{total}}",
+    "fields": {
+      "name": "Unternehmensname",
+      "company": "Unternehmen",
+      "address": "Adresse",
+      "addressComplete": "Vollständige Adresse",
+      "addressPlaceholder": "123 Beispielstraße, 10115 Berlin",
+      "addressNotProvided": "Adresse nicht angegeben",
+      "siret": "SIRET",
+      "siretPlaceholder": "12345678901234",
+      "siretNotProvided": "Nicht angegeben",
+      "email": "E-Mail",
+      "emailPlaceholder": "kontakt@firma.de",
+      "phone": "Telefon",
+      "phonePlaceholder": "+49 30 12 34 56 78",
+      "contact": "Kontakt",
+      "noContact": "Kein Kontakt",
+      "createdAt": "Erstellt am",
+      "companyNamePlaceholder": "z.B.: ACME GmbH",
+      "required": "*"
+    },
+    "actions": {
+      "save": "Speichern",
+      "close": "Schließen",
+      "modify": "Ändern",
+      "create": "Erstellen",
+      "creating": "Erstellen...",
+      "modifying": "Ändern..."
+    },
+    "validation": {
+      "nameMinLength": "Name muss mindestens 2 Zeichen enthalten",
+      "emailInvalid": "Ungültige E-Mail-Adresse"
+    }
+  },
+  "services": {
+    "title": "Dienstleistungen",
+    "newService": "Neue Dienstleistung",
+    "editService": "Dienstleistung bearbeiten",
+    "deleteConfirm": "Sind Sie sicher, dass Sie die Dienstleistung \"{{name}}\" löschen möchten?",
+    "noServicesFound": "Keine Dienstleistungen gefunden",
+    "searchPlaceholder": "Suche nach Name, Unternehmen oder Adresse...",
+    "columns": "Spalten",
+    "noContact": "Kein Kontakt",
+    "fields": {
+      "name": "Dienstleistungsname",
+      "namePlaceholder": "Dienstleistungsname",
+      "company": "Unternehmen",
+      "companySelect": "Unternehmen auswählen",
+      "companyRequired": "Bitte wählen Sie ein Unternehmen aus",
+      "address": "Adresse",
+      "addressPlaceholder": "Adresse der Dienstleistung",
+      "addressNotProvided": "Adresse nicht angegeben",
+      "phone": "Telefon",
+      "phonePlaceholder": "030 12 34 56 78",
+      "createdAt": "Erstellt am",
+      "required": "*"
+    },
+    "actions": {
+      "create": "Erstellen",
+      "modify": "Ändern",
+      "creating": "Erstellen...",
+      "modifying": "Ändern...",
+      "save": "Speichern",
+      "close": "Schließen"
+    },
+    "validation": {
+      "nameMinLength": "Name muss mindestens 2 Zeichen enthalten",
+      "companyRequired": "Bitte wählen Sie ein Unternehmen aus"
+    }
+  },
+  "contacts": {
+    "title": "Kontakte",
+    "newContact": "Neuer Kontakt",
+    "editContact": "Kontakt bearbeiten",
+    "deleteConfirm": "Sind Sie sicher, dass Sie den Kontakt \"{{firstName}} {{lastName}}\" löschen möchten?",
+    "noContactsFound": "Keine Kontakte gefunden",
+    "searchPlaceholder": "Suche nach Name, Vorname oder E-Mail...",
+    "columns": "Spalten",
+    "company": "Unternehmen",
+    "detailedInfo": "Detaillierte Kontaktinformationen",
+    "selected": "{{count}} von {{total}} Kontakt(e) ausgewählt.",
+    "rowsPerPage": "Zeilen pro Seite",
+    "page": "Seite {{current}} von {{total}}",
+    "fields": {
+      "firstName": "Vorname",
+      "firstNamePlaceholder": "Vorname",
+      "lastName": "Nachname",
+      "lastNamePlaceholder": "Nachname",
+      "fullName": "Vollständiger Name",
+      "service": "Dienstleistung",
+      "serviceSelect": "Dienstleistung auswählen",
+      "serviceRequired": "Bitte wählen Sie eine Dienstleistung aus",
+      "email": "E-Mail",
+      "emailPlaceholder": "kontakt@unternehmen.de",
+      "phone": "Telefon",
+      "phonePlaceholder": "030 12 34 56 78",
+      "contact": "Kontakt",
+      "noContact": "Kein Kontakt",
+      "createdAt": "Erstellt am",
+      "company": "Unternehmen",
+      "required": "*"
+    },
+    "actions": {
+      "create": "Erstellen",
+      "modify": "Ändern",
+      "creating": "Erstellen...",
+      "modifying": "Ändern..."
+    },
+    "validation": {
+      "firstNameMinLength": "Vorname muss mindestens 2 Zeichen enthalten",
+      "lastNameMinLength": "Nachname muss mindestens 2 Zeichen enthalten",
+      "emailInvalid": "Ungültige E-Mail-Adresse",
+      "serviceRequired": "Bitte wählen Sie eine Dienstleistung aus"
+    }
+  },
+  "calendar": {
+    "title": "Kalender",
+    "today": "Heute",
+    "month": "Monat",
+    "week": "Woche",
+    "day": "Tag",
+    "newEvent": "Neues Ereignis",
+    "events": "Ereignisse",
+    "tasks": "Aufgaben"
+  },
+  "tasks": {
+    "title": "Aufgaben",
+    "newTask": "Neue Aufgabe",
+    "allTasks": "Alle Aufgaben",
+    "myTasks": "Meine Aufgaben",
+    "status": {
+      "todo": "Zu erledigen",
+      "inProgress": "In Bearbeitung",
+      "done": "Abgeschlossen",
+      "cancelled": "Abgebrochen"
+    },
+    "priority": {
+      "low": "Niedrig",
+      "medium": "Mittel",
+      "high": "Hoch",
+      "urgent": "Dringend"
+    },
+    "fields": {
+      "title": "Titel",
+      "description": "Beschreibung",
+      "assignee": "Zugewiesen an",
+      "dueDate": "Fälligkeitsdatum",
+      "priority": "Priorität",
+      "status": "Status",
+      "project": "Projekt",
+      "tags": "Tags"
+    }
+  },
+  "messages": {
+    "success": {
+      "saved": "Erfolgreich gespeichert",
+      "deleted": "Erfolgreich gelöscht",
+      "updated": "Erfolgreich aktualisiert",
+      "created": "Erfolgreich erstellt",
+      "sent": "Erfolgreich gesendet"
+    },
+    "error": {
+      "general": "Ein Fehler ist aufgetreten",
+      "network": "Netzwerkfehler",
+      "validation": "Validierungsfehler",
+      "unauthorized": "Nicht berechtigt",
+      "notFound": "Nicht gefunden"
+    },
+    "confirm": {
+      "delete": "Sind Sie sicher, dass Sie dieses Element löschen möchten?",
+      "unsavedChanges": "Sie haben ungespeicherte Änderungen. Möchten Sie fortfahren?"
+    }
+  }
+}

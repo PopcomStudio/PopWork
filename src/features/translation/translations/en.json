@@ -356,6 +356,133 @@
       "notes": "Notes"
     }
   },
+  "companies": {
+    "title": "Companies",
+    "newCompany": "New Company",
+    "allCompanies": "All Companies",
+    "editCompany": "Edit Company",
+    "deleteConfirm": "Are you sure you want to delete the company \"{{name}}\"?",
+    "noCompaniesFound": "No companies found",
+    "searchPlaceholder": "Search by name, address, SIRET or email...",
+    "columns": "Columns",
+    "detailedInfo": "Detailed company information",
+    "selected": "{{count}} of {{total}} company(ies) selected.",
+    "rowsPerPage": "Rows per page",
+    "page": "Page {{current}} of {{total}}",
+    "fields": {
+      "name": "Company name",
+      "company": "Company",
+      "address": "Address",
+      "addressComplete": "Complete address",
+      "addressPlaceholder": "123 Example Street, 75001 Paris",
+      "addressNotProvided": "Address not provided",
+      "siret": "SIRET",
+      "siretPlaceholder": "12345678901234",
+      "siretNotProvided": "Not provided",
+      "email": "Email",
+      "emailPlaceholder": "contact@acme.com",
+      "phone": "Phone",
+      "phonePlaceholder": "+33 1 23 45 67 89",
+      "contact": "Contact",
+      "noContact": "No contact",
+      "createdAt": "Created on",
+      "companyNamePlaceholder": "Ex: Acme Corporation",
+      "required": "*"
+    },
+    "actions": {
+      "save": "Save",
+      "close": "Close",
+      "modify": "Modify",
+      "create": "Create",
+      "creating": "Creating...",
+      "modifying": "Modifying..."
+    },
+    "validation": {
+      "nameMinLength": "Name must contain at least 2 characters",
+      "emailInvalid": "Invalid email address"
+    }
+  },
+  "services": {
+    "title": "Services",
+    "newService": "New Service",
+    "editService": "Edit Service",
+    "deleteConfirm": "Are you sure you want to delete the service \"{{name}}\"?",
+    "noServicesFound": "No services found",
+    "searchPlaceholder": "Search by name, company or address...",
+    "columns": "Columns",
+    "noContact": "No contact",
+    "fields": {
+      "name": "Service name",
+      "namePlaceholder": "Service name",
+      "company": "Company",
+      "companySelect": "Select a company",
+      "companyRequired": "Please select a company",
+      "address": "Address",
+      "addressPlaceholder": "Service address",
+      "addressNotProvided": "Address not provided",
+      "phone": "Phone",
+      "phonePlaceholder": "01 23 45 67 89",
+      "createdAt": "Created on",
+      "required": "*"
+    },
+    "actions": {
+      "create": "Create",
+      "modify": "Modify",
+      "creating": "Creating...",
+      "modifying": "Modifying...",
+      "save": "Save",
+      "close": "Close"
+    },
+    "validation": {
+      "nameMinLength": "Name must contain at least 2 characters",
+      "companyRequired": "Please select a company"
+    }
+  },
+  "contacts": {
+    "title": "Contacts",
+    "newContact": "New Contact",
+    "editContact": "Edit Contact",
+    "deleteConfirm": "Are you sure you want to delete the contact \"{{firstName}} {{lastName}}\"?",
+    "noContactsFound": "No contacts found",
+    "searchPlaceholder": "Search by first name, last name or email...",
+    "columns": "Columns",
+    "company": "Company",
+    "detailedInfo": "Detailed contact information",
+    "selected": "{{count}} of {{total}} contact(s) selected.",
+    "rowsPerPage": "Rows per page",
+    "page": "Page {{current}} of {{total}}",
+    "fields": {
+      "firstName": "First name",
+      "firstNamePlaceholder": "First name",
+      "lastName": "Last name",
+      "lastNamePlaceholder": "Last name",
+      "fullName": "Full name",
+      "service": "Service",
+      "serviceSelect": "Select a service",
+      "serviceRequired": "Please select a service",
+      "email": "Email",
+      "emailPlaceholder": "contact@company.com",
+      "phone": "Phone",
+      "phonePlaceholder": "01 23 45 67 89",
+      "contact": "Contact",
+      "noContact": "No contact",
+      "createdAt": "Created on",
+      "company": "Company",
+      "required": "*"
+    },
+    "actions": {
+      "create": "Create",
+      "modify": "Modify",
+      "creating": "Creating...",
+      "modifying": "Modifying..."
+    },
+    "validation": {
+      "firstNameMinLength": "First name must contain at least 2 characters",
+      "lastNameMinLength": "Last name must contain at least 2 characters",
+      "emailInvalid": "Invalid email address",
+      "serviceRequired": "Please select a service"
+    }
+  },
   "calendar": {
     "title": "Calendar",
     "today": "Today",
