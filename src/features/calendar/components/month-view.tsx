@@ -109,7 +109,7 @@ export function MonthView({
             <div
               key={day}
               className={`py-2 text-center text-sm ${
-                isWorkingDay ? 'text-muted-foreground/70' : 'text-muted-foreground/40 bg-muted/30 dark:bg-muted/10'
+                isWorkingDay ? 'text-muted-foreground/70' : 'text-muted-foreground/50 bg-muted/20 dark:bg-muted/30'
               }`}
             >
               {day}
@@ -152,8 +152,8 @@ export function MonthView({
               return (
                 <div
                   key={day.toString()}
-                  className={`group border-border/70 data-outside-cell:bg-muted/25 data-outside-cell:text-muted-foreground/70 border-r border-b last:border-r-0 ${
-                    !isWorkingDay ? 'bg-muted/30 dark:bg-muted/10' : ''
+                  className={`group border-border/70 border-r border-b last:border-r-0 ${
+                    !isWorkingDay ? 'bg-muted/20 dark:bg-muted/30' : ''
                   }`}
                   data-today={isToday(day) || undefined}
                   data-outside-cell={!isCurrentMonth || undefined}
@@ -169,7 +169,7 @@ export function MonthView({
                   >
                     <div className={`group-data-today:bg-primary group-data-today:text-primary-foreground mt-1 inline-flex size-6 items-center justify-center rounded-full text-sm ${
                       !isWorkingDay ? 'text-muted-foreground' : ''
-                    }`}>
+                    } ${!isCurrentMonth ? 'text-muted-foreground/50' : ''}`}>
                       {format(day, "d")}
                     </div>
                     <div

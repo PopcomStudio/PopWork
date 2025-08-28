@@ -9,7 +9,6 @@ import {
   Folder,
   FolderOpen,
   History,
-  Sparkles,
   Bell,
   Settings,
   Palmtree,
@@ -18,6 +17,7 @@ import {
   Phone,
   UserCheck,
 } from "lucide-react"
+import { Logo } from "@/components/logo"
 
 import { useAuth } from "@/features/auth/hooks/use-auth"
 import { useProfile } from "@/features/settings/hooks/use-profile"
@@ -149,11 +149,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              className="data-[slot=sidebar-menu-button]:!p-1.5"
+              className="data-[slot=sidebar-menu-button]:!p-2"
             >
               <a href="/dashboard" aria-label="Aller au tableau de bord PopWork">
-                <Sparkles className="!size-5" aria-hidden="true" />
-                <span className="text-base font-semibold">PopWork</span>
+                <Logo className="!h-7" />
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
