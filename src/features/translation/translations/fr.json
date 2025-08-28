@@ -51,7 +51,7 @@
     }
   },
   "navigation": {
-    "dashboard": "Dashboard",
+    "dashboard": "Tableau de bord",
     "projects": "Projets & Tâches", 
     "clients": "Clients",
     "calendar": "Calendrier",
@@ -62,7 +62,7 @@
     "admin": "Administration",
     "help": "Aide",
     "logout": "Déconnexion",
-    "timeTracking": "Time Tracking",
+    "timeTracking": "Suivi du temps",
     "invoicing": "Facturation",
     "team": "Équipe",
     "companies": "Entreprises",

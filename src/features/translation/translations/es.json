@@ -51,7 +51,7 @@
     }
   },
   "navigation": {
-    "dashboard": "Dashboard",
+    "dashboard": "Panel de Control",
     "projects": "Proyectos y Tareas",
     "clients": "Clientes",
     "calendar": "Calendario",
@@ -210,13 +210,174 @@
   "settings": {
     "title": "Configuración",
     "sections": {
+      "account": {
+        "title": "Cuenta",
+        "subtitle": "Gestionar configuración y preferencias de la cuenta",
+        "profile": {
+          "title": "Mi perfil",
+          "firstName": "Nombre",
+          "lastName": "Apellido",
+          "email": "Email",
+          "changeImage": "Cambiar imagen",
+          "removeImage": "Eliminar imagen",
+          "imageRequirements": "Admitimos PNG, JPEG y WebP de menos de 10MB.",
+          "uploading": "Subiendo...",
+          "enterFirstName": "Ingrese su nombre",
+          "enterLastName": "Ingrese su apellido"
+        },
+        "security": {
+          "title": "Seguridad de la cuenta",
+          "password": "Contraseña",
+          "changeEmail": "Cambiar email",
+          "changePassword": "Cambiar contraseña",
+          "twoFactor": "Verificación en 2 pasos",
+          "twoFactorDescription": "Añade una capa adicional de seguridad a tu cuenta al iniciar sesión."
+        },
+        "management": {
+          "title": "Gestión de cuenta",
+          "logoutAllDevices": "Cerrar sesión en todos los dispositivos",
+          "logoutAllDevicesDescription": "Cerrar sesión de todas las otras sesiones activas en otros dispositivos excepto este.",
+          "deleteAccount": "Eliminar mi cuenta",
+          "deleteAccountDescription": "Eliminar permanentemente la cuenta y quitar acceso a todos los espacios de trabajo.",
+          "logout": "Cerrar sesión",
+          "delete": "Eliminar cuenta"
+        }
+      },
+      "notifications": {
+        "title": "Notificaciones",
+        "subtitle": "Configurar cómo recibir notificaciones",
+        "email": {
+          "title": "Notificaciones por email",
+          "description": "Recibir actualizaciones por email sobre proyectos y tareas"
+        },
+        "push": {
+          "title": "Notificaciones push",
+          "description": "Recibir notificaciones push en tu dispositivo"
+        },
+        "taskReminders": {
+          "title": "Recordatorios de tareas",
+          "description": "Recibir recordatorios de vencimientos de tareas próximas"
+        },
+        "weeklyReports": {
+          "title": "Informes semanales",
+          "description": "Recibir informes de productividad semanales"
+        }
+      },
       "language": {
         "title": "Idioma y región",
-        "subtitle": "Personalizar configuración de idioma y región"
+        "subtitle": "Personalizar configuración de idioma y región",
+        "language": {
+          "title": "Idioma",
+          "description": "Seleccionar idioma preferido para la interfaz"
+        },
+        "timezone": {
+          "title": "Zona horaria",
+          "description": "Establecer tu zona horaria local"
+        },
+        "dateFormat": {
+          "title": "Formato de fecha",
+          "description": "Elegir el formato de visualización de fechas"
+        },
+        "timeFormat": {
+          "title": "Formato de hora",
+          "description": "Elegir entre formato de 12 o 24 horas"
+        },
+        "calendar": {
+          "title": "Configuración del calendario",
+          "weekStart": "Primer día de la semana",
+          "weekStartDescription": "Definir qué día comienza la semana",
+          "workingDays": "Días laborables",
+          "workingDaysDescription": "Número de días laborables en la semana",
+          "fiveDays": "5 días (Lun - Vie)",
+          "sixDays": "6 días (Lun - Sáb)",
+          "sevenDays": "7 días (todos los días)"
+        },
+        "translation": {
+          "title": "Traducción automática",
+          "subtitle": "Configuración de traducción de contenido",
+          "autoTranslate": {
+            "title": "Traducción automática",
+            "description": "Traducir automáticamente el contenido a tu idioma"
+          },
+          "showOriginal": {
+            "title": "Mostrar texto original",
+            "description": "Mostrar texto original en paralelo a la traducción"
+          },
+          "translationService": {
+            "title": "Servicio de traducción",
+            "description": "Elegir el servicio de traducción a utilizar"
+          },
+          "excludedDomains": {
+            "title": "Dominios excluidos",
+            "description": "No traducir contenido de estos dominios",
+            "placeholder": "Ejemplo: Código, nombres propios, siglas"
+          }
+        }
+      },
+      "general": {
+        "title": "General",
+        "subtitle": "Configuración general del espacio de trabajo",
+        "workspaceName": {
+          "title": "Nombre del espacio de trabajo"
+        },
+        "theme": {
+          "title": "Tema de la aplicación",
+          "description": "Elegir la apariencia de la aplicación",
+          "light": "Claro",
+          "dark": "Oscuro",
+          "system": "Sistema"
+        },
+        "darkMode": {
+          "title": "Modo oscuro",
+          "description": "Usar el tema oscuro en toda la aplicación"
+        },
+        "compactMode": {
+          "title": "Modo compacto",
+          "description": "Usar un diseño más compacto para mostrar más contenido"
+        }
+      },
+      "members": {
+        "title": "Miembros",
+        "subtitle": "Gestionar miembros del equipo y permisos",
+        "teamMembers": {
+          "title": "Miembros del equipo",
+          "description": "Invitar y gestionar miembros de tu equipo"
+        },
+        "inviteMember": "Invitar miembro",
+        "owner": "Propietario",
+        "admin": "Administrador",
+        "member": "Miembro"
+      },
+      "billing": {
+        "title": "Facturación",
+        "subtitle": "Gestionar suscripción e información de facturación",
+        "currentPlan": {
+          "title": "Plan actual",
+          "professional": "Profesional",
+          "price": "€29/mes"
+        },
+        "changePlan": "Cambiar plan",
+        "paymentMethod": {
+          "title": "Método de pago"
+        },
+        "update": "Actualizar"
       }
     },
+    "categories": {
+      "general": "Configuración general",
+      "workspace": "Configuración del espacio de trabajo"
+    },
     "sidebar": {
-      "languageRegion": "Idioma y región"
+      "account": "Cuenta",
+      "notifications": "Notificaciones",
+      "languageRegion": "Idioma y región",
+      "general": "General",
+      "members": "Miembros",
+      "billing": "Facturación"
+    },
+    "messages": {
+      "avatarUpdated": "¡Avatar actualizado con éxito!",
+      "avatarRemoved": "¡Avatar eliminado con éxito!"
     }
   },
   "auth": {

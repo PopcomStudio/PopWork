@@ -43,34 +43,12 @@ const translations: Record<Language, TranslationData> = {
 
 
 export function TranslationProvider({ children }: { children: ReactNode }) {
-  // Use lazy initialization to read from localStorage only once on mount
-  const [language, setLanguageState] = useState<Language>(() => {
-    if (typeof window === 'undefined') return "fr"
-    const saved = localStorage.getItem("language-preference")
-    return (saved && ["en", "fr", "de", "es", "it", "pt"].includes(saved)) 
-      ? saved as Language 
-      : "fr"
-  })
-  
-  const [timeFormat, setTimeFormatState] = useState<TimeFormat>(() => {
-    if (typeof window === 'undefined') return "24h"
-    const saved = localStorage.getItem("time-format-preference")
-    return (saved === "12h" || saved === "24h") ? saved as TimeFormat : "24h"
-  })
-  
-  const [weekStartDay, setWeekStartDayState] = useState<WeekStartDay>(() => {
-    if (typeof window === 'undefined') return "monday"
-    const saved = localStorage.getItem("week-start-preference")
-    return (saved === "monday" || saved === "sunday" || saved === "saturday")
-      ? saved as WeekStartDay
-      : "monday"
-  })
-  
-  const [workingDays, setWorkingDaysState] = useState<number>(() => {
-    if (typeof window === 'undefined') return 5
-    const saved = localStorage.getItem("working-days-preference")
-    return (saved && ["5", "6", "7"].includes(saved)) ? parseInt(saved) : 5
-  })
+  // Initialize with default values for both server and client to avoid hydration mismatch
+  const [language, setLanguageState] = useState<Language>("fr")
+  const [timeFormat, setTimeFormatState] = useState<TimeFormat>("24h")
+  const [weekStartDay, setWeekStartDayState] = useState<WeekStartDay>("monday")
+  const [workingDays, setWorkingDaysState] = useState<number>(5)
+  const [isHydrated, setIsHydrated] = useState(false)
   
   const supabase = createClientComponentClient()
 
@@ -82,6 +60,33 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
     { code: "it" as Language, name: "Italiano" },
     { code: "pt" as Language, name: "Português" }
   ]
+
+  // Load preferences from localStorage after hydration
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedLang = localStorage.getItem("language-preference")
+      if (savedLang && ["en", "fr", "de", "es", "it", "pt"].includes(savedLang)) {
+        setLanguageState(savedLang as Language)
+      }
+      
+      const savedTimeFormat = localStorage.getItem("time-format-preference")
+      if (savedTimeFormat === "12h" || savedTimeFormat === "24h") {
+        setTimeFormatState(savedTimeFormat as TimeFormat)
+      }
+      
+      const savedWeekStart = localStorage.getItem("week-start-preference")
+      if (savedWeekStart === "monday" || savedWeekStart === "sunday" || savedWeekStart === "saturday") {
+        setWeekStartDayState(savedWeekStart as WeekStartDay)
+      }
+      
+      const savedWorkingDays = localStorage.getItem("working-days-preference")
+      if (savedWorkingDays && ["5", "6", "7"].includes(savedWorkingDays)) {
+        setWorkingDaysState(parseInt(savedWorkingDays))
+      }
+      
+      setIsHydrated(true)
+    }
+  }, [])
 
   // Sync with database preferences (but don't override localStorage if no DB value)
   useEffect(() => {
