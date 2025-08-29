@@ -188,12 +188,31 @@ export interface Document {
 
 export interface Leave {
   id: string
-  userId: string
-  startDate: string
-  endDate: string
+  user_id: string
+  start_date: string
+  end_date: string
+  type: 'vacation' | 'sick' | 'other'
   reason: string
   status: 'pending' | 'approved' | 'rejected'
-  createdAt: string
+  approved_by?: string
+  approved_at?: string
+  rejected_reason?: string
+  days_count: number
+  attachment_url?: string
+  attachment_name?: string
+  created_at: string
+  updated_at: string
+}
+
+export interface LeaveBalance {
+  id: string
+  user_id: string
+  year: number
+  paid_leave_days: number
+  used_paid_leave_days: number
+  sick_days: number
+  used_sick_days: number
+  updated_at: string
 }
 
 export interface MagicLink {
