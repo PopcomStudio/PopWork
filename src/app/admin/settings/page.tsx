@@ -1,5 +1,5 @@
-import { SystemSettings } from "@/features/admin/components/system-settings"
+import { AdminSettingsLayout } from "@/features/admin/components/admin-settings-layout"
 
 export default function AdminSettingsPage() {
-  return <SystemSettings />
+  return <AdminSettingsLayout />
 }
