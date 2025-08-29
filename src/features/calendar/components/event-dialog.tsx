@@ -351,7 +351,7 @@ export function EventDialog({ event, isOpen, onClose, onSave, onDelete }: EventD
                     {isCalendarOpen && (
                       <div 
                         ref={calendarRef}
-                        className="absolute top-full left-0 mt-1 z-[9999] bg-white border rounded-md shadow-lg"
+                        className="absolute top-full left-0 mt-1 z-[9999] bg-background border rounded-md shadow-lg"
                       >
                         <RangeCalendar
                           className="rounded-md p-2"
