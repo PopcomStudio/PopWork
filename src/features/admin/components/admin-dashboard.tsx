@@ -4,23 +4,11 @@ import { useEffect, useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Icons } from '@/components/ui/icons'
-import { Users, Briefcase, FileText, Activity, CheckCircle, AlertCircle } from 'lucide-react'
+import { Activity, CheckCircle, AlertCircle } from 'lucide-react'
 import { createClientComponentClient } from '@/lib/supabase'
 import { ProtectedRoute } from '@/features/auth/components/protected-route'
-import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-  PieChart,
-  Pie,
-  Cell
-} from 'recharts'
+import { ChartAreaInteractive } from '@/components/chart-area-interactive'
+import { SectionCards } from '@/components/section-cards'
 
 interface DashboardMetrics {
   users: {
@@ -56,7 +44,6 @@ interface DashboardMetrics {
   }
 }
 
-const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899']
 
 export function AdminDashboard() {
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null)
@@ -275,147 +262,51 @@ export function AdminDashboard() {
           </p>
         </div>
 
-        {/* Key Metrics Cards */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Utilisateurs actifs</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{metrics.users.active}</div>
-              <p className="text-xs text-muted-foreground">
-                {metrics.users.new} nouveaux ce mois
-              </p>
-            </CardContent>
-          </Card>
+        {/* Cartes métriques avec le même style que le dashboard utilisateur */}
+        <SectionCards stats={{
+          totalProjects: metrics.projects.total,
+          activeProjects: metrics.projects.active,
+          totalTasks: metrics.tasks.total,
+          completedTasks: metrics.tasks.completed,
+          totalRevenue: 25000, // Valeur simulée pour l'admin
+          pendingInvoices: metrics.projects.overdue
+        }} />
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Projets actifs</CardTitle>
-              <Briefcase className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{metrics.projects.active}</div>
-              <p className="text-xs text-muted-foreground">
-                {metrics.projects.overdue > 0 && (
-                  <span className="text-destructive">{metrics.projects.overdue} en retard</span>
-                )}
-                {metrics.projects.overdue === 0 && "Tous dans les délais"}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Tâches complétées</CardTitle>
-              <CheckCircle className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{metrics.tasks.completed}</div>
-              <p className="text-xs text-muted-foreground">
-                {metrics.performance.taskCompletionRate}% taux de complétion
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Entreprises actives</CardTitle>
-              <FileText className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{metrics.companies.active}</div>
-              <p className="text-xs text-muted-foreground">
-                Sur {metrics.companies.total} au total
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-          {/* Activity Chart */}
-          <Card className="col-span-4">
-            <CardHeader>
-              <CardTitle>Activité de la semaine</CardTitle>
-              <CardDescription>Nombre d&apos;actions par jour</CardDescription>
-            </CardHeader>
-            <CardContent className="pl-2">
-              <ResponsiveContainer width="100%" height={300}>
-                <AreaChart data={metrics.activity.dailyStats}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <Tooltip />
-                  <Area 
-                    type="monotone" 
-                    dataKey="actions" 
-                    stroke="#3b82f6" 
-                    fill="#3b82f6" 
-                    fillOpacity={0.3}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          {/* User Distribution */}
-          <Card className="col-span-3">
-            <CardHeader>
-              <CardTitle>Répartition des utilisateurs</CardTitle>
-              <CardDescription>Par rôle</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={metrics.users.byRole}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ role, count }) => `${role}: ${count}`}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="count"
-                  >
-                    {metrics.users.byRole.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+        {/* Graphique principal avec la même interface que le dashboard utilisateur */}
+        <div className="px-0">
+          <ChartAreaInteractive />
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
-          {/* Task Status */}
+          {/* Performance Overview */}
           <Card>
             <CardHeader>
-              <CardTitle>État des tâches</CardTitle>
-              <CardDescription>Répartition globale</CardDescription>
+              <CardTitle>Aperçu des performances</CardTitle>
+              <CardDescription>Métriques système clés</CardDescription>
             </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={250}>
-                <BarChart 
-                  data={[
-                    { status: 'En attente', count: metrics.tasks.pending },
-                    { status: 'En cours', count: metrics.tasks.inProgress },
-                    { status: 'Terminées', count: metrics.tasks.completed }
-                  ]}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="status" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="count" fill="#3b82f6" />
-                </BarChart>
-              </ResponsiveContainer>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">Taux de complétion des tâches</p>
+                  <p className="text-2xl font-bold">{metrics.performance.taskCompletionRate}%</p>
+                </div>
+                <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
+                  <CheckCircle className="h-4 w-4 text-muted-foreground" />
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">Durée moyenne des projets</p>
+                  <p className="text-2xl font-bold">{metrics.performance.avgProjectDuration} jours</p>
+                </div>
+                <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
+                  <Activity className="h-4 w-4 text-muted-foreground" />
+                </div>
+              </div>
             </CardContent>
           </Card>
 
-          {/* Top Performers */}
+          {/* Top Contributors */}
           <Card>
             <CardHeader>
               <CardTitle>Top contributeurs</CardTitle>
@@ -425,9 +316,11 @@ export function AdminDashboard() {
               <div className="space-y-4">
                 {metrics.performance.userProductivity.map((user, index) => (
                   <div key={index} className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sm font-medium">{index + 1}.</span>
-                      <span className="text-sm">{user.user}</span>
+                    <div className="flex items-center space-x-3">
+                      <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                        <span className="text-sm font-medium">{index + 1}</span>
+                      </div>
+                      <span className="text-sm font-medium">{user.user}</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <span className="text-sm font-bold">{user.tasks}</span>
