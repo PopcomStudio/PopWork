@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { useProjects } from "@/features/projects/hooks/use-projects";
 import { CmdKNavigation } from "@/components/cmd-k-navigation";
+import { NotificationBell } from "@/features/notifications/components/NotificationBell";
 
 const pageNames: Record<string, string> = {
 	"/dashboard": "Dashboard",
@@ -87,6 +88,7 @@ export function SiteHeader() {
 				)}
 				<div className="ml-auto flex items-center gap-2">
 					<CmdKNavigation />
+					<NotificationBell />
 					<Button variant="ghost" asChild size="sm" className="hidden sm:flex">
 						<a
 							href="https://github.com/Kwickos/PopWork"

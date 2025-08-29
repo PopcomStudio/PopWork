@@ -4,6 +4,7 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { ProfileProvider } from "@/features/settings/contexts/profile-context";
 import { TranslationProvider } from "@/features/translation/contexts/translation-context";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -49,6 +50,7 @@ export default function RootLayout({
             <TranslationProvider>
               <ProfileProvider>
                 {children}
+                <Toaster />
               </ProfileProvider>
             </TranslationProvider>
           </ThemeProvider>
