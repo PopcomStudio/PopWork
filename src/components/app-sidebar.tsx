@@ -90,6 +90,11 @@ const getStaticData = (t: (key: string) => string) => ({
   ],
   navSecondary: [
     {
+      title: t("navigation.notifications"),
+      url: "/notifications",
+      icon: Bell,
+    },
+    {
       title: t("navigation.history"),
       url: "/audit-log",
       icon: History,

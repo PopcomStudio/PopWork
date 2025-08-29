@@ -143,7 +143,7 @@ This pattern ensures pages integrate seamlessly with the existing app layout rat
 - **Loading states** with skeleton components for better UX
 - **Error handling** with Alert components
 - **Form validation** using Zod schemas with React Hook Form
-- **Icons** from Tabler Icons React
+- **Icons** from Lucide React - ALWAYS use lucide-react icons, NEVER use @tabler/icons-react
 
 ### Database Integration
 - All database types are centrally defined in `src/shared/types/database.ts`

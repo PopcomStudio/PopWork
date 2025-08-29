@@ -158,12 +158,27 @@ export interface Invoice {
 
 export interface Notification {
   id: string
-  userId: string
+  user_id: string
   type: string
   title: string
   message: string
+  data?: Record<string, any>
   read: boolean
-  createdAt: string
+  read_at?: string
+  created_at: string
+  updated_at: string
+}
+
+export interface NotificationPreferences {
+  id: string
+  user_id: string
+  email_enabled: boolean
+  push_enabled: boolean
+  leave_requests: boolean
+  project_updates: boolean
+  task_assignments: boolean
+  created_at: string
+  updated_at: string
 }
 
 export interface ActivityLog {
