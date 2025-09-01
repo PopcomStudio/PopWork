@@ -74,7 +74,7 @@
     "resources": "Recursos"
   },
   "search": {
-    "quickSearch": "Pesquisa rápida...",
+    "quickSearch": "Pesquisar",
     "search": "Pesquisar...",
     "placeholder": "Pesquisar uma página ou projeto...",
     "noResults": "Nenhum resultado encontrado.",

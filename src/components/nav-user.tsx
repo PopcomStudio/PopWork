@@ -3,11 +3,10 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import {
-  CreditCard,
   MoreVertical,
   LogOut,
-  Bell,
-  UserCircle,
+  Settings,
+  History,
 } from "lucide-react"
 
 import {
@@ -110,17 +109,13 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <UserCircle />
-                Profil
+              <DropdownMenuItem onClick={() => router.push("/settings")}>
+                <Settings />
+                Paramètres
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard />
-                Facturation
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Bell />
-                Notifications
+              <DropdownMenuItem onClick={() => router.push("/audit-log")}>
+                <History />
+                Historique
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />

@@ -95,13 +95,6 @@ export function CalendarManagement() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">Calendrier</h1>
-          <p className="text-muted-foreground">
-            Chargement de vos tâches et échéances...
-          </p>
-        </div>
-        
         <div className="space-y-4">
           <Skeleton className="h-12 w-full" />
           <Skeleton className="h-96 w-full" />
@@ -113,13 +106,6 @@ export function CalendarManagement() {
   if (error) {
     return (
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">Calendrier</h1>
-          <p className="text-muted-foreground">
-            Une erreur est survenue lors du chargement
-          </p>
-        </div>
-        
         <Alert variant="destructive">
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription className="flex items-center justify-between">

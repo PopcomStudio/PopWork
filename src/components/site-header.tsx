@@ -2,7 +2,6 @@
 
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
@@ -14,8 +13,6 @@ import {
 	BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { useProjects } from "@/features/projects/hooks/use-projects";
-import { CmdKNavigation } from "@/components/cmd-k-navigation";
-import { NotificationBell } from "@/features/notifications/components/NotificationBell";
 
 const pageNames: Record<string, string> = {
 	"/dashboard": "Dashboard",
@@ -86,20 +83,7 @@ export function SiteHeader() {
 				) : (
 					<h1 className="text-base font-medium">{pageName}</h1>
 				)}
-				<div className="ml-auto flex items-center gap-2">
-					<CmdKNavigation />
-					<NotificationBell />
-					<Button variant="ghost" asChild size="sm" className="hidden sm:flex">
-						<a
-							href="https://github.com/Kwickos/PopWork"
-							rel="noopener noreferrer"
-							target="_blank"
-							className="dark:text-foreground"
-						>
-							GitHub
-						</a>
-					</Button>
-				</div>
+				<div className="ml-auto"></div>
 			</div>
 		</header>
 	);

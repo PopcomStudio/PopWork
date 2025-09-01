@@ -194,7 +194,9 @@ export function ServicesDataTable({
       cell: ({ row }) => (
         <div className="max-w-48">
           {row.original.address ? (
-            <span className="text-sm">{row.original.address}</span>
+            <span className="text-sm truncate block" title={row.original.address}>
+              {row.original.address}
+            </span>
           ) : (
             <span className="text-muted-foreground italic text-sm">
               {t('services.fields.addressNotProvided')}
