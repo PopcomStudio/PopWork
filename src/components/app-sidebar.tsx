@@ -8,9 +8,6 @@ import {
   FileText,
   Folder,
   FolderOpen,
-  History,
-  Bell,
-  Settings,
   Palmtree,
   Users,
   Building,
@@ -25,7 +22,6 @@ import { useTranslation } from "@/features/translation/hooks/use-translation"
 
 import { NavDocuments } from "@/components/nav-documents"
 import { NavMain } from "@/components/nav-main"
-import { NavSecondary } from "@/components/nav-secondary"
 import { NavUser } from "@/components/nav-user"
 import {
   Sidebar,
@@ -88,23 +84,7 @@ const getStaticData = (t: (key: string) => string) => ({
       icon: UserCheck,
     },
   ],
-  navSecondary: [
-    {
-      title: t("navigation.notifications"),
-      url: "/notifications",
-      icon: Bell,
-    },
-    {
-      title: t("navigation.history"),
-      url: "/audit-log",
-      icon: History,
-    },
-    {
-      title: t("navigation.settings"),
-      url: "/settings",
-      icon: Settings,
-    },
-  ],
+  navSecondary: [],
   documents: [
     {
       name: t("navigation.documents"),
@@ -115,11 +95,6 @@ const getStaticData = (t: (key: string) => string) => ({
       name: t("navigation.leaves"),
       url: "/leaves",
       icon: Palmtree,
-    },
-    {
-      name: t("navigation.notifications"),
-      url: "/notifications",
-      icon: Bell,
     },
   ],
 })
@@ -167,7 +142,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={getStaticData(t).navMain} />
         <NavDocuments items={getStaticData(t).navClients} title={t("navigation.clients")} showActions={false} />
         <NavDocuments items={getStaticData(t).documents} title={t("navigation.resources")} showActions={false} />
-        <NavSecondary items={getStaticData(t).navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
         {!loading && <NavUser user={userData} />}

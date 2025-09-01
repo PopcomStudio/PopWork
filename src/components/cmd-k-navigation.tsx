@@ -119,13 +119,15 @@ export function CmdKNavigation() {
 		<>
 			<button
 				onClick={() => setOpen(true)}
-				className="inline-flex items-center gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+				className="inline-flex items-center justify-start gap-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground px-3 py-2 text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-left w-full min-w-8 duration-200 ease-linear"
 			>
-				<Search className="h-4 w-4" />
-				<span className="hidden sm:inline">{t('search.quickSearch')}</span>
-				<span className="inline sm:hidden">{t('search.search')}</span>
-				<kbd className="pointer-events-none ml-auto hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
-					<span className="text-xs">⌘</span>K
+				<Search className="h-3.5 w-3.5" />
+				<span className="hidden sm:inline truncate">{t('search.quickSearch')}</span>
+				<span className="inline sm:hidden truncate">{t('search.search')}</span>
+				<kbd className="pointer-events-none ml-auto hidden h-5 select-none items-center gap-0.5 rounded border border-primary-foreground/20 bg-primary-foreground/5 text-primary-foreground px-1.5 font-mono text-xs font-medium opacity-100 sm:inline-flex">
+					<span>⌘</span>
+					<span>+</span>
+					<span>K</span>
 				</kbd>
 			</button>
 			<CommandDialog open={open} onOpenChange={(newOpen) => {
