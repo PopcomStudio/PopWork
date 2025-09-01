@@ -1,5 +1,5 @@
-import { LeavesAdminPanel } from "@/features/leaves/components/LeavesAdminPanel"
+import { LeavesAdminPanelNew } from "@/features/leaves/components/LeavesAdminPanelNew"
 
 export default function AdminLeavesPage() {
-  return <LeavesAdminPanel />
+  return <LeavesAdminPanelNew />
 }

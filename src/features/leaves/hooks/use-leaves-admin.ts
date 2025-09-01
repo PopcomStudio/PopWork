@@ -1,19 +1,20 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/features/auth/hooks/use-auth'
 import { createClientComponentClient } from '@/lib/supabase'
-import { Leave } from '@/shared/types/database'
+import { Leave, LeaveBalance } from '@/shared/types/database'
 
 export function useLeavesAdmin() {
   const { user } = useAuth()
   const supabase = createClientComponentClient()
   
   const [allLeaves, setAllLeaves] = useState<Leave[]>([])
+  const [employeeBalances, setEmployeeBalances] = useState<LeaveBalance[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchAllLeaves = async () => {
+  const fetchAllLeaves = useCallback(async () => {
     if (!user) return
 
     setLoading(true)
@@ -39,7 +40,7 @@ export function useLeavesAdmin() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user, supabase])
 
   const approveLeaveBatch = async (leaveIds: string[]): Promise<boolean> => {
     if (!user) return false
@@ -102,6 +103,37 @@ export function useLeavesAdmin() {
     }
   }
 
+  const rejectLeave = async (leaveId: string, rejectedReason: string): Promise<boolean> => {
+    return rejectLeaveBatch([leaveId], rejectedReason)
+  }
+
+  const fetchEmployeeBalances = useCallback(async () => {
+    if (!user) return
+
+    try {
+      const { data, error } = await supabase
+        .from('leave_balances')
+        .select(`
+          *,
+          users!fk_leave_balances_user_id (
+            id,
+            first_name,
+            last_name,
+            email,
+            working_hours_per_week,
+            contract_type
+          )
+        `)
+        .eq('year', new Date().getFullYear())
+        .order('users(last_name)', { ascending: true })
+
+      if (error) throw error
+      setEmployeeBalances(data || [])
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erreur lors du chargement des soldes')
+    }
+  }, [user, supabase])
+
   const deleteLeave = async (leaveId: string): Promise<boolean> => {
     setError(null)
 
@@ -141,19 +173,23 @@ export function useLeavesAdmin() {
   useEffect(() => {
     if (user) {
       fetchAllLeaves()
+      fetchEmployeeBalances()
     }
-  }, [user])
+  }, [user, fetchAllLeaves, fetchEmployeeBalances])
 
   return {
     allLeaves,
+    employeeBalances,
     loading,
     error,
     approveLeaveBatch,
     rejectLeaveBatch,
+    rejectLeave,
     deleteLeave,
     getLeavesByStatus,
     getLeavesByUser,
     getLeaveStats,
+    fetchEmployeeBalances,
     refetch: fetchAllLeaves,
   }
 }
