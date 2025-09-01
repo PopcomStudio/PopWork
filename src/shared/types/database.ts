@@ -9,6 +9,9 @@ export interface User {
   createdAt: string
   updatedAt: string
   avatarUrl?: string
+  workingHoursPerWeek?: number
+  startDate?: string
+  contractType?: 'full_time' | 'part_time' | 'intern' | 'freelance'
 }
 
 export interface Role {
@@ -206,7 +209,7 @@ export interface Leave {
   user_id: string
   start_date: string
   end_date: string
-  type: 'vacation' | 'sick' | 'other'
+  type: 'conges_payes' | 'rtt' | 'sick' | 'maternity' | 'paternity' | 'other'
   reason: string
   status: 'pending' | 'approved' | 'rejected'
   approved_by?: string
@@ -225,8 +228,37 @@ export interface LeaveBalance {
   year: number
   paid_leave_days: number
   used_paid_leave_days: number
+  rtt_days: number
+  used_rtt_days: number
   sick_days: number
   used_sick_days: number
+  reference_period_start: string
+  reference_period_end: string
+  months_worked: number
+  updated_at: string
+}
+
+export interface FrenchLeaveSettings {
+  id: string
+  company_id?: string
+  legal_working_hours: number
+  reference_period_start_month: number
+  reference_period_start_day: number
+  collective_agreement?: string
+  rtt_calculation_method: 'automatic' | 'manual'
+  created_at: string
+  updated_at: string
+}
+
+export interface EmployeeLeaveProfile {
+  id: string
+  user_id: string
+  hire_date: string
+  working_hours_per_week: number
+  contract_type: 'full_time' | 'part_time' | 'intern' | 'freelance'
+  seniority_months: number
+  current_year_earned_days: number
+  created_at: string
   updated_at: string
 }
 
