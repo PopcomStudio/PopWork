@@ -139,7 +139,7 @@ export function LeavesManagementNew() {
       case 'rtt':
         return (leaveBalance.rtt_days || 0) - (leaveBalance.used_rtt_days || 0)
       case 'sick':
-        return leaveBalance.sick_days - leaveBalance.used_sick_days
+        return 'Illimité' // No legal limit for sick leave in France
       default:
         return 0
     }
@@ -173,7 +173,7 @@ export function LeavesManagementNew() {
       )}
 
       {/* Leave Balance Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Congés Payés</CardTitle>
@@ -211,39 +211,21 @@ export function LeavesManagementNew() {
             <p className="text-xs text-muted-foreground">
               sur {leaveBalance?.rtt_days || 0} disponibles
             </p>
-            {leaveBalance && leaveBalance.rtt_days > 0 && (
+            {leaveBalance && (
               <Progress 
-                value={calculateProgress(leaveBalance.used_rtt_days || 0, leaveBalance.rtt_days)}
+                value={leaveBalance.rtt_days > 0 ? calculateProgress(leaveBalance.used_rtt_days || 0, leaveBalance.rtt_days) : 0}
                 className="mt-2"
               />
             )}
             <div className="text-xs text-muted-foreground mt-1">
               <Info className="h-3 w-3 inline mr-1" />
-              Compensation temps &gt; 35h/sem
+              {leaveBalance && leaveBalance.rtt_days > 0 
+                ? 'Compensation temps > 35h/sem'
+                : 'Aucun RTT (travail ≤ 35h/sem)'}
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Arrêts Maladie</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {leaveBalance ? getAvailableDays('sick') : 0} jours
-            </div>
-            <p className="text-xs text-muted-foreground">
-              sur {leaveBalance?.sick_days || 0} disponibles
-            </p>
-            {leaveBalance && (
-              <Progress 
-                value={calculateProgress(leaveBalance.used_sick_days, leaveBalance.sick_days)}
-                className="mt-2"
-              />
-            )}
-          </CardContent>
-        </Card>
       </div>
 
       {/* Reference Period Info */}
@@ -351,13 +333,11 @@ export function LeavesManagementNew() {
                   <SelectItem value="conges_payes">
                     Congés payés ({getAvailableDays('conges_payes')} jours disponibles)
                   </SelectItem>
-                  {leaveBalance && leaveBalance.rtt_days > 0 && (
-                    <SelectItem value="rtt">
-                      RTT ({getAvailableDays('rtt')} jours disponibles)
-                    </SelectItem>
-                  )}
+                  <SelectItem value="rtt">
+                    RTT ({getAvailableDays('rtt')} jours disponibles)
+                  </SelectItem>
                   <SelectItem value="sick">
-                    Arrêt maladie ({getAvailableDays('sick')} jours disponibles)
+                    Arrêt maladie (sans limite légale)
                   </SelectItem>
                   <SelectItem value="maternity">Congé maternité</SelectItem>
                   <SelectItem value="paternity">Congé paternité</SelectItem>

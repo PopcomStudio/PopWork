@@ -79,7 +79,7 @@ export function useLeaves() {
           used_paid_leave_days: 0,
           rtt_days: entitlements.rttDays,
           used_rtt_days: 0,
-          sick_days: 10,
+          sick_days: null, // No legal limit for sick leave in France
           used_sick_days: 0,
           reference_period_start: start.toISOString(),
           reference_period_end: end.toISOString(),

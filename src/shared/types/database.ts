@@ -230,7 +230,7 @@ export interface LeaveBalance {
   used_paid_leave_days: number
   rtt_days: number
   used_rtt_days: number
-  sick_days: number
+  sick_days: number | null // No legal limit in France
   used_sick_days: number
   reference_period_start: string
   reference_period_end: string
