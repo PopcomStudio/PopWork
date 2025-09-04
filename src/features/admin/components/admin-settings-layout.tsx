@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from "react"
+import { format } from "date-fns"
+import { fr } from "date-fns/locale"
 import { 
   Settings2, 
   Users, 
@@ -9,7 +11,9 @@ import {
   Bell, 
   ChevronRight,
   Server,
-  FileText
+  FileText,
+  Calendar,
+  CalendarIcon
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -17,6 +21,12 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Separator } from "@/components/ui/separator"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { Calendar as CalendarUI } from "@/components/ui/calendar"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
@@ -33,6 +43,12 @@ const adminSettingSections: AdminSettingSection[] = [
     id: "general",
     title: "Paramètres généraux",
     icon: Settings2,
+    category: "système"
+  },
+  {
+    id: "leaves",
+    title: "Système de congés",
+    icon: Calendar,
     category: "système"
   },
   {
@@ -81,6 +97,7 @@ const adminSettingSections: AdminSettingSection[] = [
 
 export function AdminSettingsLayout() {
   const [activeSection, setActiveSection] = useState("general")
+  const [referenceStartDate, setReferenceStartDate] = useState<Date | undefined>(new Date(new Date().getFullYear(), 5, 1))
 
   const renderContent = () => {
     switch (activeSection) {
@@ -174,6 +191,110 @@ export function AdminSettingsLayout() {
                 <Button>
                   <Settings2 className="w-4 h-4 mr-2" />
                   Sauvegarder les modifications
+                </Button>
+              </div>
+            </div>
+          </div>
+        )
+
+      case "leaves":
+        return (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-semibold mb-1">Système de congés</h2>
+              <p className="text-sm text-muted-foreground">
+                Configuration du système de congés conforme au code du travail français
+              </p>
+            </div>
+
+            <Separator />
+
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Paramètres légaux</CardTitle>
+                  <CardDescription>
+                    Configuration des droits et limites selon la législation française
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="legalWorkingHours">Durée légale du travail (h/semaine)</Label>
+                    <Input id="legalWorkingHours" type="number" defaultValue="35" />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Période de référence</CardTitle>
+                  <CardDescription>
+                    Définition de l'année de référence pour l'acquisition des congés
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>Date de début de la période de référence</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="w-full justify-start text-left font-normal"
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {referenceStartDate ? (
+                            format(referenceStartDate, 'dd MMMM', { locale: fr })
+                          ) : (
+                            <span>Sélectionnez une date</span>
+                          )}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <CalendarUI
+                          mode="single"
+                          selected={referenceStartDate}
+                          onSelect={setReferenceStartDate}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch id="autoReset" defaultChecked />
+                    <Label htmlFor="autoReset">Reset automatique annuel des soldes</Label>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Notifications</CardTitle>
+                  <CardDescription>
+                    Alertes automatiques pour l'expiration des congés
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="expirationWarning">Alerte expiration (jours avant)</Label>
+                      <Input id="expirationWarning" type="number" defaultValue="30" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="reminderFreq">Fréquence des rappels (jours)</Label>
+                      <Input id="reminderFreq" type="number" defaultValue="7" />
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch id="emailNotifications" defaultChecked />
+                    <Label htmlFor="emailNotifications">Notifications par email</Label>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <div className="flex justify-end">
+                <Button>
+                  <Calendar className="w-4 h-4 mr-2" />
+                  Sauvegarder la configuration
                 </Button>
               </div>
             </div>

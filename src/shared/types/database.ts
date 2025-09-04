@@ -220,6 +220,12 @@ export interface Leave {
   attachment_name?: string
   created_at: string
   updated_at: string
+  users?: {
+    id: string
+    first_name: string
+    last_name: string
+    email: string
+  }
 }
 
 export interface LeaveBalance {
@@ -236,6 +242,14 @@ export interface LeaveBalance {
   reference_period_end: string
   months_worked: number
   updated_at: string
+  users?: {
+    id: string
+    first_name: string
+    last_name: string
+    email: string
+    working_hours_per_week?: number
+    contract_type?: 'full_time' | 'part_time' | 'intern' | 'freelance'
+  }
 }
 
 export interface FrenchLeaveSettings {

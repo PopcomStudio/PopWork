@@ -25,7 +25,7 @@ export function useLeavesAdmin() {
         .from('leaves')
         .select(`
           *,
-          profiles:user_id (
+          users!user_id (
             first_name,
             last_name,
             email
@@ -115,7 +115,7 @@ export function useLeavesAdmin() {
         .from('leave_balances')
         .select(`
           *,
-          users!fk_leave_balances_user_id (
+          users!user_id (
             id,
             first_name,
             last_name,
@@ -125,7 +125,6 @@ export function useLeavesAdmin() {
           )
         `)
         .eq('year', new Date().getFullYear())
-        .order('users(last_name)', { ascending: true })
 
       if (error) throw error
       setEmployeeBalances(data || [])

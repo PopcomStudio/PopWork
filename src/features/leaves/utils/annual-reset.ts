@@ -3,7 +3,7 @@
  * Handles the automatic reset of leave entitlements on June 1st according to French law
  */
 
-import { createServerComponentClient } from '@/lib/supabase'
+import { createClientComponentClient } from '@/lib/supabase'
 import { getFrenchReferenceYear, calculateLeaveEntitlements } from './french-leave-calculator'
 
 export interface AnnualResetResult {

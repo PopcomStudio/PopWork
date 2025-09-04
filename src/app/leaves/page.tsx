@@ -1,10 +1,10 @@
 import { PageLayout } from "@/components/PageLayout"
-import { LeavesManagementNew } from "@/features/leaves/components/LeavesManagementNew"
+import { LeavesManagement } from "@/features/leaves"
 
 export default function LeavesPage() {
   return (
     <PageLayout>
-      <LeavesManagementNew />
+      <LeavesManagement />
     </PageLayout>
   )
 }

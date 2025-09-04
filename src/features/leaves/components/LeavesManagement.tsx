@@ -1,14 +1,18 @@
 'use client'
 
-import React, { useState, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import { DateRange } from 'react-day-picker'
 import { useLeaves } from '../hooks/use-leaves'
+import { useFrenchLeaveCalculator } from '../hooks/use-french-leave-calculator'
+import { useAuth } from '@/features/auth/hooks/use-auth'
 import { Leave } from '@/shared/types/database'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Progress } from '@/components/ui/progress'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import {
   Table,
   TableBody,
@@ -32,7 +36,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Calendar } from '@/components/ui/calendar'
@@ -44,465 +47,219 @@ import {
 import {
   Palmtree,
   Plus,
-  Edit,
   Trash2,
   Clock,
-  Check,
-  X,
-  AlertCircle,
-  Paperclip,
-  CalendarIcon,
-  Upload,
-  Download,
-  Eye
+  Calendar as CalendarIcon,
+  AlertTriangle,
+  Info,
 } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { createClientComponentClient } from '@/lib/supabase'
 
 const leaveTypeLabels = {
-  vacation: 'Congés payés',
-  sick: 'Congé maladie',
+  conges_payes: 'Congés payés',
+  rtt: 'RTT',
+  sick: 'Arrêt maladie',
+  maternity: 'Congé maternité',
+  paternity: 'Congé paternité',
   other: 'Autre'
 }
 
 const statusLabels = {
   pending: 'En attente',
   approved: 'Approuvé',
-  rejected: 'Rejeté'
+  rejected: 'Refusé'
 }
 
-const statusColors = {
-  pending: 'bg-yellow-100 text-yellow-800',
-  approved: 'bg-green-100 text-green-800',
-  rejected: 'bg-red-100 text-red-800'
+const getStatusBadgeVariant = (status: string) => {
+  switch (status) {
+    case 'approved':
+      return 'default'
+    case 'rejected':
+      return 'destructive'
+    default:
+      return 'secondary'
+  }
 }
 
 export function LeavesManagement() {
-  const {
-    leaves,
-    leaveBalance,
-    loading,
-    error,
-    createLeaveRequest,
-    updateLeaveRequest,
-    deleteLeaveRequest
-  } = useLeaves()
+  const { user } = useAuth()
+  const { leaves, leaveBalance, loading, error, createLeaveRequest, deleteLeaveRequest } = useLeaves()
+  const { 
+    checkLeaveExpirationWarning,
+    recalculateUserLeaves,
+    loading: calculatorLoading
+  } = useFrenchLeaveCalculator()
 
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
-  const [editingLeave, setEditingLeave] = useState<Leave | null>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
-
-  const [formData, setFormData] = useState({
-    type: '' as Leave['type'] | '',
-    reason: '',
-    attachment_file: null as File | null,
-    attachment_name: ''
-  })
-
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [dateRange, setDateRange] = useState<DateRange | undefined>()
-  const [attachmentViewerOpen, setAttachmentViewerOpen] = useState(false)
-  const [viewingAttachment, setViewingAttachment] = useState<{url: string, name: string} | null>(null)
+  const [leaveType, setLeaveType] = useState<string>('')
+  const [reason, setReason] = useState('')
+  const [expirationWarning, setExpirationWarning] = useState<{
+    isExpiring: boolean
+    daysUntilExpiration: number
+    expirationDate: Date
+  } | null>(null)
 
-  const resetForm = () => {
-    setFormData({
-      type: '',
-      reason: '',
-      attachment_file: null,
-      attachment_name: ''
-    })
-    setDateRange(undefined)
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ''
+  useEffect(() => {
+    setExpirationWarning(checkLeaveExpirationWarning())
+  }, [checkLeaveExpirationWarning])
+
+  useEffect(() => {
+    if (user && !calculatorLoading) {
+      recalculateUserLeaves(user.id)
     }
-  }
-
-  const calculateDays = () => {
-    if (!dateRange?.from) return 0
-    const to = dateRange.to || dateRange.from
-    return Math.ceil((to.getTime() - dateRange.from.getTime()) / (1000 * 60 * 60 * 24)) + 1
-  }
-
-
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file) {
-      setFormData(prev => ({
-        ...prev,
-        attachment_file: file,
-        attachment_name: file.name
-      }))
-    }
-  }
+  }, [user, recalculateUserLeaves, calculatorLoading])
 
   const handleCreateLeave = async () => {
-    if (!isFormValid()) {
+    if (!dateRange?.from || !dateRange?.to || !leaveType || !reason.trim()) {
       return
     }
 
-    setIsSubmitting(true)
-
-    const to = dateRange.to || dateRange.from
-
-    // Upload du fichier si présent
-    let attachmentUrl = ''
-    if (formData.attachment_file) {
-      attachmentUrl = await uploadAttachment(formData.attachment_file) || ''
-      
-      if (!attachmentUrl) {
-        alert('Erreur lors de l\'upload du fichier. Veuillez réessayer.')
-        setIsSubmitting(false)
-        return
-      }
-    }
-
-    const leaveData = {
-      type: formData.type,
-      start_date: dateRange?.from?.toISOString() || '',
-      end_date: to.toISOString(),
-      reason: formData.reason,
-      attachment_url: attachmentUrl || undefined,
-      attachment_name: formData.attachment_name || undefined
-    }
-
-    const result = await createLeaveRequest(leaveData)
-    
-    if (result) {
-      setIsCreateDialogOpen(false)
-      resetForm()
-    }
-
-    setIsSubmitting(false)
-  }
-
-  const handleUpdateLeave = async () => {
-    if (!editingLeave || !isFormValid()) {
-      return
-    }
-
-    setIsSubmitting(true)
-
-    const to = dateRange.to || dateRange.from
-    const days_count = calculateDays()
-
-    // Gérer l'upload de fichier si un nouveau fichier est sélectionné
-    let attachmentUrl = editingLeave.attachment_url
-    let attachmentName = editingLeave.attachment_name
-    
-    if (formData.attachment_file) {
-      const uploadedUrl = await uploadAttachment(formData.attachment_file)
-      
-      if (!uploadedUrl) {
-        alert('Erreur lors de l\'upload du fichier. Veuillez réessayer.')
-        setIsSubmitting(false)
-        return
-      }
-      
-      attachmentUrl = uploadedUrl
-      attachmentName = formData.attachment_name
-    }
-
-    const updates = {
-      type: formData.type,
-      start_date: dateRange?.from?.toISOString() || '',
-      end_date: to.toISOString(),
-      reason: formData.reason,
-      days_count,
-      attachment_url: attachmentUrl || undefined,
-      attachment_name: attachmentName || undefined
-    }
-
-    const result = await updateLeaveRequest(editingLeave.id, updates)
-    
-    if (result) {
-      setEditingLeave(null)
-      resetForm()
-    }
-
-    setIsSubmitting(false)
-  }
-
-  const handleEditLeave = (leave: Leave) => {
-    setEditingLeave(leave)
-    setFormData({
-      type: leave.type,
-      reason: leave.reason,
-      attachment_file: null,
-      attachment_name: leave.attachment_name || ''
+    const success = await createLeaveRequest({
+      start_date: dateRange.from.toISOString(),
+      end_date: dateRange.to.toISOString(),
+      type: leaveType as Leave['type'],
+      reason: reason.trim(),
     })
-    
-    // Convertir les dates du leave en DateRange
-    const from = new Date(leave.start_date)
-    const to = new Date(leave.end_date)
-    
-    setDateRange({
-      from,
-      to: from.toDateString() === to.toDateString() ? undefined : to
-    })
+
+    if (success) {
+      setIsDialogOpen(false)
+      setDateRange(undefined)
+      setLeaveType('')
+      setReason('')
+    }
   }
 
   const handleDeleteLeave = async (id: string) => {
-    if (confirm('Êtes-vous sûr de vouloir supprimer cette demande de congé ?')) {
+    if (window.confirm('Êtes-vous sûr de vouloir supprimer cette demande ?')) {
       await deleteLeaveRequest(id)
     }
   }
 
-  const handleCancelLeave = async (id: string) => {
-    if (confirm('Êtes-vous sûr de vouloir annuler cette demande de congé ?')) {
-      await deleteLeaveRequest(id)
+  const getAvailableDays = (type: string) => {
+    if (!leaveBalance) return 0
+    
+    switch (type) {
+      case 'conges_payes':
+        return leaveBalance.paid_leave_days - leaveBalance.used_paid_leave_days
+      case 'rtt':
+        return (leaveBalance.rtt_days || 0) - (leaveBalance.used_rtt_days || 0)
+      case 'sick':
+        return 'Illimité' // No legal limit for sick leave in France
+      default:
+        return 0
     }
   }
 
-  const handleViewAttachment = (url: string, name: string) => {
-    setViewingAttachment({ url, name })
-    setAttachmentViewerOpen(true)
+  const calculateProgress = (used: number, total: number) => {
+    if (total === 0) return 0
+    return Math.min((used / total) * 100, 100)
   }
 
-  const uploadAttachment = async (file: File): Promise<string | null> => {
-    const supabase = createClientComponentClient()
-    
-    // Générer un nom de fichier unique
-    const fileExt = file.name.split('.').pop()
-    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
-    
-    try {
-      const { data, error } = await supabase.storage
-        .from('leave-attachments')
-        .upload(fileName, file, {
-          cacheControl: '3600',
-          upsert: false
-        })
-      
-      if (error) {
-        console.error('Upload error:', error)
-        return null
-      }
-      
-      // Obtenir l'URL publique
-      const { data: { publicUrl } } = supabase.storage
-        .from('leave-attachments')
-        .getPublicUrl(data.path)
-      
-      return publicUrl
-    } catch (error) {
-      console.error('Upload failed:', error)
-      return null
-    }
-  }
-
-  const canEdit = (leave: Leave) => {
-    return leave.status === 'pending'
-  }
-
-  const canDelete = (leave: Leave) => {
-    return leave.status === 'pending'
-  }
-
-  const isFormValid = () => {
-    if (!formData.type || !dateRange?.from) return false
-    // Motif obligatoire seulement pour congé maladie et autre
-    if ((formData.type === 'sick' || formData.type === 'other') && !formData.reason) return false
-    return true
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    )
   }
 
   return (
     <div className="space-y-6">
-      {error && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
+      {/* Expiration Warning */}
+      {expirationWarning?.isExpiring && (
+        <Alert>
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>
+            <strong>Attention !</strong> Vos congés non utilisés expirent dans {expirationWarning.daysUntilExpiration} jours 
+            (le {format(expirationWarning.expirationDate, 'dd MMMM yyyy', { locale: fr })}). 
+            Les congés non posés avant cette date seront perdus selon le code du travail.
+          </AlertDescription>
         </Alert>
       )}
 
-      {/* Statistics Cards */}
-      {leaveBalance && (
-        <div className="grid gap-4 md:grid-cols-2">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Congés payés</CardTitle>
-              <Palmtree className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {leaveBalance.paid_leave_days - leaveBalance.used_paid_leave_days}/{leaveBalance.paid_leave_days}
-              </div>
-              <p className="text-xs text-muted-foreground">jours disponibles</p>
-            </CardContent>
-          </Card>
+      {/* Leave Balance Cards */}
+      <div className="grid grid-cols-1 gap-4 @xl/main:grid-cols-2">
+        <Card className="@container/card">
+          <CardHeader>
+            <CardDescription>Congés payés disponibles</CardDescription>
+            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+              {leaveBalance ? getAvailableDays('conges_payes') : 0} jours
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <p className="text-sm text-muted-foreground">
+              sur {leaveBalance?.paid_leave_days || 0} disponibles
+            </p>
+            {leaveBalance && (
+              <Progress 
+                value={calculateProgress(leaveBalance.used_paid_leave_days, leaveBalance.paid_leave_days)}
+                className="h-2"
+              />
+            )}
+            <p className="text-xs text-muted-foreground">
+              2,5 jours/mois • Max 30 jours/an
+            </p>
+          </CardContent>
+        </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Congés maladie</CardTitle>
-              <Clock className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {leaveBalance.used_sick_days}
-              </div>
-              <p className="text-xs text-muted-foreground">jours utilisés cette année</p>
-            </CardContent>
-          </Card>
-        </div>
+        <Card className="@container/card">
+          <CardHeader>
+            <CardDescription>RTT disponibles</CardDescription>
+            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+              {leaveBalance ? getAvailableDays('rtt') : 0} jours
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <p className="text-sm text-muted-foreground">
+              sur {leaveBalance?.rtt_days || 0} disponibles
+            </p>
+            {leaveBalance && (
+              <Progress 
+                value={leaveBalance.rtt_days > 0 ? calculateProgress(leaveBalance.used_rtt_days || 0, leaveBalance.rtt_days) : 0}
+                className="h-2"
+              />
+            )}
+            <p className="text-xs text-muted-foreground">
+              {leaveBalance && leaveBalance.rtt_days > 0 
+                ? 'Compensation temps > 35h/sem'
+                : 'Aucun RTT (travail ≤ 35h/sem)'}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Reference Period Info */}
+      {leaveBalance && (
+        <Alert>
+          <Info className="h-4 w-4" />
+          <AlertDescription>
+            Période de référence : du {format(new Date(leaveBalance.reference_period_start), 'dd MMMM yyyy', { locale: fr })} 
+            {' '}au {format(new Date(leaveBalance.reference_period_end), 'dd MMMM yyyy', { locale: fr })} 
+            • Mois travaillés : {Math.round(leaveBalance.months_worked * 10) / 10}
+          </AlertDescription>
+        </Alert>
       )}
 
-      {/* Leaves List */}
+      {/* Leaves Table */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
               <CardTitle>Mes demandes de congés</CardTitle>
-              <CardDescription>Gérez vos demandes de congés et consultez leur statut</CardDescription>
+              <CardDescription>
+                Gérez vos demandes de congés et RTT
+              </CardDescription>
             </div>
-            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-              <Button onClick={() => setIsCreateDialogOpen(true)}>
-                <Plus className="h-4 w-4 mr-2" />
-                Nouvelle demande
-              </Button>
-              <DialogContent className="max-w-md">
-                <DialogHeader>
-                  <DialogTitle>Nouvelle demande de congé</DialogTitle>
-                  <DialogDescription>
-                    Remplissez les informations pour votre demande de congé
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="type">Type de congé</Label>
-                    <Select
-                      value={formData.type}
-                      onValueChange={(value: Leave['type']) => setFormData(prev => ({ ...prev, type: value }))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner le type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="vacation">Congés payés</SelectItem>
-                        <SelectItem value="sick">Congé maladie</SelectItem>
-                        <SelectItem value="other">Autre</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Label>Période</Label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className="w-full justify-start text-left font-normal"
-                        >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {dateRange?.from ? (
-                            dateRange.to && dateRange.from.toDateString() !== dateRange.to.toDateString() ? (
-                              <>
-                                Du {format(dateRange.from, "dd MMM yyyy", { locale: fr })} au{" "}
-                                {format(dateRange.to, "dd MMM yyyy", { locale: fr })}
-                              </>
-                            ) : (
-                              `Le ${format(dateRange.from, "dd MMM yyyy", { locale: fr })}`
-                            )
-                          ) : (
-                            <span>Choisir les dates</span>
-                          )}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="range"
-                          selected={dateRange}
-                          onSelect={setDateRange}
-                          numberOfMonths={2}
-                          pagedNavigation
-                          showOutsideDays={false}
-                          locale={fr}
-                          classNames={{
-                            months: "gap-8",
-                            month:
-                              "relative first-of-type:before:hidden before:absolute max-sm:before:inset-x-2 max-sm:before:h-px max-sm:before:-top-2 sm:before:inset-y-2 sm:before:w-px before:bg-border sm:before:-left-4",
-                          }}
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-
-                  {dateRange?.from && (
-                    <div className="text-sm text-muted-foreground">
-                      Durée: {calculateDays()} jour{calculateDays() > 1 ? 's' : ''}
-                    </div>
-                  )}
-
-                  <div>
-                    <Label htmlFor="reason">
-                      Motif {formData.type === 'vacation' ? '(optionnel)' : '*'}
-                    </Label>
-                    <Textarea
-                      id="reason"
-                      placeholder={
-                        formData.type === 'vacation'
-                          ? "Motif optionnel..."
-                          : "Décrivez la raison de votre demande..."
-                      }
-                      value={formData.reason}
-                      onChange={(e) => setFormData(prev => ({ ...prev, reason: e.target.value }))}
-                      rows={3}
-                    />
-                  </div>
-
-                  <div>
-                    <Label>Pièce jointe (optionnel)</Label>
-                    <div className="flex items-center gap-2">
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        onChange={handleFileSelect}
-                        className="hidden"
-                        accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => fileInputRef.current?.click()}
-                      >
-                        <Paperclip className="h-4 w-4 mr-2" />
-                        Joindre un fichier
-                      </Button>
-                      {formData.attachment_name && (
-                        <span className="text-sm text-muted-foreground truncate">
-                          {formData.attachment_name}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setIsCreateDialogOpen(false)
-                      resetForm()
-                    }}
-                  >
-                    Annuler
-                  </Button>
-                  <Button
-                    onClick={handleCreateLeave}
-                    disabled={!isFormValid() || isSubmitting}
-                  >
-                    {isSubmitting ? 'Création...' : 'Créer la demande'}
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+            <Button onClick={() => setIsDialogOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              Nouvelle demande
+            </Button>
           </div>
         </CardHeader>
         <CardContent>
-          {loading ? (
-            <div className="text-center py-8">Chargement...</div>
-          ) : leaves.length === 0 ? (
+          {leaves.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              Aucune demande de congé trouvée
+              Aucune demande de congés pour le moment
             </div>
           ) : (
             <Table>
@@ -511,9 +268,8 @@ export function LeavesManagement() {
                   <TableHead>Type</TableHead>
                   <TableHead>Période</TableHead>
                   <TableHead>Durée</TableHead>
-                  <TableHead>Statut</TableHead>
                   <TableHead>Motif</TableHead>
-                  <TableHead>Pièce jointe</TableHead>
+                  <TableHead>Statut</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -522,77 +278,30 @@ export function LeavesManagement() {
                   <TableRow key={leave.id}>
                     <TableCell>
                       <Badge variant="outline">
-                        {leaveTypeLabels[leave.type]}
+                        {leaveTypeLabels[leave.type as keyof typeof leaveTypeLabels]}
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      {format(new Date(leave.start_date), 'dd MMM yyyy', { locale: fr })} -{' '}
-                      {format(new Date(leave.end_date), 'dd MMM yyyy', { locale: fr })}
+                      {format(new Date(leave.start_date), 'dd/MM/yyyy', { locale: fr })} - 
+                      {format(new Date(leave.end_date), 'dd/MM/yyyy', { locale: fr })}
                     </TableCell>
+                    <TableCell>{leave.days_count} jour(s)</TableCell>
+                    <TableCell className="max-w-xs truncate">{leave.reason}</TableCell>
                     <TableCell>
-                      {leave.days_count} jour{leave.days_count > 1 ? 's' : ''}
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        className={cn(
-                          statusColors[leave.status],
-                          "text-xs"
-                        )}
-                      >
-                        {statusLabels[leave.status]}
+                      <Badge variant={getStatusBadgeVariant(leave.status)}>
+                        {statusLabels[leave.status as keyof typeof statusLabels]}
                       </Badge>
-                    </TableCell>
-                    <TableCell className="max-w-[200px] truncate">
-                      {leave.reason}
-                    </TableCell>
-                    <TableCell>
-                      {leave.attachment_name ? (
-                        <button
-                          onClick={() => leave.attachment_url && handleViewAttachment(leave.attachment_url, leave.attachment_name!)}
-                          className="flex items-center gap-1 hover:text-primary cursor-pointer transition-colors"
-                          title="Voir la pièce jointe"
-                        >
-                          <Paperclip className="h-4 w-4" />
-                          <span className="text-sm truncate max-w-[100px]">
-                            {leave.attachment_name}
-                          </span>
-                        </button>
-                      ) : (
-                        <span className="text-muted-foreground">-</span>
-                      )}
                     </TableCell>
                     <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        {canEdit(leave) && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEditLeave(leave)}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                        )}
-                        {canDelete(leave) && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleCancelLeave(leave.id)}
-                            title="Annuler la demande"
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        )}
-                        {canDelete(leave) && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDeleteLeave(leave.id)}
-                            title="Supprimer la demande"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </div>
+                      {leave.status === 'pending' && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteLeave(leave.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -602,203 +311,112 @@ export function LeavesManagement() {
         </CardContent>
       </Card>
 
-      {/* Edit Dialog */}
-      <Dialog open={!!editingLeave} onOpenChange={() => setEditingLeave(null)}>
-        <DialogContent className="max-w-md">
+      {/* Create Leave Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Modifier la demande de congé</DialogTitle>
+            <DialogTitle>Nouvelle demande de congés</DialogTitle>
             <DialogDescription>
-              Modifiez les informations de votre demande
+              Créez une nouvelle demande de congés ou RTT selon le code du travail français.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="edit-type">Type de congé</Label>
-              <Select
-                value={formData.type}
-                onValueChange={(value: Leave['type']) => setFormData(prev => ({ ...prev, type: value }))}
-              >
+
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="leave-type">Type de congé</Label>
+              <Select value={leaveType} onValueChange={setLeaveType}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner le type" />
+                  <SelectValue placeholder="Sélectionnez un type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="vacation">Congés payés</SelectItem>
-                  <SelectItem value="sick">Congé maladie</SelectItem>
+                  <SelectItem value="conges_payes">
+                    Congés payés ({getAvailableDays('conges_payes')} jours disponibles)
+                  </SelectItem>
+                  <SelectItem value="rtt">
+                    RTT ({getAvailableDays('rtt')} jours disponibles)
+                  </SelectItem>
+                  <SelectItem value="sick">
+                    Arrêt maladie (sans limite légale)
+                  </SelectItem>
+                  <SelectItem value="maternity">Congé maternité</SelectItem>
+                  <SelectItem value="paternity">Congé paternité</SelectItem>
                   <SelectItem value="other">Autre</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
-            <div>
+            <div className="grid gap-2">
               <Label>Période</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
+                    id="date"
                     variant="outline"
-                    className="w-full justify-start text-left font-normal"
+                    className="justify-start text-left font-normal"
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {dateRange?.from ? (
-                      dateRange.to && dateRange.from.toDateString() !== dateRange.to.toDateString() ? (
+                      dateRange.to ? (
                         <>
-                          Du {format(dateRange.from, "dd MMM yyyy", { locale: fr })} au{" "}
-                          {format(dateRange.to, "dd MMM yyyy", { locale: fr })}
+                          {format(dateRange.from, 'dd LLL y', { locale: fr })} -{' '}
+                          {format(dateRange.to, 'dd LLL y', { locale: fr })}
                         </>
                       ) : (
-                        `Le ${format(dateRange.from, "dd MMM yyyy", { locale: fr })}`
+                        format(dateRange.from, 'dd LLL y', { locale: fr })
                       )
                     ) : (
-                      <span>Choisir les dates</span>
+                      <span>Sélectionnez les dates</span>
                     )}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
+                    initialFocus
                     mode="range"
+                    defaultMonth={dateRange?.from}
                     selected={dateRange}
                     onSelect={setDateRange}
                     numberOfMonths={2}
-                    pagedNavigation
-                    showOutsideDays={false}
                     locale={fr}
-                    classNames={{
-                      months: "gap-8",
-                      month:
-                        "relative first-of-type:before:hidden before:absolute max-sm:before:inset-x-2 max-sm:before:h-px max-sm:before:-top-2 sm:before:inset-y-2 sm:before:w-px before:bg-border sm:before:-left-4",
-                    }}
                   />
                 </PopoverContent>
               </Popover>
             </div>
 
-            {dateRange?.from && (
-              <div className="text-sm text-muted-foreground">
-                Durée: {calculateDays()} jour{calculateDays() > 1 ? 's' : ''}
-              </div>
-            )}
-
-            <div>
-              <Label htmlFor="edit-reason">
-                Motif {formData.type === 'vacation' ? '(optionnel)' : '*'}
-              </Label>
+            <div className="grid gap-2">
+              <Label htmlFor="reason">Motif</Label>
               <Textarea
-                id="edit-reason"
-                placeholder={
-                  formData.type === 'vacation'
-                    ? "Motif optionnel..."
-                    : "Décrivez la raison de votre demande..."
-                }
-                value={formData.reason}
-                onChange={(e) => setFormData(prev => ({ ...prev, reason: e.target.value }))}
-                rows={3}
+                id="reason"
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                placeholder="Décrivez brièvement le motif de votre demande..."
+                className="min-h-[100px]"
               />
             </div>
-
-            <div>
-              <Label>Pièce jointe</Label>
-              <div className="flex items-center gap-2">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  onChange={handleFileSelect}
-                  className="hidden"
-                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <Upload className="h-4 w-4 mr-2" />
-                  {formData.attachment_name || editingLeave?.attachment_name ? 'Changer' : 'Joindre'}
-                </Button>
-                {(formData.attachment_name || editingLeave?.attachment_name) && (
-                  <span className="text-sm text-muted-foreground truncate">
-                    {formData.attachment_name || editingLeave?.attachment_name}
-                  </span>
-                )}
-              </div>
-            </div>
           </div>
+
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setEditingLeave(null)
-                resetForm()
-              }}
-            >
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
               Annuler
             </Button>
-            <Button
-              onClick={handleUpdateLeave}
-              disabled={!isFormValid() || isSubmitting}
+            <Button 
+              onClick={handleCreateLeave}
+              disabled={!dateRange?.from || !dateRange?.to || !leaveType || !reason.trim()}
             >
-              {isSubmitting ? 'Modification...' : 'Modifier'}
+              Créer la demande
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Attachment Viewer Dialog */}
-      <Dialog open={attachmentViewerOpen} onOpenChange={setAttachmentViewerOpen}>
-        <DialogContent 
-          className="!max-w-[85vw] max-h-[95vh] !w-[85vw]" 
-          style={{ width: '85vw', maxWidth: '85vw', minWidth: '85vw' }}
-        >
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Eye className="h-4 w-4" />
-              {viewingAttachment?.name}
-            </DialogTitle>
-            <DialogDescription>
-              Prévisualisation de la pièce jointe
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="flex-1 overflow-hidden">
-            {viewingAttachment?.url && (
-              <div className="w-full h-[80vh] border rounded-lg overflow-hidden">
-                {viewingAttachment.name.toLowerCase().endsWith('.pdf') ? (
-                  <iframe
-                    src={viewingAttachment.url}
-                    className="w-full h-full border-0"
-                    title={viewingAttachment.name}
-                  />
-                ) : viewingAttachment.name.toLowerCase().match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
-                  <img
-                    src={viewingAttachment.url}
-                    alt={viewingAttachment.name}
-                    className="w-full h-full object-contain"
-                  />
-                ) : (
-                  <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
-                    <Paperclip className="h-12 w-12 mb-4" />
-                    <p className="text-lg font-medium">Aperçu non disponible</p>
-                    <p className="text-sm">Utilisez le bouton de téléchargement pour ouvrir le fichier</p>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          <DialogFooter>
-            {viewingAttachment && (
-              <Button
-                variant="outline"
-                onClick={() => viewingAttachment?.url && window.open(viewingAttachment.url, '_blank')}
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Télécharger
-              </Button>
-            )}
-            <Button onClick={() => setAttachmentViewerOpen(false)}>
-              Fermer
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {error && (
+        <Alert className="border-red-200 bg-red-50">
+          <AlertTriangle className="h-4 w-4 text-red-500" />
+          <AlertDescription className="text-red-700">
+            {error}
+          </AlertDescription>
+        </Alert>
+      )}
     </div>
   )
 }
