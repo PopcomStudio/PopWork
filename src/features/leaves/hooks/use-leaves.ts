@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/features/auth/hooks/use-auth'
 import { createClientComponentClient } from '@/lib/supabase'
 import { Leave, LeaveBalance } from '@/shared/types/database'
+import { calculateLeaveEntitlements, getFrenchReferenceYear } from '../utils/french-leave-calculator'
 
 export function useLeaves() {
   const { user } = useAuth()
@@ -14,7 +15,7 @@ export function useLeaves() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchLeaves = async () => {
+  const fetchLeaves = useCallback(async () => {
     if (!user) return
 
     setLoading(true)
@@ -40,9 +41,9 @@ export function useLeaves() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user, supabase])
 
-  const fetchLeaveBalance = async () => {
+  const fetchLeaveBalance = useCallback(async () => {
     if (!user) return
 
     try {
@@ -59,13 +60,30 @@ export function useLeaves() {
       }
 
       if (!data) {
+        // Get French reference year (June 1st to May 31st)
+        const { start, end } = getFrenchReferenceYear()
+        
+        // Calculate entitlements based on French labor law
+        // Default to standard full-time employee (35h/week, hired at start of reference year)
+        const entitlements = calculateLeaveEntitlements({
+          hireDate: start.toISOString(),
+          workingHoursPerWeek: 35,
+          referenceYearStart: start,
+          referenceYearEnd: end
+        })
+        
         const newBalance: Partial<LeaveBalance> = {
           user_id: user.id,
           year: currentYear,
-          paid_leave_days: 25,
+          paid_leave_days: entitlements.earnedPaidLeaveDays,
           used_paid_leave_days: 0,
-          sick_days: 10,
+          rtt_days: entitlements.rttDays,
+          used_rtt_days: 0,
+          sick_days: null, // No legal limit for sick leave in France
           used_sick_days: 0,
+          reference_period_start: start.toISOString(),
+          reference_period_end: end.toISOString(),
+          months_worked: entitlements.monthsWorked,
         }
 
         const { data: createdBalance, error: createError } = await supabase
@@ -82,7 +100,7 @@ export function useLeaves() {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur lors du chargement du solde de congés')
     }
-  }
+  }, [user, supabase])
 
   const createLeaveRequest = async (leaveData: Partial<Leave>): Promise<Leave | null> => {
     if (!user) return null
@@ -174,8 +192,11 @@ export function useLeaves() {
         const updatedBalance = { ...leaveBalance }
         
         switch (leave.type) {
-          case 'vacation':
+          case 'conges_payes':
             updatedBalance.used_paid_leave_days += leave.days_count
+            break
+          case 'rtt':
+            updatedBalance.used_rtt_days += leave.days_count
             break
           case 'sick':
             updatedBalance.used_sick_days += leave.days_count
@@ -209,7 +230,7 @@ export function useLeaves() {
       fetchLeaves()
       fetchLeaveBalance()
     }
-  }, [user])
+  }, [user, fetchLeaves, fetchLeaveBalance])
 
   return {
     leaves,

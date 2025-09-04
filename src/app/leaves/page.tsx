@@ -1,5 +1,5 @@
 import { PageLayout } from "@/components/PageLayout"
-import { LeavesManagement } from "@/features/leaves/components/LeavesManagement"
+import { LeavesManagement } from "@/features/leaves"
 
 export default function LeavesPage() {
   return (
