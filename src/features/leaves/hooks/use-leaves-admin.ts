@@ -48,6 +48,15 @@ export function useLeavesAdmin() {
     setError(null)
 
     try {
+      // First, get the leaves to approve
+      const { data: leavesToApprove, error: fetchError } = await supabase
+        .from('leaves')
+        .select('*')
+        .in('id', leaveIds)
+
+      if (fetchError) throw fetchError
+
+      // Update the leaves status
       const { error } = await supabase
         .from('leaves')
         .update({
@@ -59,6 +68,46 @@ export function useLeavesAdmin() {
 
       if (error) throw error
 
+      // Update leave balances for each approved leave
+      for (const leave of leavesToApprove || []) {
+        const { data: currentBalance, error: balanceError } = await supabase
+          .from('leave_balances')
+          .select('*')
+          .eq('user_id', leave.user_id)
+          .eq('year', new Date().getFullYear())
+          .single()
+
+        if (balanceError && balanceError.code !== 'PGRST116') {
+          console.error('Error fetching balance:', balanceError)
+          continue
+        }
+
+        if (currentBalance) {
+          const updatedBalance: Partial<LeaveBalance> = { ...currentBalance }
+          
+          switch (leave.type) {
+            case 'conges_payes':
+              updatedBalance.used_paid_leave_days = (currentBalance.used_paid_leave_days || 0) + leave.days_count
+              break
+            case 'rtt':
+              updatedBalance.used_rtt_days = (currentBalance.used_rtt_days || 0) + leave.days_count
+              break
+            case 'sick':
+              updatedBalance.used_sick_days = (currentBalance.used_sick_days || 0) + leave.days_count
+              break
+          }
+
+          const { error: updateError } = await supabase
+            .from('leave_balances')
+            .update(updatedBalance)
+            .eq('id', currentBalance.id)
+
+          if (updateError) {
+            console.error('Error updating balance:', updateError)
+          }
+        }
+      }
+
       setAllLeaves(prev => 
         prev.map(leave => 
           leaveIds.includes(leave.id)
@@ -66,6 +115,9 @@ export function useLeavesAdmin() {
             : leave
         )
       )
+
+      // Refresh employee balances
+      await fetchEmployeeBalances()
 
       return true
     } catch (err) {
