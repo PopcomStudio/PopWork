@@ -173,3 +173,26 @@ Currently no testing framework is configured. When implementing tests:
 - Check existing project structure first
 - Follow the feature-based organization
 - Look for existing test patterns before adding new ones
+
+## Workflow modification
+
+**Critical Rule**  
+Always read **at least 3 relevant sources** (files/docs/schemas) before using MCP.  
+This ensures consistency, patterns, and prevents breaking changes.  
+
+### Workflow
+1. **Read ≥3 sources** (similar files + docs/schema)  
+2. **Pick server**:  
+   - **shadcn** → UI/components  
+   - **supabase** → DB/policies  
+   - **context7** → context lookup/examples  
+3. **Draft a short plan** (purpose, files, side effects, rollback)  
+4. **Preview first** (dry-run/diff)  
+5. **Small changes only**, commit atomically  
+6. **Verify**: build/tests pass, no secrets exposed, tokens/a11y respected  
+7. **Document**: add note + list files read in PR  
+
+### Safeguards
+- Never expose `service_role` on client  
+- No overwriting existing components without review  
+- If context unclear → stop and read more sources  
