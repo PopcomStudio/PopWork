@@ -142,38 +142,45 @@ export function InvoiceLineForm({
     })
   }, [quantity, unitPrice, discountRate, vatRate])
 
-  const handleFormSubmit = (data: InvoiceLineFormData) => {
-    // Calculer tous les montants pour la ligne
-    const subtotalExcludingTax = roundAmount(data.quantity * data.unit_price_excluding_tax)
-    const discountAmount = data.discount_rate
-      ? roundAmount(subtotalExcludingTax * (data.discount_rate / 100))
-      : 0
-    const subtotalAfterDiscount = roundAmount(subtotalExcludingTax - discountAmount)
-    const vatAmount = calculateVATAmount(subtotalAfterDiscount, data.vat_rate)
-    const totalIncludingTax = roundAmount(subtotalAfterDiscount + vatAmount)
-
-    // Construire l'objet ligne
-    const lineData = {
-      line_number: lineNumber,
-      description: data.description,
-      product_code: data.product_code || null,
-      quantity: data.quantity,
-      unit: data.unit,
-      unit_price_excluding_tax: data.unit_price_excluding_tax,
-      subtotal_excluding_tax: subtotalExcludingTax,
-      discount_rate: data.discount_rate || null,
-      discount_amount: discountAmount > 0 ? discountAmount : null,
-      subtotal_after_discount: subtotalAfterDiscount,
-      vat_rate: data.vat_rate,
-      vat_amount: vatAmount,
-      total_including_tax: totalIncludingTax,
+  const handleFormSubmit = (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault()
+      e.stopPropagation()
     }
 
-    onSubmit(lineData)
+    handleSubmit((data: InvoiceLineFormData) => {
+      // Calculer tous les montants pour la ligne
+      const subtotalExcludingTax = roundAmount(data.quantity * data.unit_price_excluding_tax)
+      const discountAmount = data.discount_rate
+        ? roundAmount(subtotalExcludingTax * (data.discount_rate / 100))
+        : 0
+      const subtotalAfterDiscount = roundAmount(subtotalExcludingTax - discountAmount)
+      const vatAmount = calculateVATAmount(subtotalAfterDiscount, data.vat_rate)
+      const totalIncludingTax = roundAmount(subtotalAfterDiscount + vatAmount)
+
+      // Construire l'objet ligne
+      const lineData = {
+        line_number: lineNumber,
+        description: data.description,
+        product_code: data.product_code || null,
+        quantity: data.quantity,
+        unit: data.unit,
+        unit_price_excluding_tax: data.unit_price_excluding_tax,
+        subtotal_excluding_tax: subtotalExcludingTax,
+        discount_rate: data.discount_rate || null,
+        discount_amount: discountAmount > 0 ? discountAmount : null,
+        subtotal_after_discount: subtotalAfterDiscount,
+        vat_rate: data.vat_rate,
+        vat_amount: vatAmount,
+        total_including_tax: totalIncludingTax,
+      }
+
+      onSubmit(lineData)
+    })()
   }
 
   return (
-    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
+    <div className="space-y-6">
       {/* En-tête */}
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">
@@ -375,11 +382,11 @@ export function InvoiceLineForm({
           <X className="mr-2 h-4 w-4" />
           Annuler
         </Button>
-        <Button type="submit">
+        <Button type="button" onClick={handleFormSubmit}>
           <Save className="mr-2 h-4 w-4" />
           {mode === 'add' ? 'Ajouter la ligne' : 'Enregistrer'}
         </Button>
       </div>
-    </form>
+    </div>
   )
 }
