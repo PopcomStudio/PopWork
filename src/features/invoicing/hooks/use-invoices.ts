@@ -7,6 +7,7 @@ import type {
   InvoiceLine,
   InvoiceVATBreakdown,
   InvoiceAuditTrail,
+  InvoicePayment,
   InvoiceStatus,
   InvoiceOperationType,
   PaymentTerms,
@@ -321,7 +322,7 @@ export function useInvoices() {
   )
 
   // Valider une facture (attribution du numéro définitif)
-  const validateInvoice = useCallback(
+  const validateInvoiceAction = useCallback(
     async (id: string): Promise<{ invoice: Invoice; validation: ValidationResult }> => {
       try {
         // Charger la facture avec ses lignes
@@ -419,6 +420,385 @@ export function useInvoices() {
     [supabase]
   )
 
+  // Marquer une facture comme envoyée
+  const markAsSent = useCallback(
+    async (id: string, sentDate?: string): Promise<Invoice> => {
+      try {
+        // Vérifier que la facture est bien validée
+        const { data: existing, error: fetchError } = await supabase
+          .from('invoices')
+          .select('status')
+          .eq('id', id)
+          .single()
+
+        if (fetchError) throw fetchError
+
+        if (existing.status !== 'validated') {
+          throw new Error(
+            'Seules les factures validées peuvent être marquées comme envoyées.'
+          )
+        }
+
+        const sendDate = sentDate || new Date().toISOString()
+
+        const { data: invoice, error } = await supabase
+          .from('invoices')
+          .update({
+            status: 'sent',
+            // Note: pdp_transmission_date sera ajouté quand on implémentera PDP
+          })
+          .eq('id', id)
+          .select()
+          .single()
+
+        if (error) throw error
+
+        // Audit trail
+        await createAuditEntry(
+          id,
+          'sent',
+          `Facture envoyée le ${new Date(sendDate).toLocaleDateString('fr-FR')}`
+        )
+
+        return invoice
+      } catch (err) {
+        console.error('Erreur lors du marquage comme envoyée:', err)
+        throw err
+      }
+    },
+    [supabase]
+  )
+
+  // Enregistrer un paiement
+  const recordPayment = useCallback(
+    async (
+      invoiceId: string,
+      payment: {
+        amount: number
+        payment_method: 'bank_transfer' | 'check' | 'credit_card' | 'direct_debit' | 'cash'
+        payment_date: string
+        payment_reference?: string
+        transaction_id?: string
+        notes?: string
+      }
+    ): Promise<{ invoice: Invoice; totalPaid: number }> => {
+      try {
+        // Charger la facture
+        const { data: invoice, error: invoiceError } = await supabase
+          .from('invoices')
+          .select('*')
+          .eq('id', invoiceId)
+          .single()
+
+        if (invoiceError) throw invoiceError
+
+        // Vérifier que la facture peut recevoir un paiement
+        if (!['sent', 'partial_paid', 'overdue'].includes(invoice.status)) {
+          throw new Error(
+            'Seules les factures envoyées peuvent recevoir des paiements.'
+          )
+        }
+
+        // Insérer le paiement
+        const { error: paymentError } = await supabase
+          .from('invoice_payments')
+          .insert([
+            {
+              invoice_id: invoiceId,
+              ...payment,
+              created_by: '', // À remplir avec le user_id
+            },
+          ])
+
+        if (paymentError) throw paymentError
+
+        // Calculer le total des paiements
+        const { data: payments, error: paymentsError } = await supabase
+          .from('invoice_payments')
+          .select('amount')
+          .eq('invoice_id', invoiceId)
+
+        if (paymentsError) throw paymentsError
+
+        const totalPaid = payments.reduce((sum, p) => sum + Number(p.amount), 0)
+        const totalDue = Number(invoice.total_including_tax)
+
+        // Déterminer le nouveau statut
+        let newStatus: InvoiceStatus = invoice.status
+        if (totalPaid >= totalDue) {
+          newStatus = 'paid'
+        } else if (totalPaid > 0) {
+          newStatus = 'partial_paid'
+        }
+
+        // Mettre à jour le statut de la facture
+        const { data: updatedInvoice, error: updateError } = await supabase
+          .from('invoices')
+          .update({ status: newStatus })
+          .eq('id', invoiceId)
+          .select()
+          .single()
+
+        if (updateError) throw updateError
+
+        // Audit trail
+        await createAuditEntry(
+          invoiceId,
+          'payment_received',
+          `Paiement de ${payment.amount}€ reçu (${payment.payment_method}) - Total payé: ${totalPaid}€ / ${totalDue}€`
+        )
+
+        return { invoice: updatedInvoice, totalPaid }
+      } catch (err) {
+        console.error('Erreur lors de l\'enregistrement du paiement:', err)
+        throw err
+      }
+    },
+    [supabase]
+  )
+
+  // Créer un avoir (credit note)
+  const createCreditNote = useCallback(
+    async (
+      originalInvoiceId: string,
+      reason: string,
+      partialLines?: { lineId: string; quantity: number }[]
+    ): Promise<Invoice> => {
+      try {
+        // Charger la facture originale avec ses lignes
+        const invoiceData = await fetchInvoiceById(originalInvoiceId)
+
+        if (!invoiceData) {
+          throw new Error('Facture originale non trouvée')
+        }
+
+        const { invoice: originalInvoice, lines: originalLines } = invoiceData
+
+        // Vérifier que la facture peut être annulée
+        if (!['validated', 'sent', 'paid', 'partial_paid', 'overdue'].includes(originalInvoice.status)) {
+          throw new Error(
+            'Seules les factures validées peuvent être annulées par avoir.'
+          )
+        }
+
+        // Générer un numéro d'avoir (format: AV-YYYY-NNNNN)
+        // Note: Pour l'instant on utilise le même système de numérotation
+        // TODO: Implémenter une séquence séparée pour les avoirs
+        const { invoiceNumber } = await getNextInvoiceNumber()
+        const creditNoteNumber = invoiceNumber.replace(/^\d{4}/, 'AV-$&')
+
+        // Déterminer les lignes à inclure dans l'avoir
+        let creditLines = originalLines
+        if (partialLines && partialLines.length > 0) {
+          creditLines = originalLines
+            .filter((line) =>
+              partialLines.some((pl) => pl.lineId === line.id)
+            )
+            .map((line) => {
+              const partialLine = partialLines.find((pl) => pl.lineId === line.id)
+              if (partialLine) {
+                return { ...line, quantity: partialLine.quantity }
+              }
+              return line
+            })
+        }
+
+        // Créer l'avoir
+        const { data: creditNote, error: creditNoteError } = await supabase
+          .from('invoices')
+          .insert([
+            {
+              invoice_number: creditNoteNumber,
+              invoice_date: new Date().toISOString().split('T')[0],
+              operation_type: originalInvoice.operation_type,
+              status: 'validated',
+              is_credit_note: true,
+              credit_note_reason: reason,
+              original_invoice_id: originalInvoiceId,
+
+              // Copier les informations de l'émetteur
+              issuer_company_id: originalInvoice.issuer_company_id,
+              issuer_name: originalInvoice.issuer_name,
+              issuer_address: originalInvoice.issuer_address,
+              issuer_postal_code: originalInvoice.issuer_postal_code,
+              issuer_city: originalInvoice.issuer_city,
+              issuer_country: originalInvoice.issuer_country,
+              issuer_siret: originalInvoice.issuer_siret,
+              issuer_vat_number: originalInvoice.issuer_vat_number,
+
+              // Copier les informations du client
+              customer_company_id: originalInvoice.customer_company_id,
+              customer_service_id: originalInvoice.customer_service_id,
+              customer_name: originalInvoice.customer_name,
+              customer_address: originalInvoice.customer_address,
+              customer_postal_code: originalInvoice.customer_postal_code,
+              customer_city: originalInvoice.customer_city,
+              customer_country: originalInvoice.customer_country,
+              customer_siret: originalInvoice.customer_siret,
+              customer_vat_number: originalInvoice.customer_vat_number,
+
+              // Montants négatifs
+              subtotal_excluding_tax: -originalInvoice.subtotal_excluding_tax,
+              total_vat_amount: -originalInvoice.total_vat_amount,
+              total_including_tax: -originalInvoice.total_including_tax,
+
+              // Autres champs
+              payment_terms: originalInvoice.payment_terms,
+              payment_due_date: new Date().toISOString().split('T')[0],
+              facturx_generated: false,
+              validated_at: new Date().toISOString(),
+              created_by: '', // À remplir avec le user_id
+            },
+          ])
+          .select()
+          .single()
+
+        if (creditNoteError) throw creditNoteError
+
+        // Créer les lignes de l'avoir (quantités et montants négatifs)
+        const creditNoteLinesData = creditLines.map((line, index) => ({
+          invoice_id: creditNote.id,
+          line_number: index + 1,
+          description: line.description,
+          product_code: line.product_code,
+          quantity: -line.quantity, // Négatif
+          unit: line.unit,
+          unit_price_excluding_tax: line.unit_price_excluding_tax,
+          subtotal_excluding_tax: -line.subtotal_excluding_tax, // Négatif
+          discount_rate: line.discount_rate,
+          discount_amount: line.discount_amount ? -line.discount_amount : null,
+          subtotal_after_discount: -line.subtotal_after_discount, // Négatif
+          vat_rate: line.vat_rate,
+          vat_amount: -line.vat_amount, // Négatif
+          total_including_tax: -line.total_including_tax, // Négatif
+        }))
+
+        const { error: linesError } = await supabase
+          .from('invoice_lines')
+          .insert(creditNoteLinesData)
+
+        if (linesError) throw linesError
+
+        // Annuler la facture originale
+        const { error: cancelError } = await supabase
+          .from('invoices')
+          .update({
+            status: 'cancelled',
+            cancelled_at: new Date().toISOString(),
+            cancellation_reason: reason,
+          })
+          .eq('id', originalInvoiceId)
+
+        if (cancelError) throw cancelError
+
+        // Audit trails
+        await createAuditEntry(
+          creditNote.id,
+          'created',
+          `Avoir créé pour annulation de ${originalInvoice.invoice_number}: ${reason}`
+        )
+
+        await createAuditEntry(
+          originalInvoiceId,
+          'cancelled',
+          `Facture annulée par avoir ${creditNoteNumber}: ${reason}`
+        )
+
+        return creditNote
+      } catch (err) {
+        console.error('Erreur lors de la création de l\'avoir:', err)
+        throw err
+      }
+    },
+    [supabase, fetchInvoiceById]
+  )
+
+  // Annuler une facture
+  const cancelInvoice = useCallback(
+    async (id: string, reason: string): Promise<Invoice> => {
+      try {
+        // Vérifier qu'aucun paiement n'a été enregistré
+        const { data: payments, error: paymentsError } = await supabase
+          .from('invoice_payments')
+          .select('id')
+          .eq('invoice_id', id)
+
+        if (paymentsError) throw paymentsError
+
+        if (payments && payments.length > 0) {
+          throw new Error(
+            'Impossible d\'annuler une facture avec des paiements enregistrés. Créez un avoir à la place.'
+          )
+        }
+
+        // Annuler la facture
+        const { data: invoice, error } = await supabase
+          .from('invoices')
+          .update({
+            status: 'cancelled',
+            cancelled_at: new Date().toISOString(),
+            cancellation_reason: reason,
+          })
+          .eq('id', id)
+          .select()
+          .single()
+
+        if (error) throw error
+
+        // Audit trail
+        await createAuditEntry(id, 'cancelled', `Facture annulée: ${reason}`)
+
+        return invoice
+      } catch (err) {
+        console.error('Erreur lors de l\'annulation de la facture:', err)
+        throw err
+      }
+    },
+    [supabase]
+  )
+
+  // Charger les paiements d'une facture
+  const fetchPayments = useCallback(
+    async (invoiceId: string) => {
+      try {
+        const { data, error } = await supabase
+          .from('invoice_payments')
+          .select('*')
+          .eq('invoice_id', invoiceId)
+          .order('payment_date', { ascending: false })
+
+        if (error) throw error
+
+        return data || []
+      } catch (err) {
+        console.error('Erreur lors du chargement des paiements:', err)
+        throw err
+      }
+    },
+    [supabase]
+  )
+
+  // Charger l'audit trail d'une facture
+  const fetchAuditTrail = useCallback(
+    async (invoiceId: string) => {
+      try {
+        const { data, error } = await supabase
+          .from('invoice_audit_trail')
+          .select('*')
+          .eq('invoice_id', invoiceId)
+          .order('timestamp', { ascending: false })
+
+        if (error) throw error
+
+        return data || []
+      } catch (err) {
+        console.error('Erreur lors du chargement de l\'audit trail:', err)
+        throw err
+      }
+    },
+    [supabase]
+  )
+
   // Charger les factures au montage du composant
   useEffect(() => {
     const loadInvoices = async () => {
@@ -451,6 +831,12 @@ export function useInvoices() {
     addLine,
     deleteLine,
     recalculateInvoiceTotals,
-    validateInvoice,
+    validateInvoice: validateInvoiceAction,
+    markAsSent,
+    recordPayment,
+    createCreditNote,
+    cancelInvoice,
+    fetchPayments,
+    fetchAuditTrail,
   }
 }
