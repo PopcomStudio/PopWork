@@ -52,7 +52,7 @@ import { useInvoices } from '../hooks/use-invoices'
 import { Skeleton } from '@/components/ui/skeleton'
 import { InvoiceLineForm } from './forms/InvoiceLineForm'
 import { formatAmount } from '../utils/vat-calculator'
-import { useToast } from '@/hooks/use-toast'
+import { toast } from 'sonner'
 
 interface InvoiceDialogProps {
   open: boolean
@@ -101,7 +101,6 @@ export function InvoiceDialog({
     recalculateInvoiceTotals,
     fetchInvoices,
   } = useInvoices()
-  const { toast } = useToast()
 
   const {
     register,
@@ -223,8 +222,7 @@ export function InvoiceDialog({
 
         // TODO: Mettre à jour les lignes existantes
 
-        toast({
-          title: 'Facture mise à jour',
+        toast.success('Facture mise à jour', {
           description: 'Le brouillon a été mis à jour avec succès',
         })
       } else {
@@ -241,8 +239,7 @@ export function InvoiceDialog({
           await addLine(invoice.id, line)
         }
 
-        toast({
-          title: 'Facture créée',
+        toast.success('Facture créée', {
           description: `Le brouillon ${invoice.invoice_number} a été créé avec succès`,
         })
       }
