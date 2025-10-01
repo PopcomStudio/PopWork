@@ -53,7 +53,7 @@ const getStaticData = (t: (key: string) => string) => ({
     },
     {
       title: t("navigation.invoicing"),
-      url: "/invoicing",
+      url: "/factures",
       icon: FileText,
     },
     {
