@@ -49,6 +49,7 @@ import type {
 } from '@/shared/types/database'
 import { useCompanies } from '@/features/clients/hooks/use-companies'
 import { useInvoices } from '../hooks/use-invoices'
+import { useInvoiceSettings } from '../hooks/use-invoice-settings'
 import { Skeleton } from '@/components/ui/skeleton'
 import { InvoiceLineForm } from './forms/InvoiceLineForm'
 import { formatAmount } from '../utils/vat-calculator'
@@ -101,6 +102,7 @@ export function InvoiceDialog({
     recalculateInvoiceTotals,
     fetchInvoices,
   } = useInvoices()
+  const { settings: invoiceSettings, loading: settingsLoading, error: settingsError } = useInvoiceSettings()
 
   const {
     register,
@@ -202,12 +204,26 @@ export function InvoiceDialog({
         return
       }
 
-      // TODO: Récupérer les infos de l'émetteur depuis les settings
+      // Vérifier que les settings sont chargés
+      if (!invoiceSettings) {
+        setError('Paramètres de facturation non disponibles. Veuillez contacter votre administrateur.')
+        return
+      }
+
+      // Vérifier que organization_id existe
+      if (!invoiceSettings.organization_id) {
+        setError('L\'organisation n\'est pas configurée dans les paramètres de facturation. Veuillez contacter votre administrateur.')
+        return
+      }
+
+      // Récupérer les infos de l'émetteur depuis les settings
       const issuerData = {
-        issuer_company_id: '', // À compléter
-        issuer_name: 'PopWork SAS', // À récupérer depuis settings
-        issuer_address: '123 rue de la Paix', // À récupérer depuis settings
-        issuer_siret: '12345678901234', // À récupérer depuis settings
+        issuer_company_id: invoiceSettings.organization_id,
+        issuer_name: invoiceSettings.company_name,
+        issuer_address: invoiceSettings.address,
+        issuer_postal_code: invoiceSettings.postal_code,
+        issuer_city: invoiceSettings.city,
+        issuer_siret: invoiceSettings.siret,
       }
 
       if (editingInvoice) {
@@ -286,6 +302,14 @@ export function InvoiceDialog({
 
             {/* Onglet Général */}
             <TabsContent value="general" className="space-y-4">
+              {settingsError && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    Erreur lors du chargement des paramètres: {settingsError}
+                  </AlertDescription>
+                </Alert>
+              )}
               {error && (
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
@@ -614,11 +638,16 @@ export function InvoiceDialog({
             <Button type="button" variant="outline" onClick={onClose}>
               Annuler
             </Button>
-            <Button type="submit" disabled={loading || showLineForm}>
+            <Button type="submit" disabled={loading || showLineForm || settingsLoading}>
               {loading ? (
                 <>
                   <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-background border-t-foreground" />
                   Enregistrement...
+                </>
+              ) : settingsLoading ? (
+                <>
+                  <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-background border-t-foreground" />
+                  Chargement des paramètres...
                 </>
               ) : (
                 <>

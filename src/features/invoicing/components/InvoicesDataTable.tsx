@@ -24,12 +24,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import {
   Select,
   SelectContent,
   SelectItem,
@@ -41,19 +35,21 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
-  MoreVertical,
-  Eye,
-  Edit,
-  FileText,
   Search,
   AlertCircle,
 } from 'lucide-react'
 import type { Invoice, InvoiceStatus } from '@/shared/types/database'
 import { formatAmount } from '../utils/vat-calculator'
+import { InvoiceActions, type InvoiceAction } from './InvoiceActions'
 
 interface InvoicesDataTableProps {
   invoices: Invoice[]
+  onView: (invoice: Invoice) => void
   onEdit: (invoice: Invoice) => void
+  onValidate: (invoice: Invoice) => void
+  onSend: (invoice: Invoice) => void
+  onPayment: (invoice: Invoice) => void
+  onCancel: (invoice: Invoice) => void
 }
 
 // Badge de statut avec couleurs
@@ -73,12 +69,56 @@ function StatusBadge({ status }: { status: InvoiceStatus }) {
   return <Badge variant={config.variant}>{config.label}</Badge>
 }
 
-export function InvoicesDataTable({ invoices, onEdit }: InvoicesDataTableProps) {
+export function InvoicesDataTable({
+  invoices,
+  onView,
+  onEdit,
+  onValidate,
+  onSend,
+  onPayment,
+  onCancel,
+}: InvoicesDataTableProps) {
   const [sorting, setSorting] = useState<SortingState>([
     { id: 'invoice_date', desc: true },
   ])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [globalFilter, setGlobalFilter] = useState('')
+
+  // Handler pour les actions
+  const handleAction = (action: InvoiceAction, invoice: Invoice) => {
+    switch (action) {
+      case 'view':
+        onView(invoice)
+        break
+      case 'edit':
+        onEdit(invoice)
+        break
+      case 'validate':
+        onValidate(invoice)
+        break
+      case 'send':
+        onSend(invoice)
+        break
+      case 'payment':
+        onPayment(invoice)
+        break
+      case 'cancel':
+        onCancel(invoice)
+        break
+      case 'download':
+        // TODO: Implémenter le téléchargement PDF
+        console.log('Download PDF:', invoice.id)
+        break
+      case 'delete':
+        // TODO: Implémenter la suppression
+        console.log('Delete invoice:', invoice.id)
+        break
+      case 'credit_note':
+        // TODO: Implémenter la création d'avoir
+        console.log('Create credit note for:', invoice.id)
+        break
+    }
+  }
 
   // Colonnes du tableau
   const columns: ColumnDef<Invoice>[] = useMemo(
@@ -159,37 +199,15 @@ export function InvoicesDataTable({ invoices, onEdit }: InvoicesDataTableProps) 
           const invoice = row.original
 
           return (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <MoreVertical className="h-4 w-4" />
-                  <span className="sr-only">Actions</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => onEdit(invoice)}>
-                  <Eye className="mr-2 h-4 w-4" />
-                  Voir
-                </DropdownMenuItem>
-                {invoice.status === 'draft' && (
-                  <DropdownMenuItem onClick={() => onEdit(invoice)}>
-                    <Edit className="mr-2 h-4 w-4" />
-                    Modifier
-                  </DropdownMenuItem>
-                )}
-                {invoice.facturx_generated && (
-                  <DropdownMenuItem>
-                    <FileText className="mr-2 h-4 w-4" />
-                    Télécharger PDF
-                  </DropdownMenuItem>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <InvoiceActions
+              invoice={invoice}
+              onAction={(action) => handleAction(action, invoice)}
+            />
           )
         },
       },
     ],
-    [onEdit]
+    [handleAction]
   )
 
   const table = useReactTable({

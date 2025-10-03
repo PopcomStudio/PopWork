@@ -109,9 +109,17 @@ export function useInvoices() {
       issuer_company_id: string
       issuer_name: string
       issuer_address: string
+      issuer_postal_code: string
+      issuer_city: string
       issuer_siret: string
     }): Promise<Invoice> => {
       try {
+        // Récupérer l'utilisateur connecté
+        const { data: { user }, error: userError } = await supabase.auth.getUser()
+        if (userError || !user) {
+          throw new Error('Utilisateur non authentifié')
+        }
+
         const currentDate = new Date().toISOString().split('T')[0]
         const dueDate = new Date()
         dueDate.setDate(dueDate.getDate() + 30)
@@ -133,12 +141,10 @@ export function useInvoices() {
               facturx_generated: false,
               issuer_country: 'FR',
               customer_country: 'FR',
-              issuer_postal_code: '',
-              issuer_city: '',
               customer_address: '',
               customer_postal_code: '',
               customer_city: '',
-              created_by: '', // À remplir avec le user_id
+              created_by: user.id,
             },
           ])
           .select()

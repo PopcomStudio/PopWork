@@ -6,13 +6,27 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { InvoicesDataTable } from './InvoicesDataTable'
 import { InvoiceDialog } from './InvoiceDialog'
+import { InvoiceView } from './InvoiceView'
+import { ConfirmValidateDialog } from './dialogs/ConfirmValidateDialog'
+import { ConfirmSendDialog } from './dialogs/ConfirmSendDialog'
+import { ConfirmCancelDialog } from './dialogs/ConfirmCancelDialog'
+import { PaymentDialog, type PaymentFormData } from './dialogs/PaymentDialog'
 import { useInvoices } from '../hooks/use-invoices'
 import { Plus, FileText, AlertCircle } from 'lucide-react'
+import { toast } from 'sonner'
 import type { Invoice } from '@/shared/types/database'
 
 export function InvoiceManagement() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null)
+
+  // États pour les différents dialogs
+  const [viewingInvoiceId, setViewingInvoiceId] = useState<string | null>(null)
+  const [validatingInvoice, setValidatingInvoice] = useState<Invoice | null>(null)
+  const [sendingInvoice, setSendingInvoice] = useState<Invoice | null>(null)
+  const [cancellingInvoice, setCancellingInvoice] = useState<Invoice | null>(null)
+  const [paymentInvoice, setPaymentInvoice] = useState<Invoice | null>(null)
+  const [paymentTotalPaid, setPaymentTotalPaid] = useState(0)
 
   const {
     invoices,
@@ -20,6 +34,12 @@ export function InvoiceManagement() {
     error,
     setError,
     fetchInvoiceById,
+    validateInvoiceAction,
+    markAsSent,
+    recordPayment,
+    cancelInvoice,
+    fetchPayments,
+    fetchInvoices,
   } = useInvoices()
 
   // Ouvrir le dialogue pour créer une nouvelle facture
@@ -48,6 +68,108 @@ export function InvoiceManagement() {
     setIsDialogOpen(false)
     setEditingInvoice(null)
     setError(null)
+  }
+
+  // Voir les détails d'une facture
+  const handleViewInvoice = (invoice: Invoice) => {
+    setViewingInvoiceId(invoice.id)
+  }
+
+  // Valider une facture
+  const handleValidateInvoice = (invoice: Invoice) => {
+    setValidatingInvoice(invoice)
+  }
+
+  const handleConfirmValidate = async () => {
+    if (!validatingInvoice) return
+    try {
+      await validateInvoiceAction(validatingInvoice.id)
+      toast.success('Facture validée', {
+        description: `La facture ${validatingInvoice.invoice_number} a été validée avec succès`,
+      })
+      await fetchInvoices()
+      setValidatingInvoice(null)
+    } catch (err) {
+      toast.error('Erreur', {
+        description: err instanceof Error ? err.message : 'Erreur lors de la validation',
+      })
+    }
+  }
+
+  // Marquer comme envoyée
+  const handleSendInvoice = (invoice: Invoice) => {
+    setSendingInvoice(invoice)
+  }
+
+  const handleConfirmSend = async (data: {
+    sentDate: string
+    sendMethod: 'email' | 'mail'
+    recipientEmail?: string
+  }) => {
+    if (!sendingInvoice) return
+    try {
+      await markAsSent(sendingInvoice.id, data.sentDate)
+      toast.success('Facture envoyée', {
+        description: `La facture ${sendingInvoice.invoice_number} a été marquée comme envoyée`,
+      })
+      await fetchInvoices()
+      setSendingInvoice(null)
+    } catch (err) {
+      toast.error('Erreur', {
+        description: err instanceof Error ? err.message : "Erreur lors de l'envoi",
+      })
+    }
+  }
+
+  // Enregistrer un paiement
+  const handleRecordPayment = async (invoice: Invoice) => {
+    try {
+      const payments = await fetchPayments(invoice.id)
+      const totalPaid = payments.reduce((sum, p) => sum + Number(p.amount), 0)
+      setPaymentTotalPaid(totalPaid)
+      setPaymentInvoice(invoice)
+    } catch (err) {
+      toast.error('Erreur', {
+        description: 'Impossible de charger les paiements',
+      })
+    }
+  }
+
+  const handleConfirmPayment = async (data: PaymentFormData) => {
+    if (!paymentInvoice) return
+    try {
+      await recordPayment(paymentInvoice.id, data)
+      toast.success('Paiement enregistré', {
+        description: `Le paiement de ${data.amount}€ a été enregistré`,
+      })
+      await fetchInvoices()
+      setPaymentInvoice(null)
+    } catch (err) {
+      toast.error('Erreur', {
+        description: err instanceof Error ? err.message : 'Erreur lors de l\'enregistrement',
+      })
+    }
+  }
+
+  // Annuler une facture
+  const handleCancelInvoice = (invoice: Invoice) => {
+    setCancellingInvoice(invoice)
+  }
+
+  const handleConfirmCancel = async (reason: string) => {
+    if (!cancellingInvoice) return
+    try {
+      await cancelInvoice(cancellingInvoice.id, reason)
+      toast.success('Facture annulée', {
+        description: `La facture ${cancellingInvoice.invoice_number} a été annulée`,
+      })
+      await fetchInvoices()
+      setCancellingInvoice(null)
+    } catch (err) {
+      toast.error('Erreur', {
+        description: err instanceof Error ? err.message : "Erreur lors de l'annulation",
+      })
+    }
   }
 
   if (loading) {
@@ -95,7 +217,12 @@ export function InvoiceManagement() {
       {/* Tableau des factures */}
       <InvoicesDataTable
         invoices={invoices}
+        onView={handleViewInvoice}
         onEdit={handleEditInvoice}
+        onValidate={handleValidateInvoice}
+        onSend={handleSendInvoice}
+        onPayment={handleRecordPayment}
+        onCancel={handleCancelInvoice}
       />
 
       {/* Dialog de création/édition */}
@@ -103,6 +230,44 @@ export function InvoiceManagement() {
         open={isDialogOpen}
         onClose={handleCloseDialog}
         editingInvoice={editingInvoice}
+      />
+
+      {/* Vue détaillée */}
+      <InvoiceView
+        invoiceId={viewingInvoiceId}
+        open={viewingInvoiceId !== null}
+        onClose={() => setViewingInvoiceId(null)}
+        onEdit={handleEditInvoice}
+      />
+
+      {/* Dialogs de confirmation */}
+      <ConfirmValidateDialog
+        open={validatingInvoice !== null}
+        onClose={() => setValidatingInvoice(null)}
+        invoice={validatingInvoice}
+        onConfirm={handleConfirmValidate}
+      />
+
+      <ConfirmSendDialog
+        open={sendingInvoice !== null}
+        onClose={() => setSendingInvoice(null)}
+        invoice={sendingInvoice}
+        onConfirm={handleConfirmSend}
+      />
+
+      <ConfirmCancelDialog
+        open={cancellingInvoice !== null}
+        onClose={() => setCancellingInvoice(null)}
+        invoice={cancellingInvoice}
+        onConfirm={handleConfirmCancel}
+      />
+
+      <PaymentDialog
+        open={paymentInvoice !== null}
+        onClose={() => setPaymentInvoice(null)}
+        invoice={paymentInvoice}
+        totalPaid={paymentTotalPaid}
+        onConfirm={handleConfirmPayment}
       />
     </div>
   )
