@@ -82,7 +82,7 @@ const getStatusBadgeVariant = (status: string) => {
 
 export function LeavesManagement() {
   const { user } = useAuth()
-  const { leaves, leaveBalance, loading, error, createLeaveRequest, deleteLeaveRequest } = useLeaves()
+  const { leaves, leaveBalance, loading, error, createLeaveRequest, deleteLeaveRequest, refetchBalance } = useLeaves()
   const { 
     checkLeaveExpirationWarning,
     recalculateUserLeaves,
@@ -108,6 +108,25 @@ export function LeavesManagement() {
       recalculateUserLeaves(user.id)
     }
   }, [user, recalculateUserLeaves, calculatorLoading])
+
+  // Refresh balance when leaves change (e.g., when one gets approved)
+  useEffect(() => {
+    const approvedLeaves = leaves.filter(l => l.status === 'approved')
+    if (approvedLeaves.length > 0 && refetchBalance) {
+      refetchBalance()
+    }
+  }, [leaves, refetchBalance])
+
+  // Auto-refresh balance every 30 seconds
+  useEffect(() => {
+    if (!refetchBalance) return
+    
+    const interval = setInterval(() => {
+      refetchBalance()
+    }, 30000)
+
+    return () => clearInterval(interval)
+  }, [refetchBalance])
 
   const handleCreateLeave = async () => {
     if (!dateRange?.from || !dateRange?.to || !leaveType || !reason.trim()) {
@@ -188,7 +207,7 @@ export function LeavesManagement() {
           </CardHeader>
           <CardContent className="space-y-2">
             <p className="text-sm text-muted-foreground">
-              sur {leaveBalance?.paid_leave_days || 0} disponibles
+              sur {leaveBalance?.paid_leave_days || 0} jours acquis
             </p>
             {leaveBalance && (
               <Progress 
@@ -197,7 +216,7 @@ export function LeavesManagement() {
               />
             )}
             <p className="text-xs text-muted-foreground">
-              2,5 jours/mois • Max 30 jours/an
+              {leaveBalance?.used_paid_leave_days || 0} jours utilisés
             </p>
           </CardContent>
         </Card>
@@ -211,7 +230,7 @@ export function LeavesManagement() {
           </CardHeader>
           <CardContent className="space-y-2">
             <p className="text-sm text-muted-foreground">
-              sur {leaveBalance?.rtt_days || 0} disponibles
+              sur {leaveBalance?.rtt_days || 0} jours acquis
             </p>
             {leaveBalance && (
               <Progress 
@@ -220,25 +239,12 @@ export function LeavesManagement() {
               />
             )}
             <p className="text-xs text-muted-foreground">
-              {leaveBalance && leaveBalance.rtt_days > 0 
-                ? 'Compensation temps > 35h/sem'
-                : 'Aucun RTT (travail ≤ 35h/sem)'}
+              {leaveBalance?.used_rtt_days || 0} jours utilisés
             </p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Reference Period Info */}
-      {leaveBalance && (
-        <Alert>
-          <Info className="h-4 w-4" />
-          <AlertDescription>
-            Période de référence : du {format(new Date(leaveBalance.reference_period_start), 'dd MMMM yyyy', { locale: fr })} 
-            {' '}au {format(new Date(leaveBalance.reference_period_end), 'dd MMMM yyyy', { locale: fr })} 
-            • Mois travaillés : {Math.round(leaveBalance.months_worked * 10) / 10}
-          </AlertDescription>
-        </Alert>
-      )}
 
       {/* Leaves Table */}
       <Card>

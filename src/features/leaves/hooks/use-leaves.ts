@@ -243,5 +243,6 @@ export function useLeaves() {
     approveLeaveRequest,
     rejectLeaveRequest,
     refetch: fetchLeaves,
+    refetchBalance: fetchLeaveBalance,
   }
 }

@@ -502,15 +502,6 @@ export function LeavesAdminPanel() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Alert>
-                <Info className="h-4 w-4" />
-                <AlertDescription>
-                  <strong>Période de référence :</strong> Du 1er juin au 31 mai • 
-                  <strong> Calcul :</strong> 2,5 jours/mois (max 30j/an) • 
-                  <strong> RTT :</strong> Basé sur heures &gt; 35h/sem •
-                  <strong> Maladie :</strong> Sans limite légale
-                </AlertDescription>
-              </Alert>
               {employeeBalances && employeeBalances.length > 0 ? (
                 <Table className="mt-4">
                   <TableHeader>

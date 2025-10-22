@@ -157,7 +157,6 @@ export function EmployeeWorkingHoursSettings({ onUpdate }: WorkingHoursSettingsP
               <li>• Durée légale : 35 heures par semaine</li>
               <li>• Congés payés : 2,5 jours par mois travaillé (max 30 jours/an)</li>
               <li>• RTT : compensation pour heures &gt; 35h/semaine</li>
-              <li>• Période de référence : du 1er juin au 31 mai</li>
               <li>• Les congés non posés avant le 31 mai sont perdus</li>
             </ul>
           </div>
