@@ -1,6 +1,7 @@
-import { createClientComponentClient } from '@/lib/supabase'
+import { createServerComponentClient } from '@/lib/supabase'
 import { NextResponse } from 'next/server'
 import { NextRequest } from 'next/server'
+import { cookies } from 'next/headers'
 
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url)
@@ -8,7 +9,8 @@ export async function GET(request: NextRequest) {
   const next = requestUrl.searchParams.get('next') ?? '/dashboard'
 
   if (code) {
-    const supabase = createClientComponentClient()
+    const cookieStore = await cookies()
+    const supabase = await createServerComponentClient(cookieStore)
     
     // Échanger le code pour une session
     const { data: { session }, error } = await supabase.auth.exchangeCodeForSession(code)
