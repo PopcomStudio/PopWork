@@ -59,40 +59,45 @@ export async function middleware(request: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession()
 
-  const isAuthRoute = 
-    request.nextUrl.pathname.startsWith('/login') ||
+  const isAuthRoute =
+    request.nextUrl.pathname.startsWith('/auth/signin') ||
+    request.nextUrl.pathname.startsWith('/auth/callback') ||
+    request.nextUrl.pathname.startsWith('/auth/accept-invite') ||
+    request.nextUrl.pathname.startsWith('/auth/error') ||
     request.nextUrl.pathname.startsWith('/register')
-  const isProtectedRoute = 
+  const isProtectedRoute =
     request.nextUrl.pathname.startsWith('/dashboard') ||
     request.nextUrl.pathname.startsWith('/projects') ||
     request.nextUrl.pathname.startsWith('/tasks') ||
     request.nextUrl.pathname.startsWith('/team') ||
     request.nextUrl.pathname.startsWith('/clients') ||
-    request.nextUrl.pathname.startsWith('/invoicing') ||
+    request.nextUrl.pathname.startsWith('/entreprises') ||
+    request.nextUrl.pathname.startsWith('/contacts') ||
+    request.nextUrl.pathname.startsWith('/factures') ||
     request.nextUrl.pathname.startsWith('/time-tracking') ||
     request.nextUrl.pathname.startsWith('/calendar') ||
     request.nextUrl.pathname.startsWith('/documents') ||
     request.nextUrl.pathname.startsWith('/leaves') ||
     request.nextUrl.pathname.startsWith('/notifications') ||
     request.nextUrl.pathname.startsWith('/settings') ||
-    request.nextUrl.pathname.startsWith('/audit-log')
+    request.nextUrl.pathname.startsWith('/admin')
 
   // Si l'utilisateur est connecté et essaie d'accéder à la page de connexion
-  if (session && isAuthRoute) {
+  if (session && isAuthRoute && !request.nextUrl.pathname.startsWith('/auth/callback')) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
   // Si l'utilisateur n'est pas connecté et essaie d'accéder à une route protégée
   if (!session && isProtectedRoute) {
-    return NextResponse.redirect(new URL('/login', request.url))
+    return NextResponse.redirect(new URL('/auth/signin', request.url))
   }
 
-  // Rediriger la page d'accueil vers le dashboard si connecté, sinon vers login
+  // Rediriger la page d'accueil vers le dashboard si connecté, sinon vers signin
   if (request.nextUrl.pathname === '/') {
     if (session) {
       return NextResponse.redirect(new URL('/dashboard', request.url))
     } else {
-      return NextResponse.redirect(new URL('/login', request.url))
+      return NextResponse.redirect(new URL('/auth/signin', request.url))
     }
   }
 
