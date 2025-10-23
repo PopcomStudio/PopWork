@@ -37,7 +37,6 @@ export function useTeams() {
 	const fetchTeams = useCallback(async () => {
 		try {
 			setError(null);
-			console.log("Fetching teams...");
 
 			// Récupérer les équipes avec leurs statistiques calculées
 			const { data, error } = await supabase
@@ -65,8 +64,6 @@ export function useTeams() {
 				.is("deleted_at", null)
 				.order("created_at", { ascending: false });
 
-			console.log("Teams query result:", { data, error });
-
 			if (error) throw error;
 
 			// Mapper les équipes avec les statistiques réelles
@@ -91,12 +88,11 @@ export function useTeams() {
 					deleted_at: team.deleted_at,
 					member_count: memberCount,
 					project_count: projectCount,
-					lead_count: 0, // Pas utilisé maintenant
+					lead_count: 0,
 					last_activity: team.updated_at,
 				};
 			});
 
-			console.log("Mapped teams:", mappedTeams);
 			setTeams(mappedTeams);
 		} catch (err) {
 			console.error("Erreur lors du chargement des équipes:", err);

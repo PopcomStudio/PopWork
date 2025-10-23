@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { Plus, Search, Filter, Grid3X3, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,27 +40,29 @@ export function TeamManagement() {
 	}, []);
 
 	// Filtrer les équipes selon la recherche et l'onglet sélectionné
-	const filteredTeams = teams.filter((team) => {
-		const matchesSearch =
-			team.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-			team.description?.toLowerCase().includes(searchTerm.toLowerCase());
+	const filteredTeams = useMemo(() => {
+		return teams.filter((team) => {
+			const matchesSearch =
+				team.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+				team.description?.toLowerCase().includes(searchTerm.toLowerCase());
 
-		const matchesTab =
-			selectedTab === "all" ||
-			(selectedTab === "active" && team.is_active) ||
-			(selectedTab === "inactive" && !team.is_active);
+			const matchesTab =
+				selectedTab === "all" ||
+				(selectedTab === "active" && team.is_active) ||
+				(selectedTab === "inactive" && !team.is_active);
 
-		return matchesSearch && matchesTab;
-	});
+			return matchesSearch && matchesTab;
+		});
+	}, [teams, searchTerm, selectedTab]);
 
 	// Statistiques pour les badges
-	const stats = {
+	const stats = useMemo(() => ({
 		total: teams.length,
 		active: teams.filter((t) => t.is_active).length,
 		inactive: teams.filter((t) => !t.is_active).length,
-	};
+	}), [teams]);
 
-	const handleCreateTeam = async (teamData: CreateTeamData) => {
+	const handleCreateTeam = useCallback(async (teamData: CreateTeamData) => {
 		try {
 			const createdTeam = await createTeam(teamData);
 			setIsCreateDialogOpen(false);
@@ -69,14 +71,14 @@ export function TeamManagement() {
 			console.error("Erreur lors de la création de l'équipe:", error);
 			throw error;
 		}
-	};
+	}, [createTeam]);
 
-	const handleEditTeam = (team: TeamWithStats) => {
+	const handleEditTeam = useCallback((team: TeamWithStats) => {
 		setSelectedTeam(team);
 		setIsEditDialogOpen(true);
-	};
+	}, []);
 
-	const handleUpdateTeam = async (teamData: UpdateTeamData) => {
+	const handleUpdateTeam = useCallback(async (teamData: UpdateTeamData) => {
 		try {
 			const updatedTeam = await updateTeam(teamData);
 			setIsEditDialogOpen(false);
@@ -86,9 +88,9 @@ export function TeamManagement() {
 			console.error("Erreur lors de la mise à jour de l'équipe:", error);
 			throw error;
 		}
-	};
+	}, [updateTeam]);
 
-	const handleDeleteTeam = async (teamId: string) => {
+	const handleDeleteTeam = useCallback(async (teamId: string) => {
 		try {
 			if (confirm("Êtes-vous sûr de vouloir supprimer cette équipe ?")) {
 				await deleteTeam(teamId);
@@ -96,15 +98,15 @@ export function TeamManagement() {
 		} catch (error) {
 			console.error("Erreur lors de la suppression de l'équipe:", error);
 		}
-	};
+	}, [deleteTeam]);
 
-	const handleToggleTeamStatus = async (teamId: string, isActive: boolean) => {
+	const handleToggleTeamStatus = useCallback(async (teamId: string, isActive: boolean) => {
 		try {
 			await toggleTeamStatus(teamId, isActive);
 		} catch (error) {
 			console.error("Erreur lors du changement de statut:", error);
 		}
-	};
+	}, [toggleTeamStatus]);
 
 	if (error) {
 		return (
