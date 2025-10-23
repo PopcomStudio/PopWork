@@ -52,12 +52,23 @@ export async function middleware(request: NextRequest) {
           })
         },
       },
+      auth: {
+        // Désactiver le rafraîchissement automatique dans le middleware
+        // car cela cause des erreurs de fetch dans l'edge runtime
+        autoRefreshToken: false,
+        persistSession: false,
+        detectSessionInUrl: false,
+      },
     }
   )
 
+  // Vérifier la session (ne tentera pas de la rafraîchir grâce à autoRefreshToken: false)
   const {
     data: { session },
   } = await supabase.auth.getSession()
+
+  // Si pas de session et qu'on essaie d'accéder à une route protégée, on redirige
+  // Cela évite les tentatives de refresh qui échouent dans l'edge runtime
 
   const isAuthRoute =
     request.nextUrl.pathname.startsWith('/auth/signin') ||
