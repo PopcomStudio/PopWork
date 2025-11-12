@@ -220,13 +220,13 @@ export function useDashboardData() {
       .from('invoices')
       .select(`
         id,
-        number,
+        invoice_number,
         status,
-        amount,
-        due_date,
+        total_including_tax,
+        payment_due_date,
         created_at,
-        companies!inner(name),
-        services!inner(name)
+        companies!customer_company_id(name),
+        services!customer_service_id(name)
       `)
       .order('created_at', { ascending: false })
 
@@ -234,12 +234,12 @@ export function useDashboardData() {
 
     return data.map(invoice => ({
       id: invoice.id,
-      number: invoice.number,
+      number: invoice.invoice_number,
       status: invoice.status,
-      amount: parseFloat(invoice.amount.toString()),
-      companyName: invoice.companies[0]?.name || '',
-      serviceName: invoice.services[0]?.name || '',
-      dueDate: invoice.due_date,
+      amount: parseFloat(invoice.total_including_tax.toString()),
+      companyName: invoice.companies?.name || '',
+      serviceName: invoice.services?.name || '',
+      dueDate: invoice.payment_due_date,
       createdAt: invoice.created_at,
     }))
   }
