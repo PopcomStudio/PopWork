@@ -227,10 +227,10 @@ export function TaskCard({ task, onEdit }: TaskCardProps) {
             )}
           </div>
           
-          {/* Timer component */}
-          <div onClick={(e) => e.stopPropagation()}>
+          {/* Timer component - Temporairement désactivé pour diagnostiquer les erreurs 406 */}
+          {/* <div onClick={(e) => e.stopPropagation()}>
             <TaskTimer taskId={task.id} compact showTotal />
-          </div>
+          </div> */}
         </div>
       </CardContent>
     </Card>

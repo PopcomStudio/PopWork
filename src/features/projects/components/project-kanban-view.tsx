@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   DndContext,
   DragEndEvent,
@@ -26,10 +26,13 @@ import {
   Clock,
   AlertTriangle,
   Flag,
-  Calendar,
+  Calendar as CalendarIcon,
   User,
   GripVertical,
 } from 'lucide-react'
+import { CalendarDate, getLocalTimeZone, today, parseDate } from "@internationalized/date"
+import { format } from "date-fns"
+import { fr } from "date-fns/locale"
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -53,6 +56,8 @@ import {
 } from '@/components/ui/select'
 import { useTasks, type Task, type CreateTaskData, type UpdateTaskData } from '../hooks/use-tasks'
 import { useRolesPermissions } from '../../auth/hooks/use-roles-permissions'
+import { Calendar } from "@/components/ui/calendar-rac"
+import { cn } from "@/lib/utils"
 
 interface ProjectKanbanViewProps {
   projectId: string
@@ -90,6 +95,10 @@ function SortableTask({ task, onEdit, onDelete }: SortableTaskProps) {
     isDragging,
   } = useSortable({
     id: task.id,
+    data: {
+      type: 'task',
+      task,
+    },
     transition: {
       duration: 200,
       easing: 'cubic-bezier(0.25, 1, 0.5, 1)',
@@ -172,7 +181,7 @@ function SortableTask({ task, onEdit, onDelete }: SortableTaskProps) {
             {/* Date d'échéance */}
             {task.due_date && (
               <Badge variant="outline" className="text-xs">
-                <Calendar className="h-3 w-3 mr-1" />
+                <CalendarIcon className="h-3 w-3 mr-1" />
                 {new Date(task.due_date).toLocaleDateString('fr-FR')}
               </Badge>
             )}
@@ -218,7 +227,13 @@ interface DroppableColumnProps {
 function DroppableColumn({ column, tasks, onCreateTask, onEditTask, onDeleteTask }: DroppableColumnProps) {
   const { setNodeRef, isOver } = useDroppable({
     id: `column-${column.id}`,
+    data: {
+      type: 'column',
+      columnId: column.id,
+    },
   })
+
+  console.log(`📍 [COLUMN ${column.id}] isOver:`, isOver, 'tasks count:', tasks.length)
 
   return (
     <div className="space-y-4">
@@ -247,57 +262,78 @@ function DroppableColumn({ column, tasks, onCreateTask, onEditTask, onDeleteTask
 
       {/* Zone de drop pour les tâches avec animations */}
       <div
-        ref={setNodeRef}
-        className={`space-y-3 min-h-64 rounded-lg p-3 transition-all duration-300 ease-in-out border-2 ${
-          isOver 
-            ? 'bg-primary/5 border-primary/30 border-dashed shadow-lg scale-[1.02] ring-2 ring-primary/20' 
-            : 'border-transparent bg-muted/30'
-        }`}
+        className="flex flex-col rounded-lg min-h-64"
       >
-        <SortableContext items={tasks.map(task => task.id)} strategy={verticalListSortingStrategy}>
-          {tasks.map((task, index) => (
-            <div
-              key={task.id}
-              className="animate-in fade-in-0 slide-in-from-top-2"
-              style={{
-                animationDelay: `${index * 50}ms`,
-                animationDuration: '300ms',
-              }}
-            >
-              <SortableTask
-                task={task}
-                onEdit={onEditTask}
-                onDelete={onDeleteTask}
-              />
-            </div>
-          ))}
-        </SortableContext>
+        {/* Liste des tâches sortables */}
+        <div className="flex-1 space-y-3 p-3">
+          <SortableContext items={tasks.map(task => task.id)} strategy={verticalListSortingStrategy}>
+            {tasks.map((task, index) => (
+              <div
+                key={task.id}
+                className="animate-in fade-in-0 slide-in-from-top-2"
+                style={{
+                  animationDelay: `${index * 50}ms`,
+                  animationDuration: '300ms',
+                }}
+              >
+                <SortableTask
+                  task={task}
+                  onEdit={onEditTask}
+                  onDelete={onDeleteTask}
+                />
+              </div>
+            ))}
+          </SortableContext>
+        </div>
 
-        {tasks.length === 0 && (
-          <div className={`text-center py-12 text-muted-foreground transition-all duration-300 ${
-            isOver ? 'animate-pulse' : ''
-          }`}>
-            <div className={`inline-flex flex-col items-center gap-2 ${
-              isOver ? 'scale-110' : ''
+        {/* Zone de drop visible en bas de la colonne */}
+        <div
+          ref={setNodeRef}
+          className={`mx-3 mb-3 rounded-lg p-4 transition-all duration-300 ease-in-out border-2 ${
+            isOver
+              ? 'bg-primary/10 border-primary border-dashed shadow-lg ring-2 ring-primary/20 min-h-20'
+              : 'border-transparent bg-muted/20 min-h-12'
+          } ${tasks.length === 0 ? 'min-h-52' : ''}`}
+        >
+          {tasks.length === 0 ? (
+            <div className={`text-center py-12 text-muted-foreground transition-all duration-300 ${
+              isOver ? 'animate-pulse' : ''
+            }`}>
+              <div className={`inline-flex flex-col items-center gap-2 ${
+                isOver ? 'scale-110' : ''
+              }`}>
+                {isOver ? (
+                  <>
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Plus className="h-4 w-4 text-primary" />
+                    </div>
+                    <p className="text-sm font-medium text-primary">Déposez la tâche ici</p>
+                  </>
+                ) : (
+                  <>
+                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                      <Plus className="h-4 w-4" />
+                    </div>
+                    <p className="text-sm">Aucune tâche</p>
+                  </>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className={`flex items-center justify-center text-sm transition-all duration-300 ${
+              isOver ? 'text-primary font-medium' : 'text-muted-foreground'
             }`}>
               {isOver ? (
                 <>
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Plus className="h-4 w-4 text-primary" />
-                  </div>
-                  <p className="text-sm font-medium text-primary">Déposez la tâche ici</p>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Déposer ici
                 </>
               ) : (
-                <>
-                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                    <Plus className="h-4 w-4" />
-                  </div>
-                  <p className="text-sm">Aucune tâche</p>
-                </>
+                <span className="text-xs opacity-50">Zone de drop</span>
               )}
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   )
@@ -350,6 +386,10 @@ export function ProjectKanbanView({ projectId }: ProjectKanbanViewProps) {
     due_date: '',
   })
   const [taskLoading, setTaskLoading] = useState(false)
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false)
+  const [isEditCalendarOpen, setIsEditCalendarOpen] = useState(false)
+  const calendarRef = useRef<HTMLDivElement>(null)
+  const editCalendarRef = useRef<HTMLDivElement>(null)
 
   // Configuration des capteurs de drag
   const sensors = useSensors(
@@ -360,6 +400,26 @@ export function ProjectKanbanView({ projectId }: ProjectKanbanViewProps) {
     })
   )
 
+  // Fermer le calendrier quand on clique en dehors
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) {
+        setIsCalendarOpen(false)
+      }
+      if (editCalendarRef.current && !editCalendarRef.current.contains(event.target as Node)) {
+        setIsEditCalendarOpen(false)
+      }
+    }
+
+    if (isCalendarOpen || isEditCalendarOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isCalendarOpen, isEditCalendarOpen])
+
   const handleCreateTask = () => {
     setTaskForm({
       title: '',
@@ -367,6 +427,7 @@ export function ProjectKanbanView({ projectId }: ProjectKanbanViewProps) {
       priority: 'medium',
       due_date: '',
     })
+    setIsCalendarOpen(false)
     setIsCreateDialogOpen(true)
   }
 
@@ -383,6 +444,7 @@ export function ProjectKanbanView({ projectId }: ProjectKanbanViewProps) {
       priority: task.priority,
       due_date: task.due_date || '',
     })
+    setIsEditCalendarOpen(false)
     setIsEditDialogOpen(true)
   }
 
@@ -448,7 +510,9 @@ export function ProjectKanbanView({ projectId }: ProjectKanbanViewProps) {
 
   // Gestion des événements de drag and drop
   const handleDragStart = (event: DragStartEvent) => {
+    console.log('🎬 [DRAG START] Task ID:', event.active.id)
     const task = tasks.find(t => t.id === event.active.id)
+    console.log('🎬 [DRAG START] Task found:', task ? { id: task.id, title: task.title, status: task.status } : 'NOT FOUND')
     setActiveTask(task || null)
     // Petit effet de vibration sur mobile si disponible
     if (typeof navigator !== 'undefined' && navigator.vibrate) {
@@ -460,37 +524,66 @@ export function ProjectKanbanView({ projectId }: ProjectKanbanViewProps) {
     const { active, over } = event
     setActiveTask(null)
 
-    if (!over) return
+    console.log('🎯 [DRAG END] Event:', {
+      activeId: active.id,
+      overId: over?.id,
+      overData: over?.data?.current
+    })
+
+    if (!over) {
+      console.log('❌ [DRAG END] No over target')
+      return
+    }
 
     const taskId = active.id as string
-    const overId = over.id as string
 
-    // Déterminer le nouveau statut basé sur l'ID de la zone de drop
+    // Déterminer le nouveau statut en utilisant les données de la zone de drop
     let newStatus: 'todo' | 'in_progress' | 'done'
-    if (overId.includes('todo')) {
-      newStatus = 'todo'
-    } else if (overId.includes('in_progress')) {
-      newStatus = 'in_progress'
-    } else if (overId.includes('done')) {
-      newStatus = 'done'
+
+    // Vérifier le type de la zone de drop grâce aux données
+    const overData = over.data.current as any
+
+    console.log('📊 [DRAG END] Over data type:', overData?.type)
+
+    if (overData?.type === 'column') {
+      // On a droppé sur une colonne
+      newStatus = overData.columnId
+      console.log('✅ [DRAG END] Dropped on column:', newStatus)
+    } else if (overData?.type === 'task') {
+      // On a droppé sur une autre tâche - prendre le statut de cette tâche
+      newStatus = overData.task.status
+      console.log('✅ [DRAG END] Dropped on task, status:', newStatus)
     } else {
-      // Si on ne reconnaît pas la zone, chercher une tâche dans cette zone
-      const targetTask = tasks.find(t => t.id === overId)
-      if (targetTask) {
-        newStatus = targetTask.status
+      // Fallback: essayer de déterminer depuis l'ID
+      const overId = over.id as string
+      if (overId.startsWith('column-')) {
+        const columnId = overId.replace('column-', '') as typeof newStatus
+        newStatus = columnId
+        console.log('✅ [DRAG END] Status from column ID fallback:', newStatus)
       } else {
+        console.log('❌ [DRAG END] Cannot determine target status')
         return
       }
     }
 
     // Déplacer la tâche si nécessaire
     const currentTask = tasks.find(t => t.id === taskId)
+    console.log('📋 [DRAG END] Current task:', {
+      id: currentTask?.id,
+      currentStatus: currentTask?.status,
+      newStatus
+    })
+
     if (currentTask && currentTask.status !== newStatus) {
+      console.log('🚀 [DRAG END] Updating task status...')
       try {
         await updateTaskStatus(taskId, newStatus)
+        console.log('✅ [DRAG END] Task status updated successfully')
       } catch (error) {
-        console.error('Erreur lors du déplacement de la tâche:', error)
+        console.error('❌ [DRAG END] Error updating task:', error)
       }
+    } else {
+      console.log('⏭️ [DRAG END] No status change needed')
     }
   }
 
@@ -597,7 +690,7 @@ export function ProjectKanbanView({ projectId }: ProjectKanbanViewProps) {
                     </Badge>
                     {activeTask.due_date && (
                       <Badge variant="outline" className="text-xs">
-                        <Calendar className="h-3 w-3 mr-1" />
+                        <CalendarIcon className="h-3 w-3 mr-1" />
                         {new Date(activeTask.due_date).toLocaleDateString('fr-FR')}
                       </Badge>
                     )}
@@ -655,8 +748,8 @@ export function ProjectKanbanView({ projectId }: ProjectKanbanViewProps) {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="task-priority">Priorité</Label>
-                <Select 
-                  value={taskForm.priority} 
+                <Select
+                  value={taskForm.priority}
                   onValueChange={(value) => setTaskForm(prev => ({ ...prev, priority: value as 'low' | 'medium' | 'high' }))}
                 >
                   <SelectTrigger>
@@ -670,14 +763,48 @@ export function ProjectKanbanView({ projectId }: ProjectKanbanViewProps) {
                 </Select>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 relative">
                 <Label htmlFor="task-due-date">Date d'échéance</Label>
-                <Input
-                  id="task-due-date"
-                  type="date"
-                  value={taskForm.due_date}
-                  onChange={(e) => setTaskForm(prev => ({ ...prev, due_date: e.target.value }))}
-                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  className={cn(
+                    "group bg-background hover:bg-background border-input w-full justify-between px-3 font-normal outline-offset-0 outline-none focus-visible:outline-[3px]",
+                    !taskForm.due_date && "text-muted-foreground"
+                  )}
+                  onClick={() => setIsCalendarOpen(!isCalendarOpen)}
+                >
+                  <span className="truncate">
+                    {taskForm.due_date
+                      ? format(new Date(taskForm.due_date), "d MMM yyyy", { locale: fr })
+                      : "Choisir une date"
+                    }
+                  </span>
+                  <CalendarIcon
+                    size={16}
+                    className="text-muted-foreground/80 group-hover:text-foreground shrink-0 transition-colors"
+                    aria-hidden="true"
+                  />
+                </Button>
+
+                {isCalendarOpen && (
+                  <div
+                    ref={calendarRef}
+                    className="absolute top-full left-0 mt-1 z-[9999] bg-background border rounded-md shadow-lg"
+                  >
+                    <Calendar
+                      className="rounded-md p-2"
+                      value={taskForm.due_date ? parseDate(taskForm.due_date) : null}
+                      onChange={(date) => {
+                        if (date) {
+                          const dateString = format(date.toDate(getLocalTimeZone()), "yyyy-MM-dd")
+                          setTaskForm(prev => ({ ...prev, due_date: dateString }))
+                          setIsCalendarOpen(false)
+                        }
+                      }}
+                    />
+                  </div>
+                )}
               </div>
             </div>
 
@@ -732,8 +859,8 @@ export function ProjectKanbanView({ projectId }: ProjectKanbanViewProps) {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="edit-task-priority">Priorité</Label>
-                <Select 
-                  value={taskForm.priority} 
+                <Select
+                  value={taskForm.priority}
                   onValueChange={(value) => setTaskForm(prev => ({ ...prev, priority: value as 'low' | 'medium' | 'high' }))}
                 >
                   <SelectTrigger>
@@ -747,14 +874,48 @@ export function ProjectKanbanView({ projectId }: ProjectKanbanViewProps) {
                 </Select>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 relative">
                 <Label htmlFor="edit-task-due-date">Date d'échéance</Label>
-                <Input
-                  id="edit-task-due-date"
-                  type="date"
-                  value={taskForm.due_date}
-                  onChange={(e) => setTaskForm(prev => ({ ...prev, due_date: e.target.value }))}
-                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  className={cn(
+                    "group bg-background hover:bg-background border-input w-full justify-between px-3 font-normal outline-offset-0 outline-none focus-visible:outline-[3px]",
+                    !taskForm.due_date && "text-muted-foreground"
+                  )}
+                  onClick={() => setIsEditCalendarOpen(!isEditCalendarOpen)}
+                >
+                  <span className="truncate">
+                    {taskForm.due_date
+                      ? format(new Date(taskForm.due_date), "d MMM yyyy", { locale: fr })
+                      : "Choisir une date"
+                    }
+                  </span>
+                  <CalendarIcon
+                    size={16}
+                    className="text-muted-foreground/80 group-hover:text-foreground shrink-0 transition-colors"
+                    aria-hidden="true"
+                  />
+                </Button>
+
+                {isEditCalendarOpen && (
+                  <div
+                    ref={editCalendarRef}
+                    className="absolute top-full left-0 mt-1 z-[9999] bg-background border rounded-md shadow-lg"
+                  >
+                    <Calendar
+                      className="rounded-md p-2"
+                      value={taskForm.due_date ? parseDate(taskForm.due_date) : null}
+                      onChange={(date) => {
+                        if (date) {
+                          const dateString = format(date.toDate(getLocalTimeZone()), "yyyy-MM-dd")
+                          setTaskForm(prev => ({ ...prev, due_date: dateString }))
+                          setIsEditCalendarOpen(false)
+                        }
+                      }}
+                    />
+                  </div>
+                )}
               </div>
             </div>
 

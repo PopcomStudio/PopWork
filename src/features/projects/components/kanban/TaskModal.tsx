@@ -24,15 +24,20 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
-import { 
-  Calendar, 
-  User as UserIcon, 
+import {
+  Calendar as CalendarIcon,
+  User as UserIcon,
   Tag as TagIcon,
   Flag,
   MessageSquare,
   Paperclip,
   Plus
 } from 'lucide-react';
+import { Calendar } from "@/components/ui/calendar-rac";
+import { CalendarDate, getLocalTimeZone, parseDate } from "@internationalized/date";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
+import { cn } from "@/lib/utils";
 import { createClientComponentClient } from '@/lib/supabase';
 import { CommentItem } from '../discussion/CommentItem';
 import { CommentEditor } from '../discussion/CommentEditor';
@@ -56,7 +61,7 @@ export function TaskModal({ task, isOpen, onClose, updateTask, projectId }: Task
     description: task?.description || '',
     status: task?.status || 'todo' as TaskStatus,
     priority: task?.priority || 'medium' as Task['priority'],
-    due_date: task?.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : '',
+    due_date: task?.due_date ? new Date(task.due_date).toISOString().split('T')[0] : '',
     assignee_ids: task?.assignees?.map(a => a.id) || [],
     tag_ids: task?.tags?.map(t => t.id) || []
   });
@@ -68,6 +73,8 @@ export function TaskModal({ task, isOpen, onClose, updateTask, projectId }: Task
   const [isUpdatingFromRealTime, setIsUpdatingFromRealTime] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [assigneeSearch, setAssigneeSearch] = useState('');
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const calendarRef = useRef<HTMLDivElement>(null);
 
   // Hooks pour les commentaires et pièces jointes
   const {
@@ -151,6 +158,38 @@ export function TaskModal({ task, isOpen, onClose, updateTask, projectId }: Task
       setTimeout(() => setIsUpdatingFromRealTime(false), 200);
     }
   }, [task?.id, supabase, isUpdatingFromRealTime]);
+
+  // Mettre à jour formData quand task change
+  useEffect(() => {
+    if (task) {
+      setFormData({
+        title: task.title || '',
+        description: task.description || '',
+        status: task.status || 'todo' as TaskStatus,
+        priority: task.priority || 'medium' as Task['priority'],
+        due_date: task.due_date ? new Date(task.due_date).toISOString().split('T')[0] : '',
+        assignee_ids: task.assignees?.map(a => a.id) || [],
+        tag_ids: task.tags?.map(t => t.id) || []
+      });
+    }
+  }, [task]);
+
+  // Fermer le calendrier quand on clique en dehors
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) {
+        setIsCalendarOpen(false);
+      }
+    };
+
+    if (isCalendarOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isCalendarOpen]);
 
   // Charger les données nécessaires
   useEffect(() => {
@@ -624,17 +663,51 @@ export function TaskModal({ task, isOpen, onClose, updateTask, projectId }: Task
                 <Separator />
 
                 {/* Date d'échéance */}
-                <div className="space-y-3">
+                <div className="space-y-3 relative">
                   <Label className="text-sm font-medium flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
+                    <CalendarIcon className="h-4 w-4" />
                     Deadline
                   </Label>
-                  <Input
-                    type="date"
-                    value={formData.due_date}
-                    onChange={(e) => setFormData(prev => ({ ...prev, due_date: e.target.value }))}
-                    className="text-sm"
-                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className={cn(
+                      "group bg-background hover:bg-background border-input w-full justify-between px-3 font-normal outline-offset-0 outline-none focus-visible:outline-[3px] text-sm",
+                      !formData.due_date && "text-muted-foreground"
+                    )}
+                    onClick={() => setIsCalendarOpen(!isCalendarOpen)}
+                  >
+                    <span className="truncate">
+                      {formData.due_date && formData.due_date.trim() !== ''
+                        ? format(new Date(formData.due_date), "d MMM yyyy", { locale: fr })
+                        : "Choisir une date"
+                      }
+                    </span>
+                    <CalendarIcon
+                      size={16}
+                      className="text-muted-foreground/80 group-hover:text-foreground shrink-0 transition-colors"
+                      aria-hidden="true"
+                    />
+                  </Button>
+
+                  {isCalendarOpen && (
+                    <div
+                      ref={calendarRef}
+                      className="absolute top-full left-0 mt-1 z-[9999] bg-background border rounded-md shadow-lg"
+                    >
+                      <Calendar
+                        className="rounded-md p-2"
+                        value={formData.due_date && formData.due_date.trim() !== '' ? parseDate(formData.due_date) : null}
+                        onChange={(date) => {
+                          if (date) {
+                            const dateString = format(date.toDate(getLocalTimeZone()), "yyyy-MM-dd");
+                            setFormData(prev => ({ ...prev, due_date: dateString }));
+                            setIsCalendarOpen(false);
+                          }
+                        }}
+                      />
+                    </div>
+                  )}
                 </div>
 
                 <Separator />
