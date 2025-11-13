@@ -29,6 +29,7 @@ export function ProjectGanttView({ projectId }: ProjectGanttViewProps) {
   const ganttInstanceRef = useRef<GanttInstance>(null)
   const [viewMode, setViewMode] = useState<ViewMode>('Day')
   const [GanttLib, setGanttLib] = useState<GanttInstance>(null)
+  const scrollPositionRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
 
   // Charger frappe-gantt dynamiquement côté client
   useEffect(() => {
@@ -53,6 +54,15 @@ export function ProjectGanttView({ projectId }: ProjectGanttViewProps) {
 
   useEffect(() => {
     if (!ganttRef.current || loading || tasks.length === 0 || !GanttLib) return
+
+    // Sauvegarder la position de scroll actuelle
+    const ganttContainer = ganttRef.current.querySelector('.gantt-container')
+    if (ganttContainer && ganttInstanceRef.current) {
+      scrollPositionRef.current = {
+        x: ganttContainer.scrollLeft,
+        y: ganttContainer.scrollTop,
+      }
+    }
 
     // Transformer les tâches au format Frappe Gantt
     const ganttTasks = tasks.map((task: Task) => {
@@ -84,6 +94,14 @@ export function ProjectGanttView({ projectId }: ProjectGanttViewProps) {
     try {
       if (ganttInstanceRef.current) {
         ganttInstanceRef.current.refresh(ganttTasks)
+
+        // Restaurer la position de scroll après le refresh
+        setTimeout(() => {
+          if (ganttContainer && scrollPositionRef.current) {
+            ganttContainer.scrollLeft = scrollPositionRef.current.x
+            ganttContainer.scrollTop = scrollPositionRef.current.y
+          }
+        }, 50)
       } else {
         ganttInstanceRef.current = new GanttLib(ganttRef.current, ganttTasks, {
           view_mode: viewMode,
