@@ -72,6 +72,7 @@ export interface Task {
   status: 'todo' | 'in_progress' | 'review' | 'done'
   priority: 'low' | 'medium' | 'high' | 'urgent'
   project_id: string
+  start_date?: string
   due_date?: string
   created_at: string
   updated_at: string

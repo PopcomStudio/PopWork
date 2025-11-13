@@ -10,6 +10,7 @@ export interface Task {
   status: 'todo' | 'in_progress' | 'done'
   priority: 'low' | 'medium' | 'high'
   project_id: string
+  start_date: string | null
   due_date: string | null
   created_at: string
   updated_at: string
@@ -34,6 +35,7 @@ export interface CreateTaskData {
   status: 'todo' | 'in_progress' | 'done'
   priority: 'low' | 'medium' | 'high'
   project_id: string
+  start_date?: string
   due_date?: string
   assignee_ids?: string[]
 }
@@ -64,6 +66,7 @@ export function useTasks(projectId: string) {
           status,
           priority,
           project_id,
+          start_date,
           due_date,
           created_at,
           updated_at,
@@ -133,9 +136,10 @@ export function useTasks(projectId: string) {
           status: taskData.status,
           priority: taskData.priority,
           project_id: taskData.project_id,
+          start_date: taskData.start_date || null,
           due_date: taskData.due_date || null,
         }])
-        .select('id, title, description, status, priority, project_id, due_date, created_at, updated_at')
+        .select('id, title, description, status, priority, project_id, start_date, due_date, created_at, updated_at')
         .single()
 
       if (taskError) throw taskError
@@ -203,10 +207,11 @@ export function useTasks(projectId: string) {
           description: taskData.description || null,
           status: taskData.status,
           priority: taskData.priority,
+          start_date: taskData.start_date || null,
           due_date: taskData.due_date || null,
         })
         .eq('id', taskData.id)
-        .select('id, title, description, status, priority, project_id, due_date, created_at, updated_at')
+        .select('id, title, description, status, priority, project_id, start_date, due_date, created_at, updated_at')
         .single()
 
       if (taskError) throw taskError

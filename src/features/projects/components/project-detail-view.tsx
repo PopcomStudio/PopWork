@@ -48,6 +48,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Checkbox } from '@/components/ui/checkbox'
 import { KanbanBoard } from './kanban/KanbanBoard'
+import { ProjectGanttView } from './project-gantt-view'
 
 interface ProjectDetailViewProps {
   projectId: string
@@ -97,13 +98,13 @@ export function ProjectDetailView({ projectId }: ProjectDetailViewProps) {
           status: foundProject.status,
         })
         
-        // Initialiser l'affichage de l'équipe avec les vraies données si disponibles
+        // Initialiser l'affichage de l&apos;équipe avec les vraies données si disponibles
         initializeTeamDisplay()
       }
     }
   }, [projects, loading, projectId])
 
-  // Initialiser l'affichage de l'équipe avec les vraies données depuis la DB
+  // Initialiser l'affichage de l&apos;équipe avec les vraies données depuis la DB
   const initializeTeamDisplay = async () => {
     try {
       const assignments = await fetchProjectAssignees(projectId)
@@ -529,16 +530,7 @@ export function ProjectDetailView({ projectId }: ProjectDetailViewProps) {
 
           {/* Onglet Gant */}
           <TabsContent value="gantt" className="space-y-6 mt-6">
-            <div className="flex items-center gap-2 mb-6">
-              <Activity className="h-5 w-5" />
-              <h2 className="text-xl font-semibold">Diagramme de Gant</h2>
-            </div>
-            
-            <div className="text-center py-16">
-              <Activity className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <p className="text-muted-foreground mb-2">Diagramme de Gant en cours de développement</p>
-              <p className="text-sm text-muted-foreground">Ici s&apos;affichera la planification temporelle du projet</p>
-            </div>
+            <ProjectGanttView projectId={projectId} />
           </TabsContent>
 
           {/* Onglet Calendrier */}
