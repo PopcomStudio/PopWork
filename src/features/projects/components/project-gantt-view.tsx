@@ -89,6 +89,7 @@ export function ProjectGanttView({ projectId }: ProjectGanttViewProps) {
           view_mode: viewMode,
           date_format: 'YYYY-MM-DD',
           language: 'fr',
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           custom_popup_html: function(task: any) {
             const taskData = tasks.find(t => t.id === task.id)
             if (!taskData) return ''
@@ -110,6 +111,7 @@ export function ProjectGanttView({ projectId }: ProjectGanttViewProps) {
               </div>
             `
           },
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           on_date_change: async (task: any, start: Date, end: Date) => {
             const taskData = tasks.find(t => t.id === task.id)
             if (!taskData) return
@@ -128,6 +130,7 @@ export function ProjectGanttView({ projectId }: ProjectGanttViewProps) {
               console.error('Erreur lors de la mise à jour de la tâche:', err)
             }
           },
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           on_progress_change: async (task: any, progress: number) => {
             const taskData = tasks.find(t => t.id === task.id)
             if (!taskData) return
@@ -264,6 +267,7 @@ export function ProjectGanttView({ projectId }: ProjectGanttViewProps) {
           min-height: 400px;
         }
 
+        /* Définir les couleurs de base pour les barres */
         .gantt-task-done .bar {
           fill: #22c55e !important;
         }
@@ -274,6 +278,31 @@ export function ProjectGanttView({ projectId }: ProjectGanttViewProps) {
 
         .gantt-task-todo .bar {
           fill: #3b82f6 !important;
+        }
+
+        /* Styles pour la barre de progression avec pattern rayé */
+        .gantt .bar-progress {
+          fill: url(#diagonalStripes) !important;
+          opacity: 0.85;
+        }
+
+        /* Pattern rayé diagonal pour la partie complétée */
+        .gantt-task-done .bar-progress {
+          fill: url(#diagonalStripesGreen) !important;
+        }
+
+        .gantt-task-in-progress .bar-progress {
+          fill: url(#diagonalStripesOrange) !important;
+        }
+
+        .gantt-task-todo .bar-progress {
+          fill: url(#diagonalStripesBlue) !important;
+        }
+
+        /* Améliorer la visibilité du pattern */
+        .gantt .bar-wrapper .bar-progress {
+          stroke: none;
+          opacity: 0.9;
         }
 
         .gantt-popup {
@@ -298,6 +327,29 @@ export function ProjectGanttView({ projectId }: ProjectGanttViewProps) {
           color: #333;
         }
       `}</style>
+
+      {/* Définir les patterns SVG pour les rayures */}
+      <svg width="0" height="0" style={{ position: 'absolute' }}>
+        <defs>
+          {/* Pattern pour les tâches vertes (terminées) */}
+          <pattern id="diagonalStripesGreen" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <rect width="4" height="8" fill="#16a34a" />
+            <rect x="4" width="4" height="8" fill="#22c55e" />
+          </pattern>
+
+          {/* Pattern pour les tâches oranges (en cours) */}
+          <pattern id="diagonalStripesOrange" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <rect width="4" height="8" fill="#c2410c" />
+            <rect x="4" width="4" height="8" fill="#f97316" />
+          </pattern>
+
+          {/* Pattern pour les tâches bleues (à faire) */}
+          <pattern id="diagonalStripesBlue" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <rect width="4" height="8" fill="#1e40af" />
+            <rect x="4" width="4" height="8" fill="#3b82f6" />
+          </pattern>
+        </defs>
+      </svg>
     </div>
   )
 }
