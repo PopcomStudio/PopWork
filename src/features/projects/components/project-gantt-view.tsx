@@ -30,6 +30,8 @@ export function ProjectGanttView({ projectId }: ProjectGanttViewProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('Day')
   const [GanttLib, setGanttLib] = useState<GanttInstance>(null)
   const scrollPositionRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
+  const isDraggingRef = useRef(false)
+  const lastUpdateTimeRef = useRef(0)
 
   // Charger frappe-gantt dynamiquement côté client
   useEffect(() => {
@@ -55,9 +57,9 @@ export function ProjectGanttView({ projectId }: ProjectGanttViewProps) {
   useEffect(() => {
     if (!ganttRef.current || loading || tasks.length === 0 || !GanttLib) return
 
-    // Sauvegarder la position de scroll actuelle
+    // Sauvegarder la position de scroll actuelle (seulement si pas en train de drag)
     const ganttContainer = ganttRef.current.querySelector('.gantt-container')
-    if (ganttContainer && ganttInstanceRef.current) {
+    if (ganttContainer && ganttInstanceRef.current && !isDraggingRef.current) {
       scrollPositionRef.current = {
         x: ganttContainer.scrollLeft,
         y: ganttContainer.scrollTop,
@@ -95,13 +97,19 @@ export function ProjectGanttView({ projectId }: ProjectGanttViewProps) {
       if (ganttInstanceRef.current) {
         ganttInstanceRef.current.refresh(ganttTasks)
 
-        // Restaurer la position de scroll après le refresh
-        setTimeout(() => {
-          if (ganttContainer && scrollPositionRef.current) {
-            ganttContainer.scrollLeft = scrollPositionRef.current.x
-            ganttContainer.scrollTop = scrollPositionRef.current.y
-          }
-        }, 50)
+        // Restaurer la position de scroll après le refresh (seulement si pas en drag et si assez de temps écoulé)
+        const now = Date.now()
+        const timeSinceLastUpdate = now - lastUpdateTimeRef.current
+
+        // Ne restaurer que si plus de 500ms depuis la dernière mise à jour (pour éviter les conflits pendant le drag)
+        if (!isDraggingRef.current && timeSinceLastUpdate > 500) {
+          setTimeout(() => {
+            if (ganttContainer && scrollPositionRef.current) {
+              ganttContainer.scrollLeft = scrollPositionRef.current.x
+              ganttContainer.scrollTop = scrollPositionRef.current.y
+            }
+          }, 50)
+        }
       } else {
         ganttInstanceRef.current = new GanttLib(ganttRef.current, ganttTasks, {
           view_mode: viewMode,
@@ -134,6 +142,10 @@ export function ProjectGanttView({ projectId }: ProjectGanttViewProps) {
             const taskData = tasks.find(t => t.id === task.id)
             if (!taskData) return
 
+            // Marquer le début de la mise à jour
+            isDraggingRef.current = true
+            lastUpdateTimeRef.current = Date.now()
+
             try {
               await updateTask({
                 id: task.id,
@@ -146,12 +158,21 @@ export function ProjectGanttView({ projectId }: ProjectGanttViewProps) {
               })
             } catch (err) {
               console.error('Erreur lors de la mise à jour de la tâche:', err)
+            } finally {
+              // Réactiver après un délai
+              setTimeout(() => {
+                isDraggingRef.current = false
+              }, 1000)
             }
           },
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           on_progress_change: async (task: any, progress: number) => {
             const taskData = tasks.find(t => t.id === task.id)
             if (!taskData) return
+
+            // Marquer le début de la mise à jour
+            isDraggingRef.current = true
+            lastUpdateTimeRef.current = Date.now()
 
             // Déterminer le nouveau statut basé sur le progrès
             let newStatus: 'todo' | 'in_progress' | 'done' = 'todo'
@@ -173,6 +194,11 @@ export function ProjectGanttView({ projectId }: ProjectGanttViewProps) {
               })
             } catch (err) {
               console.error('Erreur lors de la mise à jour de la tâche:', err)
+            } finally {
+              // Réactiver après un délai
+              setTimeout(() => {
+                isDraggingRef.current = false
+              }, 1000)
             }
           },
         })
