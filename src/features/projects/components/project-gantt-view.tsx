@@ -35,23 +35,10 @@ export function ProjectGanttView({ projectId }: ProjectGanttViewProps) {
 
   // Charger frappe-gantt dynamiquement côté client
   useEffect(() => {
-    // Charger le CSS
-    const link = document.createElement('link')
-    link.rel = 'stylesheet'
-    link.href = '/frappe-gantt.css'
-    document.head.appendChild(link)
-
-    // Charger la bibliothèque
+    // Charger la bibliothèque (le CSS est déjà chargé globalement)
     import('frappe-gantt').then((module) => {
       setGanttLib(() => module.default)
     })
-
-    return () => {
-      // Nettoyer le lien CSS si besoin
-      if (link.parentNode) {
-        link.parentNode.removeChild(link)
-      }
-    }
   }, [])
 
   useEffect(() => {

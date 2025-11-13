@@ -3,6 +3,9 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Import Frappe Gantt CSS */
+@import url('/frappe-gantt.css');
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
