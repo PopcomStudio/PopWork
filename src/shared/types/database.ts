@@ -700,4 +700,186 @@ export interface ClientFeedback {
   rating: number
   comment: string
   createdAt: string
+}
+
+// ============================================
+// PROJECT ADMINISTRATION
+// ============================================
+
+/**
+ * Contract status
+ */
+export type ContractStatus = 'draft' | 'active' | 'expired' | 'terminated'
+
+/**
+ * Contract type
+ */
+export type ContractType =
+  | 'service_agreement'
+  | 'maintenance'
+  | 'development'
+  | 'consulting'
+  | 'other'
+
+/**
+ * Project contract
+ */
+export interface ProjectContract {
+  id: string
+  project_id: string
+  name: string
+  contract_type?: ContractType
+  status: ContractStatus
+  start_date?: string
+  end_date?: string
+  amount_total?: number
+  payment_terms?: string
+  file_path?: string
+  notes?: string
+  created_at: string
+  updated_at: string
+  created_by?: string
+}
+
+/**
+ * Quote status
+ */
+export type QuoteStatus = 'draft' | 'submitted' | 'accepted' | 'rejected' | 'expired'
+
+/**
+ * Project quote (devis)
+ */
+export interface ProjectQuote {
+  id: string
+  project_id: string
+  quote_number: string
+  quote_date: string
+  status: QuoteStatus
+  valid_until?: string
+
+  // Customer info
+  customer_company_id: string
+  customer_service_id?: string
+  customer_name: string
+  customer_address?: string
+  customer_postal_code?: string
+  customer_city?: string
+  customer_country: string
+  customer_siret?: string
+
+  // Amounts
+  subtotal_excluding_tax: number
+  total_vat_amount: number
+  total_including_tax: number
+
+  // Payment conditions
+  payment_terms: PaymentTerms
+  payment_terms_days?: number
+
+  // Notes
+  notes?: string
+  customer_notes?: string
+
+  // Files
+  file_path?: string
+
+  // Metadata
+  created_at: string
+  updated_at: string
+  created_by?: string
+  accepted_at?: string
+  accepted_by?: string
+}
+
+/**
+ * Quote line
+ */
+export interface QuoteLine {
+  id: string
+  quote_id: string
+  line_number: number
+
+  // Description
+  description: string
+  product_code?: string
+
+  // Quantity and unit
+  quantity: number
+  unit: string
+
+  // Pricing
+  unit_price_excluding_tax: number
+  subtotal_excluding_tax: number
+
+  // Discount
+  discount_rate?: number
+  discount_amount?: number
+  subtotal_after_discount: number
+
+  // VAT
+  vat_rate: number
+  vat_amount: number
+
+  // Total
+  total_including_tax: number
+
+  created_at: string
+  updated_at: string
+}
+
+/**
+ * Deliverable status
+ */
+export type DeliverableStatus = 'pending' | 'in_progress' | 'completed' | 'validated'
+
+/**
+ * Project deliverable
+ */
+export interface ProjectDeliverable {
+  id: string
+  project_id: string
+  name: string
+  description?: string
+  status: DeliverableStatus
+  due_date?: string
+  completed_at?: string
+
+  // Validation
+  validated: boolean
+  validated_at?: string
+  validated_by?: string
+
+  // File attachment
+  file_attachment_id?: string
+  file_path?: string
+
+  // Order for display
+  display_order: number
+
+  created_at: string
+  updated_at: string
+  created_by?: string
+
+  // Relation virtuelle pour les items
+  items?: DeliverableItem[]
+}
+
+/**
+ * Deliverable item (sub-task in checklist)
+ */
+export interface DeliverableItem {
+  id: string
+  deliverable_id: string
+  name: string
+  description?: string
+  status: 'pending' | 'completed'
+  completed: boolean
+  completed_at?: string
+  completed_by?: string
+
+  // Order for display
+  display_order: number
+
+  created_at: string
+  updated_at: string
 } 

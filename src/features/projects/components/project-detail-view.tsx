@@ -51,6 +51,9 @@ import { KanbanBoard } from './kanban/KanbanBoard'
 import { ProjectGanttView } from './project-gantt-view'
 import { ProjectCalendarView } from './project-calendar-view'
 import { ProjectFilesManager } from './project-files-manager'
+import { ProjectContracts } from './administration/project-contracts'
+import { ProjectQuotes } from './administration/project-quotes'
+import { ProjectDeliverables } from './administration/project-deliverables'
 
 interface ProjectDetailViewProps {
   projectId: string
@@ -545,18 +548,18 @@ export function ProjectDetailView({ projectId }: ProjectDetailViewProps) {
             <ProjectFilesManager projectId={projectId} />
           </TabsContent>
                      {/* Onglet Administration */}
-           <TabsContent value="administration" className="space-y-6 mt-6">
-             <div className="flex items-center gap-2 mb-6">
-               <Settings className="h-5 w-5" />
-               <h2 className="text-xl font-semibold">Administration du projet</h2>
-             </div>
-             
-             <div className="text-center py-16">
-               <Settings className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-               <p className="text-muted-foreground mb-2">Administration du projet en cours de développement</p>
-               <p className="text-sm text-muted-foreground">Ici s&apos;affichera les paramètres du projet</p>
-             </div>
-           </TabsContent>
+          <TabsContent value="administration" className="space-y-6 mt-6">
+            <div className="flex items-center gap-2 mb-6">
+              <Settings className="h-5 w-5" />
+              <h2 className="text-xl font-semibold">Administration du projet</h2>
+            </div>
+
+            <div className="space-y-6">
+              <ProjectContracts projectId={projectId} />
+              <ProjectQuotes projectId={projectId} />
+              <ProjectDeliverables projectId={projectId} />
+            </div>
+          </TabsContent>
         </Tabs>
       </div>
 
