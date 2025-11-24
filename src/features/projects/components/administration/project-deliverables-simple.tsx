@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from 'react'
-import { CheckCircle, Plus, Trash2 } from 'lucide-react'
+import { CheckCircle, Plus, Trash2, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -28,30 +28,43 @@ export function ProjectDeliverablesSimple({ projectId }: ProjectDeliverablesSimp
     loading,
     error,
     createDeliverable,
+    updateDeliverable,
     deleteDeliverable,
     addItem,
     toggleItemCompletion,
     deleteItem,
   } = useProjectDeliverables(projectId)
 
-  const [isAddDeliverableOpen, setIsAddDeliverableOpen] = useState(false)
-  const [isAddItemOpen, setIsAddItemOpen] = useState(false)
-  const [selectedDeliverableId, setSelectedDeliverableId] = useState<string | null>(null)
-  const [newDeliverableName, setNewDeliverableName] = useState('')
-  const [newItemName, setNewItemName] = useState('')
+  const [isAddTaskOpen, setIsAddTaskOpen] = useState(false)
+  const [newTaskName, setNewTaskName] = useState('')
+  const [isSubtask, setIsSubtask] = useState(false)
+  const [parentDeliverableId, setParentDeliverableId] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
 
-  const handleAddDeliverable = async () => {
-    if (!newDeliverableName.trim()) return
+  const handleAddTask = async () => {
+    if (!newTaskName.trim()) return
 
     try {
       setSaving(true)
-      await createDeliverable({
-        project_id: projectId,
-        name: newDeliverableName,
-      })
-      setNewDeliverableName('')
-      setIsAddDeliverableOpen(false)
+
+      if (isSubtask && parentDeliverableId) {
+        // Ajouter une sous-tâche
+        await addItem({
+          deliverable_id: parentDeliverableId,
+          name: newTaskName,
+        })
+      } else {
+        // Ajouter une tâche principale
+        await createDeliverable({
+          project_id: projectId,
+          name: newTaskName,
+        })
+      }
+
+      setNewTaskName('')
+      setIsAddTaskOpen(false)
+      setIsSubtask(false)
+      setParentDeliverableId(null)
     } catch (err) {
       console.error('Erreur:', err)
     } finally {
@@ -59,37 +72,25 @@ export function ProjectDeliverablesSimple({ projectId }: ProjectDeliverablesSimp
     }
   }
 
-  const handleAddItem = async () => {
-    if (!newItemName.trim() || !selectedDeliverableId) return
-
+  const handleToggleDeliverable = async (deliverableId: string, currentStatus: string) => {
     try {
-      setSaving(true)
-      await addItem({
-        deliverable_id: selectedDeliverableId,
-        name: newItemName,
-      })
-      setNewItemName('')
-      setIsAddItemOpen(false)
-    } catch (err) {
-      console.error('Erreur:', err)
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  const handleToggleItem = async (itemId: string, deliverableId: string, completed: boolean) => {
-    try {
-      await toggleItemCompletion(itemId, deliverableId, !completed)
+      const newStatus = currentStatus === 'completed' ? 'pending' : 'completed'
+      await updateDeliverable(deliverableId, { status: newStatus })
     } catch (err) {
       console.error('Erreur:', err)
     }
   }
 
-  const getCompletionStats = (deliverable: any) => {
-    if (!deliverable.items || deliverable.items.length === 0) return null
-    const completed = deliverable.items.filter((item: any) => item.completed).length
-    const total = deliverable.items.length
-    return { completed, total }
+  const openAddSubtask = (deliverableId: string) => {
+    setParentDeliverableId(deliverableId)
+    setIsSubtask(true)
+    setIsAddTaskOpen(true)
+  }
+
+  const openAddTask = () => {
+    setParentDeliverableId(null)
+    setIsSubtask(false)
+    setIsAddTaskOpen(true)
   }
 
   if (loading) {
@@ -109,181 +110,169 @@ export function ProjectDeliverablesSimple({ projectId }: ProjectDeliverablesSimp
     )
   }
 
+  const allTasksCount = deliverables.reduce((count, d) => {
+    return count + 1 + (d.items?.length || 0)
+  }, 0)
+
+  const completedTasksCount = deliverables.reduce((count, d) => {
+    const deliverableCompleted = d.status === 'completed' ? 1 : 0
+    const itemsCompleted = d.items?.filter(item => item.completed).length || 0
+    return count + deliverableCompleted + itemsCompleted
+  }, 0)
+
   return (
     <>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <CheckCircle className="h-5 w-5" />
-            Livrables ({deliverables.length})
-          </CardTitle>
-          <Button onClick={() => setIsAddDeliverableOpen(true)} size="sm">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <CheckCircle className="h-5 w-5" />
+              Liste des livrables
+            </CardTitle>
+            {allTasksCount > 0 && (
+              <p className="text-sm text-muted-foreground mt-1">
+                {completedTasksCount} / {allTasksCount} tâches complétées
+              </p>
+            )}
+          </div>
+          <Button onClick={openAddTask} size="sm">
             <Plus className="h-4 w-4 mr-2" />
-            Nouveau livrable
+            Ajouter une tâche
           </Button>
         </CardHeader>
         <CardContent>
           {deliverables.length === 0 ? (
             <div className="text-center py-12">
               <CheckCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <p className="text-muted-foreground mb-4">Aucun livrable pour ce projet</p>
-              <Button variant="outline" onClick={() => setIsAddDeliverableOpen(true)}>
+              <p className="text-muted-foreground mb-4">Aucune tâche pour ce projet</p>
+              <Button variant="outline" onClick={openAddTask}>
                 <Plus className="h-4 w-4 mr-2" />
-                Créer le premier livrable
+                Créer la première tâche
               </Button>
             </div>
           ) : (
-            <div className="space-y-6">
-              {deliverables.map((deliverable) => {
-                const stats = getCompletionStats(deliverable)
-
-                return (
-                  <div key={deliverable.id} className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-semibold text-lg">{deliverable.name}</h3>
-                        {stats && (
-                          <p className="text-sm text-muted-foreground">
-                            {stats.completed} / {stats.total} complété
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setSelectedDeliverableId(deliverable.id)
-                            setIsAddItemOpen(true)
-                          }}
-                        >
-                          <Plus className="h-4 w-4 mr-1" />
-                          Ajouter
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => deleteDeliverable(deliverable.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-
-                    {deliverable.items && deliverable.items.length > 0 ? (
-                      <div className="space-y-2 pl-4 border-l-2 border-muted">
-                        {deliverable.items.map((item) => (
-                          <div
-                            key={item.id}
-                            className="flex items-center gap-3 p-2 rounded hover:bg-accent/50 group"
-                          >
-                            <Checkbox
-                              checked={item.completed}
-                              onCheckedChange={() =>
-                                handleToggleItem(item.id, deliverable.id, item.completed)
-                              }
-                            />
-                            <span
-                              className={`flex-1 ${
-                                item.completed ? 'line-through text-muted-foreground' : ''
-                              }`}
-                            >
-                              {item.name}
-                            </span>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                              onClick={() => deleteItem(item.id, deliverable.id)}
-                            >
-                              <Trash2 className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-sm text-muted-foreground pl-4">
-                        Aucune tâche. Cliquez sur &quot;Ajouter&quot; pour créer une tâche.
-                      </p>
-                    )}
+            <div className="space-y-2">
+              {deliverables.map((deliverable) => (
+                <div key={deliverable.id} className="space-y-1">
+                  {/* Tâche principale */}
+                  <div className="flex items-center gap-2 p-2 rounded hover:bg-accent/50 group">
+                    <Checkbox
+                      checked={deliverable.status === 'completed'}
+                      onCheckedChange={() => handleToggleDeliverable(deliverable.id, deliverable.status)}
+                    />
+                    <span
+                      className={`flex-1 font-medium ${
+                        deliverable.status === 'completed' ? 'line-through text-muted-foreground' : ''
+                      }`}
+                    >
+                      {deliverable.name}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="opacity-0 group-hover:opacity-100 transition-opacity h-8 text-xs"
+                      onClick={() => openAddSubtask(deliverable.id)}
+                    >
+                      <Plus className="h-3 w-3 mr-1" />
+                      Sous-tâche
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() => deleteDeliverable(deliverable.id)}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
                   </div>
-                )
-              })}
+
+                  {/* Sous-tâches */}
+                  {deliverable.items && deliverable.items.length > 0 && (
+                    <div className="ml-8 space-y-1">
+                      {deliverable.items.map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex items-center gap-2 p-2 rounded hover:bg-accent/50 group"
+                        >
+                          <ChevronRight className="h-3 w-3 text-muted-foreground" />
+                          <Checkbox
+                            checked={item.completed}
+                            onCheckedChange={() =>
+                              toggleItemCompletion(item.id, deliverable.id, !item.completed)
+                            }
+                          />
+                          <span
+                            className={`flex-1 ${
+                              item.completed ? 'line-through text-muted-foreground' : ''
+                            }`}
+                          >
+                            {item.name}
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={() => deleteItem(item.id, deliverable.id)}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           )}
         </CardContent>
       </Card>
 
-      {/* Dialog Ajouter un livrable */}
-      <Dialog open={isAddDeliverableOpen} onOpenChange={setIsAddDeliverableOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Nouveau livrable</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="deliverable_name">Nom du livrable</Label>
-              <Input
-                id="deliverable_name"
-                value={newDeliverableName}
-                onChange={(e) => setNewDeliverableName(e.target.value)}
-                placeholder="Ex: Documentation technique"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault()
-                    handleAddDeliverable()
-                  }
-                }}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsAddDeliverableOpen(false)}
-              disabled={saving}
-            >
-              Annuler
-            </Button>
-            <Button onClick={handleAddDeliverable} disabled={saving || !newDeliverableName.trim()}>
-              {saving ? 'Création...' : 'Créer'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
       {/* Dialog Ajouter une tâche */}
-      <Dialog open={isAddItemOpen} onOpenChange={setIsAddItemOpen}>
+      <Dialog open={isAddTaskOpen} onOpenChange={setIsAddTaskOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Nouvelle tâche</DialogTitle>
+            <DialogTitle>
+              {isSubtask ? 'Nouvelle sous-tâche' : 'Nouvelle tâche'}
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="item_name">Nom de la tâche</Label>
+              <Label htmlFor="task_name">
+                Nom de la {isSubtask ? 'sous-tâche' : 'tâche'}
+              </Label>
               <Input
-                id="item_name"
-                value={newItemName}
-                onChange={(e) => setNewItemName(e.target.value)}
-                placeholder="Ex: Rédiger le guide utilisateur"
+                id="task_name"
+                value={newTaskName}
+                onChange={(e) => setNewTaskName(e.target.value)}
+                placeholder={
+                  isSubtask
+                    ? 'Ex: Rédiger le guide utilisateur'
+                    : 'Ex: Documentation technique'
+                }
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault()
-                    handleAddItem()
+                    handleAddTask()
                   }
                 }}
+                autoFocus
               />
             </div>
           </div>
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setIsAddItemOpen(false)}
+              onClick={() => {
+                setIsAddTaskOpen(false)
+                setNewTaskName('')
+                setIsSubtask(false)
+                setParentDeliverableId(null)
+              }}
               disabled={saving}
             >
               Annuler
             </Button>
-            <Button onClick={handleAddItem} disabled={saving || !newItemName.trim()}>
+            <Button onClick={handleAddTask} disabled={saving || !newTaskName.trim()}>
               {saving ? 'Ajout...' : 'Ajouter'}
             </Button>
           </DialogFooter>
