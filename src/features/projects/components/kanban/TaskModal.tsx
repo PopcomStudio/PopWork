@@ -45,6 +45,10 @@ import { AttachmentCard } from '../attachments/AttachmentCard';
 import { FileUploader } from '../attachments/FileUploader';
 import { useTaskComments } from '../../hooks/useTaskComments';
 import { useTaskAttachments } from '../../hooks/useTaskAttachments';
+import { useProjectFiles, type ProjectFile } from '../../hooks/use-project-files';
+import { Download, Trash2, FileText, Image as ImageIcon, File as FileIcon, Video, Music, Archive } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import Image from 'next/image';
 
 interface TaskModalProps {
   task?: TaskExtended; // Optionnel pour gérer les cas où task peut être undefined
@@ -54,6 +58,25 @@ interface TaskModalProps {
   projectId: string;
 }
 
+
+// Fonction helper pour obtenir l'icône selon le type de fichier
+function getFileIcon(fileType: string) {
+  if (fileType.startsWith('image/')) return <ImageIcon className="h-4 w-4" />
+  if (fileType.startsWith('video/')) return <Video className="h-4 w-4" />
+  if (fileType.startsWith('audio/')) return <Music className="h-4 w-4" />
+  if (fileType.includes('pdf') || fileType.includes('document')) return <FileText className="h-4 w-4" />
+  if (fileType.includes('zip') || fileType.includes('rar') || fileType.includes('tar')) return <Archive className="h-4 w-4" />
+  return <FileIcon className="h-4 w-4" />
+}
+
+// Fonction helper pour formater la taille
+function formatFileSize(bytes: number): string {
+  if (bytes === 0) return '0 B'
+  const k = 1024
+  const sizes = ['B', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`
+}
 
 export function TaskModal({ task, isOpen, onClose, updateTask, projectId }: TaskModalProps) {
   const [formData, setFormData] = useState({
@@ -97,6 +120,20 @@ export function TaskModal({ task, isOpen, onClose, updateTask, projectId }: Task
     previewAttachment,
     commentOnAttachment
   } = useTaskAttachments(task?.id || '');
+
+  // Hook pour les fichiers de projet
+  const {
+    files: projectFiles,
+    loading: projectFilesLoading,
+    downloadFile: downloadProjectFile,
+    deleteFile: deleteProjectFile,
+    getFileUrl: getProjectFileUrl,
+  } = useProjectFiles(projectId);
+
+  // Filtrer les fichiers de projet assignés à cette tâche
+  const taskProjectFiles = useMemo(() => {
+    return projectFiles.filter(file => file.task_id === task?.id);
+  }, [projectFiles, task?.id]);
 
   const supabase = createClientComponentClient();
 
@@ -469,8 +506,8 @@ export function TaskModal({ task, isOpen, onClose, updateTask, projectId }: Task
                         Discussion ({comments?.length || 0})
                       </TabsTrigger>
                       <TabsTrigger value="attachments" className="flex items-center gap-2">
-                        <Paperclip className="h-4 w-4" />
-                        Pièces jointes ({attachments?.length || 0})
+                        <FileIcon className="h-4 w-4" />
+                        Fichiers ({taskProjectFiles.length})
                       </TabsTrigger>
                     </TabsList>
 
@@ -532,45 +569,81 @@ export function TaskModal({ task, isOpen, onClose, updateTask, projectId }: Task
                     </TabsContent>
 
                     <TabsContent value="attachments" className="mt-4 flex flex-col h-96">
-                      {attachmentsLoading ? (
+                      {projectFilesLoading ? (
                         <div className="flex-1 flex items-center justify-center">
                           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                         </div>
                       ) : (
-                        <>
-                          <div className="mb-4">
-                            <FileUploader
-                              onFilesSelected={handleUploadFiles}
-                              uploading={attachmentsLoading}
-                              accept="*/*"
-                              multiple={true}
-                              maxSize={50}
-                            />
-                          </div>
-                          
-                          <div className="flex-1 overflow-y-auto">
-                            {(attachments?.length || 0) === 0 ? (
-                              <div className="text-center text-gray-500 py-8">
-                                <Paperclip className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                                <p>Aucune pièce jointe pour le moment</p>
-                              </div>
-                            ) : (
-                              <div className="grid grid-cols-1 gap-4">
-                                {(attachments || []).map((attachment) => (
-                                  <AttachmentCard
-                                    key={attachment.id}
-                                    attachment={attachment}
-                                    currentUserId={currentUserId}
-                                    onDownload={() => downloadAttachment(attachment.id)}
-                                    onDelete={() => deleteAttachment(attachment.id)}
-                                    onPreview={() => previewAttachment(attachment.id)}
-                                    onComment={() => commentOnAttachment(attachment.id)}
-                                  />
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        </>
+                        <div className="flex-1 overflow-y-auto">
+                          {taskProjectFiles.length === 0 ? (
+                            <div className="text-center text-gray-500 py-8">
+                              <FileIcon className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                              <p>Aucun fichier assigné à cette tâche</p>
+                              <p className="text-sm text-muted-foreground mt-2">
+                                Assignez des fichiers à cette tâche depuis l&apos;onglet Fichiers du projet
+                              </p>
+                            </div>
+                          ) : (
+                            <div className="space-y-2">
+                              {taskProjectFiles.map((file) => (
+                                <Card key={file.id} className="hover:bg-accent/50 transition-colors">
+                                  <CardContent className="p-3">
+                                    <div className="flex items-start gap-3">
+                                      {/* Prévisualisation ou icône du fichier */}
+                                      {file.file_type.startsWith('image/') ? (
+                                        <div className="flex-shrink-0 h-12 w-12 rounded-lg overflow-hidden bg-gray-100 relative">
+                                          <Image
+                                            src={getProjectFileUrl(file) || ''}
+                                            alt={file.file_name}
+                                            fill
+                                            className="object-cover"
+                                            sizes="48px"
+                                          />
+                                        </div>
+                                      ) : (
+                                        <div className="flex-shrink-0 h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                                          {getFileIcon(file.file_type)}
+                                        </div>
+                                      )}
+
+                                      {/* Informations du fichier */}
+                                      <div className="flex-1 min-w-0">
+                                        <div className="flex items-start justify-between gap-2">
+                                          <div className="flex-1 min-w-0">
+                                            <h5 className="font-medium text-sm truncate">{file.file_name}</h5>
+                                            <p className="text-xs text-muted-foreground">
+                                              {formatFileSize(file.file_size)}
+                                              {file.uploader && ` • Par ${file.uploader.first_name} ${file.uploader.last_name}`}
+                                            </p>
+                                          </div>
+
+                                          {/* Actions */}
+                                          <div className="flex items-center gap-1">
+                                            <Button
+                                              variant="ghost"
+                                              size="sm"
+                                              onClick={() => downloadProjectFile(file)}
+                                              title="Télécharger"
+                                            >
+                                              <Download className="h-3 w-3" />
+                                            </Button>
+                                          </div>
+                                        </div>
+
+                                        {/* Description */}
+                                        {file.description && (
+                                          <p className="text-xs text-muted-foreground mt-1">
+                                            {file.description}
+                                          </p>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                       )}
                     </TabsContent>
                   </Tabs>

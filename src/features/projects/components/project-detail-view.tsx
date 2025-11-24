@@ -49,6 +49,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Checkbox } from '@/components/ui/checkbox'
 import { KanbanBoard } from './kanban/KanbanBoard'
 import { ProjectGanttView } from './project-gantt-view'
+import { ProjectCalendarView } from './project-calendar-view'
+import { ProjectFilesManager } from './project-files-manager'
 
 interface ProjectDetailViewProps {
   projectId: string
@@ -535,30 +537,12 @@ export function ProjectDetailView({ projectId }: ProjectDetailViewProps) {
 
           {/* Onglet Calendrier */}
           <TabsContent value="calendar" className="space-y-6 mt-6">
-            <div className="flex items-center gap-2 mb-6">
-              <Calendar className="h-5 w-5" />
-              <h2 className="text-xl font-semibold">Calendrier du projet</h2>
-            </div>
-            
-            <div className="text-center py-16">
-              <Calendar className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <p className="text-muted-foreground mb-2">Vue calendrier en cours de développement</p>
-              <p className="text-sm text-muted-foreground">Ici s&apos;affichera le planning des tâches et échéances</p>
-            </div>
+            <ProjectCalendarView projectId={projectId} />
           </TabsContent>
 
           {/* Onglet Fichiers */}
           <TabsContent value="files" className="space-y-6 mt-6">
-            <div className="flex items-center gap-2 mb-6">
-              <Folder className="h-5 w-5" />
-              <h2 className="text-xl font-semibold">Documents et fichiers</h2>
-            </div>
-            
-            <div className="text-center py-16">
-              <Folder className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <p className="text-muted-foreground mb-2">Gestion des fichiers en cours de développement</p>
-              <p className="text-sm text-muted-foreground">Ici s&apos;affichera l&apos;espace de stockage des documents projet</p>
-            </div>
+            <ProjectFilesManager projectId={projectId} />
           </TabsContent>
                      {/* Onglet Administration */}
            <TabsContent value="administration" className="space-y-6 mt-6">
