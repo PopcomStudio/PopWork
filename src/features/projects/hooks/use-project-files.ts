@@ -14,6 +14,7 @@ export interface ProjectFile {
   storage_path: string
   uploaded_by: string
   description: string | null
+  document_type?: string | null
   created_at: string
   updated_at: string
   uploader?: {
@@ -33,6 +34,7 @@ export interface UploadFileData {
   project_id: string
   task_id?: string
   description?: string
+  document_type?: string
 }
 
 const BUCKET_NAME = 'project-files'
@@ -114,7 +116,7 @@ export function useProjectFiles(projectId: string) {
   }, [projectId, supabase, generateSignedUrls])
 
   // Uploader un fichier
-  const uploadFile = useCallback(async ({ file, project_id, task_id, description }: UploadFileData) => {
+  const uploadFile = useCallback(async ({ file, project_id, task_id, description, document_type }: UploadFileData) => {
     try {
       setUploading(true)
       setError(null)
@@ -150,6 +152,7 @@ export function useProjectFiles(projectId: string) {
           storage_path: storagePath,
           uploaded_by: user.id,
           description: description || null,
+          document_type: document_type || null,
         })
         .select(`
           *,
