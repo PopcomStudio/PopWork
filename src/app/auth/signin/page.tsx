@@ -13,6 +13,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2, LogIn } from 'lucide-react'
 import { toast } from 'sonner'
+import Link from 'next/link'
 
 const signInSchema = z.object({
   email: z.string().email("Email invalide"),
@@ -52,7 +53,7 @@ export default function SignInPage() {
 
       toast.success('Connexion réussie!')
       router.push('/dashboard')
-    } catch (err) {
+    } catch {
       setError('Une erreur est survenue lors de la connexion')
     } finally {
       setIsLoading(false)
@@ -91,7 +92,15 @@ export default function SignInPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Mot de passe</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Mot de passe</Label>
+                <Link
+                  href="/auth/forgot-password"
+                  className="text-sm text-primary hover:underline"
+                >
+                  Mot de passe oublié ?
+                </Link>
+              </div>
               <Input
                 id="password"
                 type="password"
