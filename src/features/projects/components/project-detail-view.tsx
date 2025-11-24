@@ -51,8 +51,7 @@ import { KanbanBoard } from './kanban/KanbanBoard'
 import { ProjectGanttView } from './project-gantt-view'
 import { ProjectCalendarView } from './project-calendar-view'
 import { ProjectFilesManager } from './project-files-manager'
-import { ProjectContracts } from './administration/project-contracts'
-import { ProjectQuotes } from './administration/project-quotes'
+import { ProjectDocuments } from './administration/project-documents'
 import { ProjectDeliverables } from './administration/project-deliverables'
 
 interface ProjectDetailViewProps {
@@ -555,8 +554,7 @@ export function ProjectDetailView({ projectId }: ProjectDetailViewProps) {
             </div>
 
             <div className="space-y-6">
-              <ProjectContracts projectId={projectId} />
-              <ProjectQuotes projectId={projectId} />
+              <ProjectDocuments projectId={projectId} />
               <ProjectDeliverables projectId={projectId} />
             </div>
           </TabsContent>
