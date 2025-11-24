@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from 'react'
-import { CheckCircle, Plus, Trash2, ChevronRight } from 'lucide-react'
+import { CheckCircle, Plus, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -194,7 +194,6 @@ export function ProjectDeliverablesSimple({ projectId }: ProjectDeliverablesSimp
                           key={item.id}
                           className="flex items-center gap-2 p-2 rounded hover:bg-accent/50 group"
                         >
-                          <ChevronRight className="h-3 w-3 text-muted-foreground" />
                           <Checkbox
                             checked={item.completed}
                             onCheckedChange={() =>
