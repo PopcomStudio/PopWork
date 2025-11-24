@@ -52,7 +52,7 @@ import { ProjectGanttView } from './project-gantt-view'
 import { ProjectCalendarView } from './project-calendar-view'
 import { ProjectFilesManager } from './project-files-manager'
 import { ProjectDocuments } from './administration/project-documents'
-import { ProjectDeliverables } from './administration/project-deliverables'
+import { ProjectDeliverablesSimple } from './administration/project-deliverables-simple'
 
 interface ProjectDetailViewProps {
   projectId: string
@@ -555,7 +555,7 @@ export function ProjectDetailView({ projectId }: ProjectDetailViewProps) {
 
             <div className="space-y-6">
               <ProjectDocuments projectId={projectId} />
-              <ProjectDeliverables projectId={projectId} />
+              <ProjectDeliverablesSimple projectId={projectId} />
             </div>
           </TabsContent>
         </Tabs>
