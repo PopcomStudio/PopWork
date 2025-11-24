@@ -1,8 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
+import Link from "next/link"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -30,6 +31,38 @@ export function LoginForm({
   const [error, setError] = useState<string | null>(null)
 
   const router = useRouter()
+
+  // Gérer les erreurs dans l'URL et la récupération de mot de passe
+  useEffect(() => {
+    const hashParams = new URLSearchParams(window.location.hash.substring(1))
+    const errorCode = hashParams.get('error_code')
+    const errorDescription = hashParams.get('error_description')
+    const type = hashParams.get('type')
+
+    // Si c'est un lien de récupération de mot de passe, rediriger vers la page appropriée
+    if (type === 'recovery') {
+      router.push('/auth/reset-password' + window.location.hash)
+      return
+    }
+
+    // Gérer les erreurs
+    if (errorCode === 'otp_expired' || errorDescription?.includes('expired')) {
+      setError('Le lien de réinitialisation a expiré. Veuillez en demander un nouveau.')
+      // Nettoyer l'URL
+      window.history.replaceState(null, '', window.location.pathname)
+    }
+
+    // Écouter l'événement PASSWORD_RECOVERY de Supabase
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event) => {
+        if (event === 'PASSWORD_RECOVERY') {
+          router.push('/auth/reset-password')
+        }
+      }
+    )
+
+    return () => subscription.unsubscribe()
+  }, [router])
 
   const {
     register,
@@ -114,17 +147,13 @@ export function LoginForm({
               <div className="grid gap-3">
                 <div className="flex items-center">
                   <Label htmlFor="password">Mot de passe</Label>
-                  <button
-                    type="button"
+                  <Link
+                    href="/auth/forgot-password"
                     className="ml-auto text-sm underline-offset-2 hover:underline focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 rounded"
-                    onClick={() => {
-                      // TODO: Implémenter reset password
-                      setError("Fonctionnalité de récupération bientôt disponible")
-                    }}
                     aria-label="Récupérer le mot de passe oublié"
                   >
                     Mot de passe oublié ?
-                  </button>
+                  </Link>
                 </div>
                 <Input 
                   id="password" 
