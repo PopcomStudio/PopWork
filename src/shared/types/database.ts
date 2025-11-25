@@ -85,10 +85,14 @@ export interface TaskAssignee {
   assignedAt: string
 }
 
+// Re-export project member types
+export type { ProjectMemberRole } from '@/features/projects/types/project-members'
+
 export interface ProjectAssignee {
   id: string
   projectId: string
   userId: string
+  role: 'project_manager' | 'developer' | 'designer' | 'integrator' | 'tester' | 'consultant' | 'observer'
   assignedAt: string
 }
 

@@ -29,6 +29,9 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { useProjects, type Project } from '../hooks/use-projects'
 import { useRolesPermissions, type UserWithRole } from '../../auth/hooks/use-roles-permissions'
+import { useProjectMembers } from '../hooks/use-project-members'
+import { ProjectMembersTable } from './project-members-table'
+import type { ProjectMemberRole } from '../types/project-members'
 import {
   Dialog,
   DialogContent,
@@ -73,6 +76,14 @@ export function ProjectDetailView({ projectId }: ProjectDetailViewProps) {
   const router = useRouter()
   const { projects, loading, error, updateProject, fetchProjectAssignees, saveProjectAssignees } = useProjects()
   const { fetchAllUsers } = useRolesPermissions()
+  const {
+    members: projectMembers,
+    availableUsers: availableProjectUsers,
+    loading: membersLoading,
+    addProjectMember,
+    updateProjectMemberRole,
+    removeProjectMember,
+  } = useProjectMembers(projectId)
   const [project, setProject] = useState<Project | null>(null)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [assignedMembers, setAssignedMembers] = useState<TeamMember[]>([])
@@ -232,6 +243,19 @@ export function ProjectDetailView({ projectId }: ProjectDetailViewProps) {
       console.error('Erreur lors de la sauvegarde des assignations:', error)
       throw error
     }
+  }
+
+  // Handlers pour la nouvelle table de membres
+  const handleAddMember = async (userId: string, role: ProjectMemberRole) => {
+    await addProjectMember({ projectId, userId, role })
+  }
+
+  const handleUpdateMemberRole = async (memberId: string, role: ProjectMemberRole) => {
+    await updateProjectMemberRole(memberId, role)
+  }
+
+  const handleRemoveMember = async (memberId: string) => {
+    await removeProjectMember(memberId)
   }
 
   const getStatusInfo = (status: string) => {
@@ -485,46 +509,17 @@ export function ProjectDetailView({ projectId }: ProjectDetailViewProps) {
           <TabsContent value="members" className="space-y-6 mt-6">
             <div className="flex items-center gap-2 mb-6">
               <Users className="h-5 w-5" />
-              <h2 className="text-xl font-semibold">Équipe assignée ({assignedMembers.length})</h2>
+              <h2 className="text-xl font-semibold">Equipe du projet ({projectMembers.length})</h2>
             </div>
-            
-            {assignedMembers.length === 0 ? (
-              <div className="text-center py-16">
-                <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">Aucun membre assigné à ce projet</p>
-                <Button variant="outline" onClick={handleEditClick} className="mt-4">
-                  <Edit className="h-4 w-4 mr-2" />
-                  Assigner des membres
-                </Button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {assignedMembers.map((member) => {
-                  const initials = member.name
-                    .split(' ')
-                    .map(n => n.charAt(0))
-                    .join('')
-                    .toUpperCase()
-                  
-                  return (
-                    <Card key={member.id} className="p-4">
-                      <div className="flex items-center gap-3">
-                        <Avatar>
-                          <AvatarFallback className="bg-primary/10 text-primary">
-                            {initials}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1">
-                          <div className="font-medium">{member.name}</div>
-                          <div className="text-sm text-muted-foreground">{member.role}</div>
-                          <div className="text-xs text-muted-foreground">{member.email}</div>
-                        </div>
-                      </div>
-                    </Card>
-                  )
-                })}
-              </div>
-            )}
+
+            <ProjectMembersTable
+              members={projectMembers}
+              availableUsers={availableProjectUsers}
+              loading={membersLoading}
+              onAddMember={handleAddMember}
+              onUpdateRole={handleUpdateMemberRole}
+              onRemoveMember={handleRemoveMember}
+            />
           </TabsContent>
 
           {/* Onglet Kanban */}
