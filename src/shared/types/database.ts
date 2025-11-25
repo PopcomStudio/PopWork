@@ -61,6 +61,8 @@ export interface Project {
   status: 'draft' | 'active' | 'completed' | 'archived'
   companyId: string
   serviceId: string
+  startDate?: string
+  endDate?: string
   createdAt: string
   updatedAt: string
 }
