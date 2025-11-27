@@ -23,6 +23,7 @@ import { useTranslation } from "@/features/translation/hooks/use-translation"
 import { NavDocuments } from "@/components/nav-documents"
 import { NavMain } from "@/components/nav-main"
 import { NavUser } from "@/components/nav-user"
+import { SidebarTimer } from "@/features/time-tracking/components/SidebarTimer"
 import {
   Sidebar,
   SidebarContent,
@@ -144,6 +145,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavDocuments items={getStaticData(t).documents} title={t("navigation.resources")} showActions={false} />
       </SidebarContent>
       <SidebarFooter>
+        <SidebarTimer />
         {!loading && <NavUser user={userData} />}
       </SidebarFooter>
     </Sidebar>

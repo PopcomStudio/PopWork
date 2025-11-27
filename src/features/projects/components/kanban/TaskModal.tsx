@@ -31,7 +31,8 @@ import {
   Flag,
   MessageSquare,
   Paperclip,
-  Plus
+  Plus,
+  Clock
 } from 'lucide-react';
 import { Calendar } from "@/components/ui/calendar-rac";
 import { CalendarDate, getLocalTimeZone, parseDate } from "@internationalized/date";
@@ -41,6 +42,7 @@ import { cn } from "@/lib/utils";
 import { createClientComponentClient } from '@/lib/supabase';
 import { CommentItem } from '../discussion/CommentItem';
 import { CommentEditor } from '../discussion/CommentEditor';
+import { TaskTimer } from '@/features/time-tracking/components/TaskTimer';
 import { AttachmentCard } from '../attachments/AttachmentCard';
 import { FileUploader } from '../attachments/FileUploader';
 import { useTaskComments } from '../../hooks/useTaskComments';
@@ -854,6 +856,20 @@ export function TaskModal({ task, isOpen, onClose, updateTask, projectId }: Task
                     ))}
                   </div>
                 </div>
+
+                {/* Time Tracking */}
+                {task && (
+                  <>
+                    <Separator />
+                    <div className="space-y-3">
+                      <Label className="text-sm font-medium flex items-center gap-2">
+                        <Clock className="h-4 w-4" />
+                        Temps de travail
+                      </Label>
+                      <TaskTimer taskId={task.id} showTotal />
+                    </div>
+                  </>
+                )}
 
                 {/* Créé par (si tâche existante) */}
                 {task && task.createdAt && (
