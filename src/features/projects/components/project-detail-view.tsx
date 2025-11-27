@@ -56,6 +56,7 @@ import { ProjectCalendarView } from './project-calendar-view'
 import { ProjectFilesManager } from './project-files-manager'
 import { ProjectDocuments } from './administration/project-documents'
 import { ProjectDeliverablesSimple } from './administration/project-deliverables-simple'
+import { ProjectOverviewTab } from './overview'
 
 interface ProjectDetailViewProps {
   projectId: string
@@ -87,6 +88,7 @@ export function ProjectDetailView({ projectId }: ProjectDetailViewProps) {
   const [project, setProject] = useState<Project | null>(null)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [assignedMembers, setAssignedMembers] = useState<TeamMember[]>([])
+  const [activeTab, setActiveTab] = useState('information')
   
   // États pour l'édition
   const [editForm, setEditForm] = useState({
@@ -369,7 +371,7 @@ export function ProjectDetailView({ projectId }: ProjectDetailViewProps) {
         </div>
 
         {/* Onglets de navigation du projet */}
-        <Tabs defaultValue="information" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid grid-cols-7">
             <TabsTrigger value="information" className="flex items-center gap-2">
               <Info className="h-4 w-4" />
@@ -403,106 +405,10 @@ export function ProjectDetailView({ projectId }: ProjectDetailViewProps) {
 
           {/* Onglet Information */}
           <TabsContent value="information" className="space-y-6 mt-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Colonne principale */}
-              <div className="lg:col-span-2 space-y-6">
-                {/* Informations générales */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <FileText className="h-5 w-5" />
-                      Informations générales
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-muted-foreground">Entreprise</label>
-                        <div className="flex items-center gap-2">
-                          <Building className="h-4 w-4 text-muted-foreground" />
-                          <span>{project.company_name}</span>
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-muted-foreground">Service</label>
-                        <Badge variant="secondary">{project.service_name}</Badge>
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-muted-foreground">Créé le</label>
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4 text-muted-foreground" />
-                          <span>{new Date(project.created_at).toLocaleDateString('fr-FR')}</span>
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-muted-foreground">Dernière modification</label>
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4 text-muted-foreground" />
-                          <span>{new Date(project.updated_at).toLocaleDateString('fr-FR')}</span>
-                        </div>
-                      </div>
-                    </div>
-                    {project.description && (
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-muted-foreground">Description</label>
-                        <p className="text-sm leading-relaxed">{project.description}</p>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-
-                {/* Progression */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <ListChecks className="h-5 w-5" />
-                      Progression du projet
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-1">
-                        <div className="text-2xl font-bold">{percentage}%</div>
-                        <div className="text-sm text-muted-foreground">
-                          {project.completed_tasks} sur {project.task_count} tâches terminées
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-sm text-muted-foreground">Tâches restantes</div>
-                        <div className="text-xl font-semibold">
-                          {project.task_count - project.completed_tasks}
-                        </div>
-                      </div>
-                    </div>
-                    <Progress value={percentage} className="h-3" />
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Sidebar */}
-              <div className="space-y-6">
-                {/* Actions rapides */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Actions rapides</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    <Button variant="outline" size="sm" className="w-full justify-start">
-                      <ListChecks className="h-4 w-4 mr-2" />
-                      Voir les tâches
-                    </Button>
-                    <Button variant="outline" size="sm" className="w-full justify-start">
-                      <Calendar className="h-4 w-4 mr-2" />
-                      Planning
-                    </Button>
-                    <Button variant="outline" size="sm" className="w-full justify-start">
-                      <FileText className="h-4 w-4 mr-2" />
-                      Documents
-                    </Button>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
+            <ProjectOverviewTab
+              projectId={projectId}
+              onTabChange={setActiveTab}
+            />
           </TabsContent>
 
           {/* Onglet Membres */}

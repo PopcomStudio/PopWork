@@ -14,6 +14,8 @@ export interface Project {
   service_name: string
   task_count: number
   completed_tasks: number
+  start_date: string | null
+  end_date: string | null
   created_at: string
   updated_at: string
 }
@@ -24,6 +26,8 @@ export interface CreateProjectData {
   status: 'draft' | 'active' | 'completed' | 'archived'
   company_id: string
   service_id: string
+  start_date?: string
+  end_date?: string
 }
 
 export interface UpdateProjectData extends CreateProjectData {
@@ -51,6 +55,8 @@ interface SupabaseProject {
   status: 'draft' | 'active' | 'completed' | 'archived'
   company_id: string
   service_id: string
+  start_date: string | null
+  end_date: string | null
   created_at: string
   updated_at: string
   companies: SupabaseCompany | SupabaseCompany[]
@@ -78,6 +84,8 @@ export function useProjects() {
           status,
           company_id,
           service_id,
+          start_date,
+          end_date,
           created_at,
           updated_at,
           companies!inner(name),
@@ -108,6 +116,8 @@ export function useProjects() {
           service_name: service?.name || '',
           task_count: tasks.length,
           completed_tasks: completedTasks,
+          start_date: project.start_date,
+          end_date: project.end_date,
           created_at: project.created_at,
           updated_at: project.updated_at,
         }
@@ -134,6 +144,8 @@ export function useProjects() {
           status: projectData.status,
           company_id: projectData.company_id,
           service_id: projectData.service_id,
+          start_date: projectData.start_date || null,
+          end_date: projectData.end_date || null,
         }])
         .select(`
           id,
@@ -142,6 +154,8 @@ export function useProjects() {
           status,
           company_id,
           service_id,
+          start_date,
+          end_date,
           created_at,
           updated_at,
           companies!inner(name),
@@ -166,6 +180,8 @@ export function useProjects() {
         service_name: service?.name || '',
         task_count: 0,
         completed_tasks: 0,
+        start_date: data.start_date,
+        end_date: data.end_date,
         created_at: data.created_at,
         updated_at: data.updated_at,
       }
@@ -190,6 +206,8 @@ export function useProjects() {
           status: projectData.status,
           company_id: projectData.company_id,
           service_id: projectData.service_id,
+          start_date: projectData.start_date || null,
+          end_date: projectData.end_date || null,
         })
         .eq('id', projectData.id)
         .select(`
@@ -199,6 +217,8 @@ export function useProjects() {
           status,
           company_id,
           service_id,
+          start_date,
+          end_date,
           created_at,
           updated_at,
           companies!inner(name),
@@ -228,6 +248,8 @@ export function useProjects() {
         service_name: service?.name || '',
         task_count: tasks.length,
         completed_tasks: completedTasks,
+        start_date: data.start_date,
+        end_date: data.end_date,
         created_at: data.created_at,
         updated_at: data.updated_at,
       }
